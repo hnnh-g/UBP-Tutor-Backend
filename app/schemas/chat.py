@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 
 class TaskType(str, Enum):
-    TEXT_TUTORING = "text_tutoring"
+    TEXT_TUTORING = "question"
     MODEL_GENERATION = "model_generation"
     MODEL_EVALUATION = "model_evaluation"
     SUMMARY = "summary"

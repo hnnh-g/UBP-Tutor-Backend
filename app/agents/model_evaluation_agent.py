@@ -1,7 +1,7 @@
 import asyncio
 
 
-class ModelGenerationAgent:
+class ModelEvaluationAgent:
     async def generate_model(self, message):
         return f"Generated model based on: {message}"
 

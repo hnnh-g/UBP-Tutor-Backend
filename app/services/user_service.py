@@ -1,22 +1,22 @@
 from sqlalchemy.orm import Session
 
 from app.database.models import UserPreference
-from app.schemas.user import UserPreferencesUpdate
+from app.schemas.user import UserContext, UserPreferencesUpdate
 
 
-def _get_or_create(db: Session, current_user: dict) -> UserPreference:
+def _get_or_create(db: Session, current_user: UserContext) -> UserPreference:
     # if no user entry exits create one at first login and set to default preferences
     user = (
         db.query(UserPreference)
-        .filter(UserPreference.keycloak_user_id == current_user["sub"])
+        .filter(UserPreference.keycloak_user_id == current_user.sub)
         .first()
     )
 
     if not user:
         user = UserPreference(
-            keycloak_user_id=current_user["sub"],
-            email=current_user.get("email"),
-            username=current_user.get("preferred_username"),
+            keycloak_user_id=current_user.sub,
+            email=current_user.email,
+            username=current_user.preferred_username,
             # language, theme, default_task_type fall back to the column defaults
         )
         db.add(user)
@@ -26,12 +26,12 @@ def _get_or_create(db: Session, current_user: dict) -> UserPreference:
     return user
 
 
-def get_user_preferences(db: Session, current_user: dict) -> UserPreference:
+def get_user_preferences(db: Session, current_user: UserContext) -> UserPreference:
     return _get_or_create(db, current_user)
 
 
 def update_user_preferences(
-    db: Session, current_user: dict, preferences: UserPreferencesUpdate
+    db: Session, current_user: UserContext, preferences: UserPreferencesUpdate
 ) -> UserPreference:
     user = _get_or_create(db, current_user)
 

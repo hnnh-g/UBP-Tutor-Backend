@@ -1,10 +1,11 @@
 import json
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from schemas.chat import ChatRequest, ChatResponse
-from schemas.user import UserContext
-from core.security import get_current_user
-from orchestration.orchestrator import Orchestrator, OrchestrationRequest
+from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.user import UserContext
+from app.core.security import get_current_user
+from app.orchestration.orchestrator import Orchestrator
+from app.orchestration.models import OrchestrationRequest
 
 router = APIRouter(tags=["Chat"])
 
@@ -38,7 +39,7 @@ async def chat(
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
     
-@router.post("/stream")
+@router.post("/chat/stream")
 async def chat_stream(
     request: ChatRequest,
     user_context: UserContext = Depends(get_current_user),

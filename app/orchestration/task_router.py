@@ -1,5 +1,5 @@
-from schemas.chat import TaskType
-from orchestration.workflows import (
+from app.schemas.chat import TaskType
+from app.orchestration.workflows import (
     TextTutoringWorkflow,
     ModelGenerationWorkflow,
     ModelEvaluationWorkflow,

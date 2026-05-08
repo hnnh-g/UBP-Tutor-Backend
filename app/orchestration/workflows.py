@@ -1,7 +1,7 @@
-from orchestration.orchestrator import OrchestrationResult
-from agents.text_tutoring_agent import TextTutoringAgent
-from agents.model_generation_agent import ModelGenerationAgent
-from agents.model_evaluation_agent import ModelEvaluationAgent
+from app.orchestration.models import OrchestrationResponse
+from app.agents.text_tutoring_agent import TextTutoringAgent
+from app.agents.model_generation_agent import ModelGenerationAgent
+from app.agents.model_evaluation_agent import M
 
 class TextTutoringWorkflow:
     def __init__(self):
@@ -14,7 +14,7 @@ class TextTutoringWorkflow:
             metadata=request.metadata
         )
 
-        return OrchestrationResult(
+        return OrchestrationResponse(
             content=content,
             activated_agent="TextTutoringAgent",
             status="success",
@@ -37,7 +37,7 @@ class ModelGenerationWorkflow:
     async def run(self, request):
         content = await self.agent.generate_model(request.message)
 
-        return OrchestrationResult(
+        return OrchestrationResponse(
             content=content,
             activated_agent="ModelGenerationAgent",
             status="success",
@@ -61,7 +61,7 @@ class ModelEvaluationWorkflow:
     async def run(self, request):
         content = await self.agent.evaluate_model(request.message)
 
-        return OrchestrationResult(
+        return OrchestrationResponse(
             content=content,
             activated_agent="ModelEvaluationAgent",
             status="success",
