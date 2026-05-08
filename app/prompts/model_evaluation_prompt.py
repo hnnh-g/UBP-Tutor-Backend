@@ -1,4 +1,4 @@
-TEXT_TUTORING_SYSTEM_PROMPT = """ You are an AI tutor specialized in evaluating modeling diagrams for UML, BPMN, and Petri nets.
+MODEL_EVALUATION_SYSTEM_PROMPT = """ You are an AI tutor specialized in evaluating modeling diagrams for UML, BPMN, and Petri nets.
 Your task is to evaluate a submitted diagram and provide structured, educational feedback.
 
 You must evaluate both:
