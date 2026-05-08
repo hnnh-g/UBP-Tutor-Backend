@@ -3,6 +3,7 @@ import requests as http
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
+from schemas.user import UserContext
 
 from app.core.config import settings
 
@@ -29,7 +30,7 @@ def _get_jwks() -> dict:
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-) -> dict:
+) -> UserContext:
     token = credentials.credentials
     try:
         jwks = _get_jwks()
@@ -46,15 +47,19 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user_id: str | None = payload.get("sub")
+    user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token is missing subject claim",
         )
 
-    return {
-        "sub": user_id,
-        "email": payload.get("email"),
-        "preferred_username": payload.get("preferred_username"),
-    }
+    # Extract roles
+    roles = (payload.get("realm_access", {}).get("roles", []))
+
+    return UserContext(
+        sub=user_id,
+        email=payload.get("email"),
+        preferred_username=payload.get("preferred_username"),
+        roles=roles
+    )

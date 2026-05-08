@@ -19,3 +19,9 @@ class UserPreferencesUpdate(BaseModel):
     defaultTaskType: Literal[
         "generation", "evaluation", "question", "summary", "QAgeneration", "chat"
     ] | None = None
+
+class UserContext(BaseModel):
+    sub: str
+    email: Optional[str] = None
+    preferred_username: Optional[str] = None
+    roles: List[str] = []

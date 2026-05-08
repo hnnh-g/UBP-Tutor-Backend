@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.routers import chat
 from app.routers import user
 
 app = FastAPI(title="UBP Tutor Backend")
@@ -14,8 +14,15 @@ app.add_middleware(
 )
 
 app.include_router(user.router, prefix="/api")
+app.include_router(chat.router, prefix="/api")
 
 
 @app.get("/api/health")
-def health():
-    return {"status": "ok"}
+async def health():
+    return {
+        "status": "ok",
+        "components": {
+            "api": "reachable",
+            "orchestration": "reachable",
+        },
+    }
