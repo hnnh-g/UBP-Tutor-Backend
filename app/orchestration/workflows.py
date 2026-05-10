@@ -22,7 +22,11 @@ class TextTutoringWorkflow:
         )
     
     async def stream(self, request):
-        async for token in self.agent.stream_response(request.message):
+        async for token in self.agent.stream_response(
+            message=request.message,
+            user_context=request.user_context,
+            metadata=request.metadata,
+        ):
             yield {
                 "event": "token",
                 "data": token,

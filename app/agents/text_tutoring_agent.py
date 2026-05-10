@@ -1,44 +1,113 @@
-from app.llm.litellm_client import LiteLLMClient
+from google.adk.agents import LlmAgent
+from google.adk.agents.run_config import RunConfig, StreamingMode
+from google.adk.models.lite_llm import LiteLlm
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai import types
 from app.prompts.text_tutoring_prompt import TEXT_TUTORING_SYSTEM_PROMPT
-
 
 class TextTutoringAgent:
     def __init__(self):
-        self.llm = LiteLLMClient(
-        model="gpt-4o-mini",
-        temperature=0.0,        
+        self.app_name = "ubp_tutor"
+
+        # defines agent (mode and behavior)
+        self.adk_agent = LlmAgent(
+            name="text_tutoring_agent",
+            model=LiteLlm(model="openai/gpt-4o-mini"),
+            instruction=TEXT_TUTORING_SYSTEM_PROMPT,
+            generate_content_config=types.GenerateContentConfig(
+                temperature=0.0
+            )
         )
 
-    def build_response(self, message: str, rag_context: str | None = None,) -> list[dict]:
-        context = rag_context or "No retrieved context was provided."
+        # stores adk session (used to remember and organize interactions)
+        # TODO: replace with database-backend session for persistence
+        self.session_service = InMemorySessionService()
 
-        return [
-            {
-                "role": "system",
-                "content": TEXT_TUTORING_SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": f"""
-                Retrieved context: {context}
-                Student question: {message}
-                """,
-            },
-        ]
-
-    async def generate_response(self, message: str, user_context, metadata: dict, rag_context: str | None = None) -> str:
-        messages = self.build_response(
-            message=message,
-            rag_context=rag_context,
+        # executes agent
+        self.runner = Runner(
+            agent=self.adk_agent,
+            app_name=self.app_name,
+            session_service=self.session_service,
         )
-        return await self.llm.generate(messages)
 
-    async def stream_response(self, message: str, user_context=None, metadata: dict | None = None, rag_context: str | None = None):
+    def build_prompt(self, message: str, rag_context: str | None = None) -> str:
+        return f"""
+        Retrieved RAG context: {rag_context or "No retrieved context provided."}
+        Student question: {message}
+        """
+    
+    # create conversation session for tutor and student
+    async def ensure_session(self, user_id: str, session_id: str) -> None:
+        try:
+            await self.session_service.create_session(
+                app_name=self.app_name,
+                user_id=user_id,
+                session_id=session_id
+            )
+        except Exception:
+            # TODO: handle session that already exists
+            pass
+
+    async def generate_response(self, message: str, user_context, metadata: dict | None = None, rag_context: str | None = None) -> str:
+        user_id = getattr(user_context, "sub", "anonym")
+        session_id = (
+            metadata.get("session:id")
+            if metadata and metadata.get("session_id")
+            else "default"
+        )
+
+        await self.ensure_session(user_id, session_id)
+        prompt = self.build_prompt(message, rag_context)
+
+        # create structured message object
+        adk_message = types.Content(
+            role="user",
+            parts=[types.Part(text=prompt)]
+        )
+        final_text = ""
+
+        # Execution (run agent insides this session with the provided input)
+        async for event in self.runner.run_async(
+            user_id=user_id,
+            session_id=session_id,
+            new_message=adk_message
+        ):
+            # extract text from event
+            if event.content and event.content.parts:
+                for part in event.content.parts:
+                    if part.text:
+                        final_text += part.text
         
-        messages = self.build_response(
-            message=message,
-            rag_context=rag_context,
+        return final_text
+
+    async def stream_response(self, message: str, user_context, metadata: dict | None = None, rag_context: str | None = None):
+        user_id = getattr(user_context, "sub", "anonym")
+        session_id = (
+            metadata.get("session:id")
+            if metadata and metadata.get("session_id")
+            else "default"
         )
 
-        async for token in self.llm.stream(messages):
-            yield token
+        await self.ensure_session(user_id, session_id)
+        prompt = self.build_prompt(message, rag_context)
+
+        # create structured message object
+        adk_message = types.Content(
+            role="user",
+            parts=[types.Part(text=prompt)]
+        )
+
+        # Execution (run agent insides this session with the provided input)
+        async for event in self.runner.run_async(
+            user_id=user_id,
+            session_id=session_id,
+            new_message=adk_message,
+            run_config=RunConfig(streaming_mode=StreamingMode.SSE),
+        ):
+            # extract text from event
+            if event.content and event.content.parts:
+                for part in event.content.parts:
+                    if part.text:
+                        # text immediately send to frontend
+                        yield part.text
