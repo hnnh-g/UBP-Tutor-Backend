@@ -24,7 +24,7 @@ class TextTutoringAgent:
         self.adk_agent = SequentialAgent(
             name="text_tutoring_pipeline",
             sub_agents=[tutor_agent],
-            description="Executes a sequence of text tutoring task including RAG retrieval and generating an answer."
+            description="Executes a sequence of text tutoring task."
         )
 
         # stores adk session (used to remember and organize interactions)

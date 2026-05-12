@@ -1,4 +1,4 @@
-from google.adk.agents import LlmAgent
+from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.runners import Runner
@@ -12,14 +12,21 @@ class ModelEvaluationAgent:
     def __init__(self):
         self.app_name = "ubp_tutor"
 
-        # defines agent (mode and behavior)
-        self.adk_agent = LlmAgent(
+        # 1 defines agent (mode and behavior)
+        evaluator_agent = LlmAgent(
             name="model_evaluation_agent",
             model=LiteLlm(model="openai/gpt-4o-mini"),
             instruction=MODEL_EVALUATION_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
                 temperature=0.0
             ),
+        )
+
+        # 2 define sequential agent for deterministic workflow
+        self.adk_agent = SequentialAgent(
+            name="model_evaluation_pipeline",
+            sub_agents=[evaluator_agent],
+            description="Executes a sequence of diagram evaluation tasks."
         )
 
         # stores adk session (used to remember and organize interactions)
