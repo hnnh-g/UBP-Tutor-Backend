@@ -6,6 +6,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 from app.prompts.model_evaluation_prompt import MODEL_EVALUATION_SYSTEM_PROMPT
 from app.syntax_checker.syntax_tool import validate_model_syntax
+from app.syntax_checker.extractors.bpmn_extractor import strip_bpmndi
 
 class ModelEvaluationAgent:
     def __init__(self):
@@ -19,7 +20,6 @@ class ModelEvaluationAgent:
             generate_content_config=types.GenerateContentConfig(
                 temperature=0.0
             ),
-            tools=[validate_model_syntax],
         )
 
         # stores adk session (used to remember and organize interactions)
@@ -34,9 +34,12 @@ class ModelEvaluationAgent:
         )
 
     def build_prompt(self, message: str, rag_context: str | None = None) -> str:
+        syntax_result = validate_model_syntax(message)
+        model_for_llm = strip_bpmndi(message)
         return f"""
         Retrieved RAG context: {rag_context or "No retrieved context provided."}
-        Student question: {message}
+        Syntax validation result: {syntax_result}
+        Student's model: {model_for_llm}
         """
     
     # create conversation session for tutor and student

@@ -1,0 +1,9 @@
+{
+  "extends": "bpmnlint:recommended",
+  "rules": {
+    "no-disconnected": "off",
+    "no-implicit-start": "off",
+    "no-implicit-end": "off",
+    "label-required": "warn"
+  }
+}

@@ -1,6 +1,8 @@
 from app.syntax_checker.detector import detect_notation
 from app.syntax_checker.validators.uml.plantuml_validator import validate_uml
 from app.syntax_checker.extractors.uml_extractor import extract_plantuml
+from app.syntax_checker.extractors.bpmn_extractor import extract_bpmn
+from app.syntax_checker.validators.bpmn.bpmn_validator import validate_bpmn
 
 
 def validate_model_syntax(model_text: str):
@@ -31,7 +33,22 @@ def validate_model_syntax(model_text: str):
         return validate_uml(diagram)
 
     elif notation == "bpmn":
-        return validate_bpmn(model_text)
+        diagram = extract_bpmn(model_text)
+        if diagram is None:
+            return {
+                "valid": False,
+                "notation": "bpmn",
+                "issues": [
+                    {
+                        "severity": "error",
+                        "code": "NO_BPMN_XML_FOUND",
+                        "message": "No BPMN XML block was found.",
+                        "suggestion": "Include BPMN XML between <bpmn:definitions> and </bpmn:definitions>.",
+                    }
+                ],
+            }
+
+        return validate_bpmn(diagram)
 
     elif notation == "pnml":
         return validate_pnml(model_text)

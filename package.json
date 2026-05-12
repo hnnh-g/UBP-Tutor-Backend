@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "bpmnlint": "^11.12.1"
+  }
+}
