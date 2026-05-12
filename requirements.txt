@@ -9,4 +9,4 @@ python-jose[cryptography]
 requests
 google-adk
 litellm
-bpmn-parser
+lxml

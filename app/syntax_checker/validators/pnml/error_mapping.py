@@ -1,0 +1,1 @@
+# no error mapping needed due to the validator already producing structured outputs

@@ -3,6 +3,8 @@ from app.syntax_checker.validators.uml.plantuml_validator import validate_uml
 from app.syntax_checker.extractors.uml_extractor import extract_plantuml
 from app.syntax_checker.extractors.bpmn_extractor import extract_bpmn
 from app.syntax_checker.validators.bpmn.bpmn_validator import validate_bpmn
+from app.syntax_checker.extractors.pnml_extractor import extract_pnml
+from app.syntax_checker.validators.pnml.pnml_validator import validate_pnml
 
 
 def validate_model_syntax(model_text: str):
@@ -51,17 +53,20 @@ def validate_model_syntax(model_text: str):
         return validate_bpmn(diagram)
 
     elif notation == "pnml":
-        return validate_pnml(model_text)
+        diagram = extract_pnml(model_text)
 
-    else:
-        return {
-            "valid": False,
-            "notation": "unknown",
-            "issues": [
-                {
-                    "severity": "error",
-                    "code": "UNKNOWN_FORMAT",
-                    "message": "Could not detect notation"
-                }
-            ]
-        }
+        if diagram is None:
+            return {
+                "valid": False,
+                "notation": "pnml",
+                "issues": [
+                    {
+                        "severity": "error",
+                        "code": "NO_PNML_XML_FOUND",
+                        "message": "No PNML XML block was found.",
+                        "suggestion": "Include a PNML model between <pnml> and </pnml>.",
+                    }
+                ],
+            }
+
+        return validate_pnml(diagram)
