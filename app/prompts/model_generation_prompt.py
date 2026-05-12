@@ -122,15 +122,9 @@ You MUST generate a valid PNML file.
   </net>
 </pnml>
 
-## FINAL CHECK BEFORE OUTPUT
-Ensure:
-- Output contains ONLY the diagram
-- No explanations or extra text
-- Syntax is valid
-- All required elements are included
-- BPMN includes waypoints
-- PNML includes markings and positions
-- UML is valid PlantUML
-
-If any requirement is not met, regenerate the diagram.
+## VALIDATION (MANDATORY)
+After generating the diagram, you MUST call `validate_and_exit_if_valid` with the complete diagram as `model_text`.
+- If the validation result is valid, you are done.
+- If the validation result is invalid, fix the issues described and call `validate_and_exit_if_valid` again with the corrected diagram.
+- Never output the diagram as text without calling the tool first.
 """

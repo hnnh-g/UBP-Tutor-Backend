@@ -4,6 +4,7 @@
     "no-disconnected": "off",
     "no-implicit-start": "off",
     "no-implicit-end": "off",
-    "label-required": "warn"
+    "label-required": "warn",
+    "no-bpmndi": "off"
   }
 }
