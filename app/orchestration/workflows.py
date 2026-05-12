@@ -6,20 +6,6 @@ from app.agents.model_evaluation_agent import ModelEvaluationAgent
 class TextTutoringWorkflow:
     def __init__(self):
         self.agent = TextTutoringAgent()
-
-    async def run(self, request):
-        content = await self.agent.generate_response(
-            message=request.message,
-            user_context=request.user_context,
-            metadata=request.metadata
-        )
-
-        return OrchestrationResponse(
-            content=content,
-            activated_agent="TextTutoringAgent",
-            status="success",
-            rag_used=False,
-        )
     
     async def stream(self, request):
         async for token in self.agent.stream_response(
@@ -39,7 +25,9 @@ class ModelGenerationWorkflow:
         self.agent = ModelGenerationAgent()
 
     async def run(self, request):
-        content = await self.agent.generate_model(request.message)
+        content = await self.agent.generate_response(message=request.message,
+            user_context=request.user_context,
+            metadata=request.metadata,)
 
         return OrchestrationResponse(
             content=content,
@@ -48,32 +36,15 @@ class ModelGenerationWorkflow:
             rag_used=False,
         )
 
-    async def stream(self, request):
-        async for token in self.agent.stream_model_generation(request.message):
-            yield {
-                "event": "token",
-                "data": token,
-                "activated_agent": "ModelGenerationAgent",
-                "rag_used": False,
-            }
-
 
 class ModelEvaluationWorkflow:
     def __init__(self):
         self.agent = ModelEvaluationAgent()
 
-    async def run(self, request):
-        content = await self.agent.evaluate_model(request.message)
-
-        return OrchestrationResponse(
-            content=content,
-            activated_agent="ModelEvaluationAgent",
-            status="success",
-            rag_used=False,
-        )
-
     async def stream(self, request):
-        async for token in self.agent.stream_evaluation(request.message):
+        async for token in self.agent.stream_response(message=request.message,
+            user_context=request.user_context,
+            metadata=request.metadata,):
             yield {
                 "event": "token",
                 "data": token,

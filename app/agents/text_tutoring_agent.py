@@ -49,38 +49,6 @@ class TextTutoringAgent:
             # TODO: handle session that already exists
             pass
 
-    async def generate_response(self, message: str, user_context, metadata: dict | None = None, rag_context: str | None = None) -> str:
-        user_id = getattr(user_context, "sub", "anonym")
-        session_id = (
-            metadata.get("session:id")
-            if metadata and metadata.get("session_id")
-            else "default"
-        )
-
-        await self.ensure_session(user_id, session_id)
-        prompt = self.build_prompt(message, rag_context)
-
-        # create structured message object
-        adk_message = types.Content(
-            role="user",
-            parts=[types.Part(text=prompt)]
-        )
-        final_text = ""
-
-        # Execution (run agent insides this session with the provided input)
-        async for event in self.runner.run_async(
-            user_id=user_id,
-            session_id=session_id,
-            new_message=adk_message
-        ):
-            # extract text from event
-            if event.content and event.content.parts:
-                for part in event.content.parts:
-                    if part.text:
-                        final_text += part.text
-        
-        return final_text
-
     async def stream_response(self, message: str, user_context, metadata: dict | None = None, rag_context: str | None = None):
         user_id = getattr(user_context, "sub", "anonym")
         session_id = (
