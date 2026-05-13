@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import chat
 from app.routers import user
 from app.routers import status
+from app.routers import admin
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -20,3 +21,4 @@ app.add_middleware(
 app.include_router(user.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(status.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")

@@ -54,8 +54,17 @@ def get_current_user(
             detail="Token is missing subject claim",
         )
 
-    # Extract roles
-    roles = (payload.get("realm_access", {}).get("roles", []))
+    # Extract realm roles
+    realm_roles = (payload.get("realm_access", {}).get("roles", []))
+
+    # client roles from ubp-frontend
+    client_roles = (
+        payload.get("resource_access", {})
+        .get("ubp-frontend", {})
+        .get("roles", [])
+    )
+
+    roles = realm_roles + client_roles
 
     return UserContext(
         sub=user_id,

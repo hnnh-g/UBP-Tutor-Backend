@@ -20,6 +20,20 @@ class StatusResponse(BaseModel):
     available_agents: list[AgentInfo]
     components: Dict[str, ComponentHealth]
 
+class UserAdminInfo(BaseModel):
+    id: str
+    username: str
+    email: Optional[str] = None
+    roles: list[str]
+    enabled: bool # check if account is active
+    last_login: Optional[str] = None
+
+class AdminUserResponse(BaseModel):
+    total_users: int
+    active_sessions: int
+    roles_distribution: Dict[str, int]
+    users: list[UserAdminInfo]
+
 
 
 
