@@ -6,6 +6,7 @@ from app.schemas.user import UserContext
 from app.core.security import get_current_user
 from app.orchestration.orchestrator import Orchestrator
 from app.orchestration.models import OrchestrationRequest
+from app.services.monitoring_service import increment_requests, decrement_requests
 
 router = APIRouter(tags=["Chat"])
 
@@ -16,6 +17,7 @@ async def chat(
     request: ChatRequest,
     user_context: UserContext = Depends(get_current_user),
 ):
+    increment_requests()
     try: 
         internal_request = OrchestrationRequest(
             message=request.message,
@@ -39,6 +41,9 @@ async def chat(
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
     
+    finally: 
+        decrement_requests()
+    
 @router.post("/chat/stream")
 async def chat_stream(
     request: ChatRequest,
@@ -53,6 +58,7 @@ async def chat_stream(
     )
 
     async def event_generator():
+        increment_requests()
         try:
             async for event in orchestrator.stream_process(internal_request):
                 yield f"data: {json.dumps(event)}\n\n"
@@ -66,6 +72,9 @@ async def chat_stream(
                 "message": str(e),
             }
             yield f"data: {json.dumps(error_event)}\n\n"
+
+        finally:
+            decrement_requests()
 
     return StreamingResponse(
         event_generator(),

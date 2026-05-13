@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     keycloak_realm: str = "ubp-tutor"
 
     model_config = {"env_file": ".env"}
+    active_model: str = "not configured"
 
 
 settings = Settings()
