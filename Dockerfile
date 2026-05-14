@@ -1,17 +1,27 @@
 FROM python:3.12-slim
 
-RUN useradd -ms /bin/bash appuser
-
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    default-jre \
+    nodejs \
+    npm \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python dependencies
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
+# Install Node dependencies if package.json exists
+COPY package*.json ./
 
-RUN chown -R appuser:appuser /app
+RUN if [ -f package.json ]; then npm install; fi
 
-USER appuser
+# Copy application
+COPY . .
 
 EXPOSE 8000
 

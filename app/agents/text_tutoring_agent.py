@@ -5,6 +5,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 from app.prompts.text_tutoring_prompt import TEXT_TUTORING_SYSTEM_PROMPT
+from app.core.config import settings
 
 class TextTutoringAgent:
     def __init__(self):
@@ -13,7 +14,11 @@ class TextTutoringAgent:
         # 1 defines agent (mode and behavior)
         tutor_agent = LlmAgent(
             name="text_tutoring_agent",
-            model=LiteLlm(model="openai/gpt-4o-mini"),
+            model=LiteLlm(
+                model="openai/text-tutor",
+                api_base=settings.vllm_text_tutor_url,
+                api_key="EMPTY",
+            ),
             instruction=TEXT_TUTORING_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
                 temperature=0.0

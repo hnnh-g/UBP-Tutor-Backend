@@ -8,9 +8,12 @@ class Settings(BaseSettings):
     keycloak_admin_user: str = "admin"
     keycloak_admin_password: str = "admin"
 
+    vllm_text_tutor_url: str = "http://localhost:8200/v1"
+    vllm_model_generation_url: str = "http://localhost:8201/v1"
+    vllm_model_evaluation_url: str = "http://localhost:8202/v1"
+
     model_config = {"env_file": ".env"}
     active_model: str = "not configured"
-    
 
 
 settings = Settings()

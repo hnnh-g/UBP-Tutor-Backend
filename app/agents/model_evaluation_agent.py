@@ -7,6 +7,7 @@ from google.genai import types
 from app.prompts.model_evaluation_prompt import MODEL_EVALUATION_SYSTEM_PROMPT
 from app.syntax_checker.syntax_tool import validate_model_syntax
 from app.syntax_checker.extractors.bpmn_extractor import strip_bpmndi
+from app.core.config import settings
 
 class ModelEvaluationAgent:
     def __init__(self):
@@ -15,7 +16,11 @@ class ModelEvaluationAgent:
         # 1 defines agent (mode and behavior)
         evaluator_agent = LlmAgent(
             name="model_evaluation_agent",
-            model=LiteLlm(model="openai/gpt-4o-mini"),
+            model=LiteLlm(
+                model="openai/model-evaluation",
+                api_base=settings.vllm_model_evaluation_url,
+                api_key="EMPTY",
+            ),
             instruction=MODEL_EVALUATION_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
                 temperature=0.0

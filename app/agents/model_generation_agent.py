@@ -9,6 +9,7 @@ from google.genai import types
 from app.prompts.model_generation_prompt import MODEL_GENERATION_SYSTEM_PROMPT
 from app.syntax_checker.syntax_tool import validate_model_syntax
 from app.syntax_checker.extractors.bpmn_extractor import strip_bpmndi
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,11 @@ class ModelGenerationAgent:
         # 1 defines agent (mode and behavior)
         model_generation_agent = LlmAgent(
             name="model_generation_agent",
-            model=LiteLlm(model="openai/gpt-4o-mini"),
+            model=LiteLlm(
+                model="openai/model-generation",
+                api_base=settings.vllm_model_generation_url,
+                api_key="EMPTY",
+            ),
             instruction=MODEL_GENERATION_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
                 temperature=0.0
