@@ -47,7 +47,8 @@ class ModelGenerationAgent:
             ),
             instruction=MODEL_GENERATION_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
-                temperature=0.0
+                temperature=0.1,
+                repetition_penalty=1.1
             ),
             tools=[validate_and_exit_if_valid]
         )

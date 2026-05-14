@@ -21,7 +21,8 @@ class TextTutoringAgent:
             ),
             instruction=TEXT_TUTORING_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
-                temperature=0.0
+                temperature=0.1,
+                repetition_penalty=1.1
             )
         )
 
