@@ -5,9 +5,12 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     default-jre \
-    nodejs \
-    npm \
     curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js via NodeSource (more reliable than Debian repos)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python dependencies
