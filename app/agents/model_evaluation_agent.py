@@ -20,11 +20,11 @@ class ModelEvaluationAgent:
                 model="openai/model-evaluation",
                 api_base=settings.vllm_model_evaluation_url,
                 api_key="EMPTY",
+                extra_body={"repetition_penalty": 1.1},
             ),
             instruction=MODEL_EVALUATION_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
                 temperature=0.1,
-                repetition_penalty=1.1
             ),
         )
 
@@ -91,9 +91,7 @@ class ModelEvaluationAgent:
             new_message=adk_message,
             run_config=RunConfig(streaming_mode=StreamingMode.SSE),
         ):
-            # extract text from event
-            if event.content and event.content.parts:
+            if event.author == "model_evaluation_agent" and event.partial and event.content and event.content.parts:
                 for part in event.content.parts:
                     if part.text:
-                        # text immediately send to frontend
                         yield part.text
