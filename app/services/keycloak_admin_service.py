@@ -9,7 +9,7 @@ class KeycloakAdminService:
     async def _get_admin_token(self) -> str:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{settings.keycloak_url}/realms/{settings.keycloak_realm}/protocol/openid-connect/token",
+                f"{settings.keycloak_url}/realms/master/protocol/openid-connect/token",
                 data={
                     "grant_type": "password",
                     "client_id": "admin-cli",
