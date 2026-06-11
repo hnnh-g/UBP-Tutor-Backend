@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from app.rag.ingestion import Ingestion
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import chat
 from app.routers import user
@@ -8,7 +10,13 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-app = FastAPI(title="UBP Tutor Backend")
+@asynccontextmanager
+async def lifespan(app):
+    await Ingestion().ingest_all_documents()
+    yield
+
+app = FastAPI(title="UBP Tutor Backend", lifespan=lifespan)
+
 
 app.add_middleware(
     CORSMiddleware,

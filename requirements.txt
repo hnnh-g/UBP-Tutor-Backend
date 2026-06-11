@@ -10,3 +10,7 @@ requests
 google-adk
 litellm
 lxml
+nltk
+numpy
+chromadb
+httpx

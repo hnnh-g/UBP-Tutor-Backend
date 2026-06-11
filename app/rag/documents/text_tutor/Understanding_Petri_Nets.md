@@ -1,0 +1,1584 @@
+What Are Petri Nets and What Should They Be?
+A central challenge of computer science is the appropriate construction of systems that contain IT-based components and that are embedded in an automated or organizational environment. Such systems are modeled so that clients, manufacturers, users, etc., can, with the help of the model, better understand what a system is supposed to do and how it can be implemented, used, varied and improved.
+In the past 50 years, a multitude of modeling techniques has been proposed for such systems. They all have their strengths and weaknesses, as well as their preferred fields of application, user groups and tools. Petri nets are among the oldest modeling techniques of computer science. For decades now, interesting theoretical questions about Petri nets have been posed and solved. Special subclasses have been studied and tools have been developed. Case studies have been conducted and successful projects have been implemented. In contrast to some other methods, which were favored for a short time and then forgotten, Petri nets have kept their place as one of the well-established modeling techniques. Initially, there was an interest in integrating Petri nets with other methods. However, over time, this has given way to a tendency to keep them separate.
+With a lively, steadily growing group of interested researchers and users as well as ever-new software tools, for decades Petri nets have been in the best position to shape some foreseeable developing lines of computer science and to contribute to novel concepts like “model-based,” “ubiquitous,” “pervasive” or “disappearing” software engineering. The Petri net portal www.informatik.uni-hamburg.de/TGI/PetriNets/ index.html offers rich material on this. Carl Adam Petri himself originally designed his approach even more broadly. He looked for a theory of information processing in accord with the laws of physics, with deep-seated invariants in the traditions of the natural sciences and with formalisms that would allow for the description of a human-oriented, pragmatic handling of the technical possibilities of computer science.
+
+##Chapter 1
+In this chapter, we will use an example to explain the basic graphical components of Petri nets and how they can be used to model discrete systems.
+
+**1.1 A Cookie Vending Machine**
+For this introductory example, we describe a vending machine that sells cookies. The machine has a coin slot and a compartment into which the packets of cookies are dropped. In the initial state of the cookie vending machine, the coin slot contains a coin. The cookie compartment is empty. Figure 1.1 models this as a Petri net: coin slot and compartment, both depicted as ellipses, are the places of the Petri net. The coin slot contains a euro coin, which is a token of the net in Fig. 1.1. The compartment does not contain any tokens. A distribution of tokens across places is a marking of a Petri net. The machine can now collect the coin and produce a packet of cookies. In the Petri net in Fig 1.1, this is modeled as a transition t, depicted as a square (or rectangle). In Fig. 1.1, the transition t is enabled, because its incoming arc starts at a place containing a coin token, as required by the arc’s label. Therefore, t can occur and thereby change the current marking. Intuitively, this can be understood as a movement or flow of tokens. As the directions and labelings of the arrows in Fig. 1.1 show, the coin “flows” out of the coin slot, and a cookie packet “flows” into the compartment. Arrows depict the arcs of the net.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig1_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Cookie Vending Machine (Fig. 1.1) - Initial State</text></name>
+    <page id="page1">
+      <place id="coin_slot">
+        <name><text>coin slot</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="compartment">
+        <name><text>compartment</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <transition id="t">
+        <name><text>t</text></name>
+      </transition>
+      <arc id="a1" source="coin_slot" target="t">
+        <inscription><text>coin</text></inscription>
+      </arc>
+      <arc id="a2" source="t" target="compartment">
+        <inscription><text>cookie_packet</text></inscription>
+      </arc>
+    </page>
+  </net>
+</pnml>
+
+
+Figure 1.1 The cookie vending machine in its initial state
+
+1.2 A Look Inside
+If we look inside the machine, we will find several components that store coins and cookie packets and handle the sale. Figure 1.3 in turn models the interior of the vending machine as a Petri net: there is a storage filled with five cookie packets and one – initially empty – cash box.
+
+Figure 1.3 A look inside the cookie vending machine
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig1_3" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Cookie Vending Machine Interior (Fig. 1.3)</text></name>
+    <page id="page1">
+      <place id="coin_slot">
+        <name><text>coin slot</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="storage">
+        <name><text>storage</text></name>
+        <initialMarking><text>5</text></initialMarking>
+      </place>
+      <place id="signal">
+        <name><text>signal</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="cash_box">
+        <name><text>cash box</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="compartment">
+        <name><text>compartment</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <transition id="a">
+        <name><text>a (collect coin)</text></name>
+      </transition>
+      <transition id="b">
+        <name><text>b (give out cookie packet)</text></name>
+      </transition>
+      <arc id="a1" source="coin_slot" target="a"/>
+      <arc id="a2" source="a" target="cash_box"/>
+      <arc id="a3" source="a" target="signal"/>
+      <arc id="a4" source="signal" target="b"/>
+      <arc id="a5" source="storage" target="b"/>
+      <arc id="a6" source="b" target="compartment"/>
+    </page>
+  </net>
+</pnml>
+
+a – collect coin
+b – give out cookie packet
+
+In the marking shown, transition a can occur. Its effect can be deduced from the arrows starting or ending in a: the coin disappears from the coin slot and appears in the cash box. Simultaneously, a signal for transition b is generated, depicted by a black dot. Figure 1.4 shows the marking after the occurrence of a.
+
+**The Interface**
+Now, transition b can occur, because the arrows ending in b are labeled with objects that are actually present in the respective places: a black dot in signal and a cookie packet (even several) in the storage. No more transitions can occur now.
+
+**1.3 The Interface**
+So far, we have modeled the vending machine as a closed system: coins and cookie packets are distributed across places and the occurrence of transitions redistributes them. What is missing are actions of the environment: someone inserts a coin, for example, or takes out a cookie packet. How do we model this? As Fig. 1.6 shows, a transition insert coin sits in front of the – empty – coin slot. insert coin does not have any preconditions, so it can occur anytime. In the real world, of course, this action, in fact, does have further preconditions. Most importantly, the environment has to provide a coin. Likewise, the transition take packet models the taking of a packet out of the compartment.
+
+Figure 1.6 The cookie vending machine with the cold transitions of its interface
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig1_6" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Cookie Vending Machine with Interface (Fig. 1.6)</text></name>
+    <page id="page1">
+      <!-- Places -->
+      <place id="coin_slot">
+        <name><text>coin slot</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="storage">
+        <name><text>storage</text></name>
+        <initialMarking><text>5</text></initialMarking>
+      </place>
+      <place id="signal">
+        <name><text>signal</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="cash_box">
+        <name><text>cash box</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="compartment">
+        <name><text>compartment</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Transitions: insert_coin and take_packet are cold (epsilon-labeled) -->
+      <transition id="insert_coin">
+        <name><text>insert coin</text></name>
+        <toolspecific tool="cold" version="1.0">
+          <cold>true</cold>
+        </toolspecific>
+      </transition>
+      <transition id="a">
+        <name><text>a</text></name>
+      </transition>
+      <transition id="b">
+        <name><text>b</text></name>
+      </transition>
+      <transition id="take_packet">
+        <name><text>take packet</text></name>
+        <toolspecific tool="cold" version="1.0">
+          <cold>true</cold>
+        </toolspecific>
+      </transition>
+      <!-- Arcs -->
+      <arc id="a1" source="insert_coin" target="coin_slot"/>
+      <arc id="a2" source="coin_slot" target="a"/>
+      <arc id="a3" source="a" target="cash_box"/>
+      <arc id="a4" source="a" target="signal"/>
+      <arc id="a5" source="signal" target="b"/>
+      <arc id="a6" source="storage" target="b"/>
+      <arc id="a7" source="b" target="compartment"/>
+      <arc id="a8" source="compartment" target="take_packet"/>
+    </page>
+  </net>
+</pnml>
+
+
+The two transitions insert coin and take packet model the vending machine’s interface. Both are enabled in the marking of Fig. 1.6. Connected with this is the label “©”, which we will deal with next.
+
+**1.4 Hot and Cold Transitions**
+So far, we have tacitly assumed that an enabled transition is actually going to occur. For the transitions a and b of the cookie vending machine, this is appropriate: A coin in the coin slot, after all, is supposed to generate a signal, which in turn triggers the transport of a cookie packet. a and b are hot transitions. However, insert coin is a different matter. In the real world, a customer triggers this transition by inserting a coin into the coin slot. Whether or not this will ever happen is not guaranteed. Therefore, we want to allow that insert coin stays forever enabled without ever actually occurring. In the model, insert coin is a cold transition. The transition take packet is cold as well: no customer is forced to take his paid-for packet out of the compartment. In general, the majority of a system model’s transitions are hot. Cold transitions are much rarer. As in our example, cold transitions are often found at the interface to the unmodeled environment. To distinguish them from hot transitions, cold transitions are labeled with “©” (as an indication of their often “external” character).
+
+**1.5 Runs**
+A run of a system model describes how transitions occur consecutively. A typical run w of the model starts with the insertion of a coin. This generates a signal (via transition a) which then triggers the release of a packet (transition b). A run is complete if it terminates in a marking that does not enable any hot transitions. The run w described above is complete, because w only enables the cold transitions insert coin and take packet. An initial part of w that enables one of the hot transitions a or b is an incomplete run. The above run w can be extended by take packet to form another – also complete – run. It can also be extended by another occurrence of insert coin. In this case, however, a and b have to occur once more as well. The description “complete” is usually omitted. Incomplete runs are discussed only rarely. The cookie vending machine in Fig. 1.6 has several more runs apart from the above-mentioned run w. They are formed by the repeated occurrence of the net’s transitions. In the marking shown in Fig. 1.6, the first packet can be taken out of the compartment, the second packet can be dropped into it and the third coin can be inserted. The transitions take packet, b and insert coin all occur independently from each other.
+
+**1.6 Alternatives**
+Our cookie vending machine does not accept every coin. Maybe the machine has a coin verifier that rejects faulty coins. Maybe the customer can manually eject the coin from the coin slot by pushing an appropriate button. The vending machine can return a coin to its environment for various reasons. However, we do not want to model all those details. For us, it is sufficient to model that a coin in the coin slot either reaches the cash box or is returned to the environment. We do not model why each alternative occurs. After the insertion of the coin, the marking is reached. Now, all preconditions for the occurrence of return coin as well as a are met. However, only one of the two will actually occur: if a occurs, the coin slot will lose its token, and return coin will no longer be enabled. However, if coin occurs, a will no longer be enabled.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig1_7" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Cookie Vending Machine with Return Coin (Fig. 1.7)</text></name>
+    <page id="page1">
+      <place id="coin_slot">
+        <name><text>coin slot</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="storage">
+        <name><text>storage</text></name>
+        <initialMarking><text>5</text></initialMarking>
+      </place>
+      <place id="signal">
+        <name><text>signal</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="cash_box">
+        <name><text>cash box</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="compartment">
+        <name><text>compartment</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <transition id="insert_coin">
+        <name><text>insert coin</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <transition id="a">
+        <name><text>a</text></name>
+      </transition>
+      <transition id="return_coin">
+        <name><text>return coin</text></name>
+      </transition>
+      <transition id="b">
+        <name><text>b</text></name>
+      </transition>
+      <transition id="take_packet">
+        <name><text>take packet</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <arc id="a1" source="insert_coin" target="coin_slot"/>
+      <arc id="a2" source="coin_slot" target="a"/>
+      <arc id="a3" source="coin_slot" target="return_coin"/>
+      <arc id="a4" source="a" target="cash_box"/>
+      <arc id="a5" source="a" target="signal"/>
+      <arc id="a6" source="signal" target="b"/>
+      <arc id="a7" source="storage" target="b"/>
+      <arc id="a8" source="b" target="compartment"/>
+      <arc id="a9" source="compartment" target="take_packet"/>
+    </page>
+  </net>
+</pnml>
+
+
+**1.7 Fine Tuning**
+After five coins have been inserted and five cookie packets have been given out, the storage is empty and the cash box contains five coins. The sixth inserted coin also reaches the cash box. It generates a signal which cannot be processed, however, because there are no more cookie packets in the storage. The sixth customer has paid, but does not get any cookies! Therefore, we have to prevent a from occurring a sixth time. The sixth coin always has to be returned to the environment. It now contains an additional counter. The counter is modeled as a place that always contains exactly one token. This token is always a natural number. Initially, this is the number of cookie packets in the storage. Every occurrence of the transition a reduces its value by one. Technically, we achieve this with the help of a parameter, x. The preconditions for the occurrence of a now include an occurrence mode, that is, the replacing of x with a concrete value. From the marking shown in Fig. 1.10 with the occurrence mode x = 5, the marking is reached. The label x > 0 in a states an additional precondition for the occurrence of a. It will prevent a from occurring, if the counter holds the token “0”.
+Finally, we wish to model that the coin slot can contain at most one coin, and that at most one signal is pending at any one time. With that, we have modeled the essential components of the cookie vending machine as a Petri net. At the chosen level of abstraction, all aspects of the vending machine’s structure and behavior are modeled correctly. What “correctness” means here and how correctness is verified are covered in Part II of this book.
+
+**1.8 Diverse Components**
+The model of the cookie vending machine shows what makes Petri nets so flexible: we model entirely diverse components that nevertheless can be expressed and combined with a uniform formalism. Places and their tokens describe:
+
+- components of a real vending machine: coin slot, cash box, storage, compartment, with coins and cookie packets as tokens;
+- technical components: the counter with a number as token and signal with a black token representing a pending signal;
+- logical abstractions: insertion possible, signal and no signal with black tokens representing the logical value true.
+
+Transitions describe:
+
+- actions of the vending machine’s interior, modeling the transport of objects and signals: a (accept coin) and b (give out packet);
+- actions of the vending machine’s interface: return coin;
+- customer actions allowed by the vending machine, influencing its behavior: insert coin, take packet.
+
+A global state of the cookie vending machine is modeled as a marking (distribution of tokens across places). One action, that is, a change from one state of the vending machine to a new one, corresponds to a step from one marking to another marking in the model. Several successive actions of the vending machine correspond to a run of the model.
+
+By modeling all these diverse components with a uniform formalism, their reciprocal effects can be identified and analyzed. In that way, the correctness of the entire system and its effects on the real world can be convincingly verified.
+
+1. How many reachable markings does the system net in Fig. 1.10 have if the place counter initially holds the token 2 (instead of 5)? Based on this result, estimate whether the number of reachable markings of the unaltered net is greater than or less than 70.
+2. In Fig. 1.10, replace the initial marking of the place counter with (a) 4 or (b) 6. Discuss what these variations mean intuitively.
+3. Model a gambling machine with the following behavior: Initially, the machine is ready for a game and the player can insert a coin. An inserted coin reaches the cash box, and the machine changes into a state in which it pays out a coin from the cash box an arbitrary number of times, which may be zero. At some point, the machine stops giving out coins (at the latest when the cash box is empty) and becomes ready for another game.
+
+**How It Began**
+In the late 1950s, Carl Adam Petri, at the time a research associate at the Department for Instrumental Mathematics at the University of Bonn, Germany, thought very pragmatically about the implementation of recursive functions. After all, for such functions, it is generally not possible to predict how much space their calculations will consume. If the available resources are insufficient for a calculation, the data processing system should be expandable, to continue the calculation. This is more efficient than starting over with a larger system. So Petri sought a system architecture that can be expanded indefinitely. Such an architecture does not have any central components, most of all no central, synchronizing clock, because every expansion enlarges the system in space. Connections to the clock would become longer, and longer cycles would demand lower clocking frequencies. At some point, the limitations of the laws of physics would have to be broken in order to further expand the system. Therefore, such an architecture inevitably has to make do without any synchronizing clocks. In his famous dissertation “Kommunikation mit Automaten” (Communication with Automata), Petri shows that it is actually possible to construct such an indefinitely expandable, asynchronous system architecture. It incorporates locally confined components communicating with each other via local interfaces. Actions with locally confined causes and effects are the central idea of the nets proposed by Petri in. Termed “Petri nets”, they became one of the most popular concepts of computer science. Only later did Petri start to use a graphical representation. Thus, the first text on Petri nets does not contain a single Petri net!
+
+##Chapter 2
+
+**The Basic Concepts**
+Now we take a little closer look at Petri nets, that is, at their structure of places, transitions and arcs, the fundamental data structure of multisets, the structure of markings and steps and lastly the reachable markings and the final markings. We explain this with the help of the (slightly modified) cookie vending machine.
+
+**2.2 Components of a Net**
+The example of the cookie vending machine shows all the kinds of components that can occur in a Petri net.1 We will look at them again individually and explain their roles in the model of the system.
+
+Places
+A Petri net is a structure with two kinds of elements. One kind of element is places. Graphically, a place is represented by a circle or ellipse. A place p always models a passive component: p can store, accumulate or show things. A place has discrete states.
+
+Transitions
+The second kind of elements of a Petri netare transitions. Graphically, a transition is represented by a square or rectangle. A transition t always models an active component: t can produce things, consume, transport or change them.
+
+Arcs
+Places and transitions are connected to each other by directed arcs. Graphically, an arc is represented by an arrow. An arc never models a system component, but an abstract, sometimes only notional relation between components such as logical connections, access rights, spatial proximities or immediate linkings. In the example of the cookie vending machine, it is striking that an arc never connects two places or two transitions. An arc rather runs from a place to a transition or vice versa from a transition to a place. This is neither coincidental nor arbitrary, but inevitably follows if nets are used correctly to model systems,
+that is, if passive and active components are properly separated.
+
+Net Structure
+It is customary to denote the sets of places, transitions and arcs with P , T and F , respectively, and to regard arcs as pairs, that is, F as a relation F # .P $ T / [ .T $ P /. Then
+
+arc .p; t/
+arc .t; p/
+
+N D .P; T; F /
+
+is a net structure. The places and transitions are the elements of N . F is the flow relation of N . Figure 2.2 shows the net structure of the cookie vending machine. If a given context unambiguously identifies a net N , the preset ! x and post-set x ! of an element x are defined as x Ddef fy j yF xg and x Ddef fy j xF yg: Two elements x, y of N form a loop if x 2 ! y and y 2 ! x. For instance, a and E form a loop.
+
+Markings
+A marking is a distribution of tokens across places. A marking can be represented graphically by symbols serving as tokens in  the respective circles and ellipses. For a system with an initial state, the initial marking is often depicted in this way. The symbolic tokens (for instance, ! , , 7) generally denote elements of the real world. This correlation is so strong that we do not distinguish between the symbolic representation and the real elements that they denote. Next to symbolic tokens, abstract black tokens often occur, for instance, in the places D and G. Such a token often indicates that a certain condition (modeled as a place) is met. It is also possible, and common, to represent concrete elements not by symbolic but by abstract black tokens. Elementary nets only utilize black tokens.
+
+Labelings of Arcs and Transitions
+Arcs and transitions can be labeled with expressions. Next to elements of the real world, which have occurred in markings before, functions (for instance, a subtraction) and variables (for instance, x and y) can occur in such expressions. These expressions have a central property: if all variables in an expression are replaced by elements, it becomes possible to evaluate the expression in order to obtain yet another element. It is convenient to write the labeling of an arc .p; t/ or .t; p/ as pt or tp respectively. Statement (1) describes the tokens that “flow through the arc” at the occurrence of t. The variables in these expressions are parameters describing different instances (“modes”) of a transition. Such a transition can only occur if its labeling evaluates to the logical value “true”.
+
+**2.3 The Data Structure for Petri Nets:**
+Multisets
+In a Petri net, the tokens of a place often represent objects that we usually do not want to distinguish. For instance, we are only interested in the number of coins in the cash box (although we could, for instance, distinguish them by their date of coining). In general, examples of different kinds of tokens are mixed in a place, e.g., rectangular and round cookie packets in the storage H. They form a multiset a, formally a mapping that maps every kind u of a universe U to the number of its occurrences in a. We always assume a “sufficiently large” universe U that contains all examined kinds of tokens. We write the set of all multisets over U as M.U / or M for short if the context unambiguously identifies the universe U . The universe U can contain an infinite number of elements, for instance, all natural numbers. A multiset a over U can map the value a.u/ D 0 to almost all u 2 U . That means that u does not occur in a. Thus, a is finite if a.u/ ¤ 0 for only a finite number of u 2 U: We write a finite multiset a with its multiple elements in square brackets Œ: : :!. Consequently, the empty multiset is denoted by Œ !.u/ D 0 for each u 2 U. With these notations, we describe dynamic behavior. The tokens of a place p usually belong to a type, that is, to a (small) subset of the universe U . In Fig. 2.1, for instance, only coins lie in the places A and F, only black tokens in D and G, only cookie packets in H and C and only numbers in E. If a place p only holds tokens of type ", the type " is assigned to the place p.
+Now we can precisely define the term marking: A marking M of a net structure .P; T; F / is a mapping. That means that M maps every place p to a multiset M.p/. A marking M describes a state of the modeled system. Given the significance of a system’s initial state, the initial marking (usually denoted M0 ) is often drawn into the respective net structure. 
+
+**2.5 Steps with Constant Arc Labelings**
+Let us now examine the special case in which the arcs around a transition t are labeled with individual elements of a universe. This applies to the arcs around the transitions c and e. In general, however, an arc is labeled with more than one element. Formally, this is a multiset, whose brackets [ and ] are not written in order to save space. Thus, with the notation of (1), for each arc .p; t/ or .t; p/ the following holds: M W P ! M:
+pt 2 M and tp 2 M:
+pt = [ ]
+qt = [
+
+We technically expand this notation for all places p and transitions t by pt D Œ ! and tp D Œ ! c if no arc .p; t/ or .t; p/ exists, respectively. A transition t can occur in a marking M if the related preconditions are met, that is if M enables the transition t. As in many other system models, we separate the enabling of t from the effect of the occurrence of t. Whether a marking M enables a transition t depends on the labelings of the arcs ending in t. M enables t if and only if M.p/ ' pt for each arc .p; t/. Thus, the initial marking of the cookie vending machine only enables the transition c. If a marking M enables a transition t, it results in the step t M &! M 0 ; in which the marking M 0 of each place p is defined as formaly: c M 0 .p/ Ddef M.p/ & pt C tp:
+
+**2.6 Steps with Variable Arc Labelings**
+An arc or a transition can be labeled with an expression a that contains variables. By assigning values to the variables in a, the expression a can be evaluated. If a is written onto an arc, the result is a multiset. If a is written into a transition, the result is either “true” or “false”. In order to calculate these values, the labelings of all arcs that end or start at a transition (the arcs around t) have to be taken into account simultaneously. Put a little more technically: Let x1 ; : : : ; xn be the variables of the arc labelings around a transition t. Let u1 ; : : : ; un be elements of the universe. Then ˇ W .x1 D u1 ; x2 D u2 ; : : : ; xn D un / is a mode of t. The variables y and z occur in the arc labelings around the transition b. Thus, ˇ1 W / is a mode of b. The transition b has three ad.y D ; z D; z D /, ˇ3 W .y D z D / additional modes: ˇ2 W .y D ˇ4 W .y D z D /. A mode ˇ of a transition t creates for each arc .p; t/ or .t; p/ a multiset ˇ.p; t/ or ˇ.t; p/, respectively. Thus, ˇ1 .H; b/ D ˇ2 .H; b/ D Œ ; !. Another example is ˇ W .x D 7/, a mode of the transition t in Fig. 2.1, and it holds: ˇ.a; E/ D Œ7 & 2! D Œ5!. If pt does not contain any variables, then obviously ˇ.p; t/ D pt: A transition t can itself have a labeling that contains variables. An example is the labeling x ' 2 of transition a. For such a labeling i, a mode ˇ of t creates a logical value, ˇ.i/. For instance, for the labeling x ' 2 of a, the mode ˇ1 W .x D 7/ creates the logical value ˇ1 .x ' 2/ D Œ7 ' 2! D true.
+
+Thus, a mode ˇ of t creates multisets at the arcs around t. A step of t in the mode ˇ is then defined as described in the previous section. Additionally, the labeling a of t has to evaluate to ˇ.a/ D t rue. For a step from M to M 0 via t in the mode ˇ, we write t;ˇ M &! M 0 : The symbol ˇ for the mode is often omitted and we write, for instance x D 5 instead of ˇ W .x D 5/: Put in a formal context, a marking M enables a transition t in the mode ˇ of t if for each arc in the form .p; t/: M.p/ ' ˇ.p; t/ and for the labeling i of t: ˇ.i/ D t rue: t;ˇ
+This then results in the step M &! M 0 , in which M 0 for each place p is defined by M 0 .p/ D M.p/ & ˇ.p; t/ C ˇ.t; p/: Again, let ˇ.p; t/ D Œ ! and ˇ.t; p/ D Œ ! if no arc .p; t/ or .t; p/ exists in N , respectively. Consider the cookie vending machine: After the step M0 &! M1 , the marking M1 enables the transition a in the mode x D 7, and in no other mode. Figure 2.3 shows the effect that the step a,x = 7 M1 &! M2 has on the surroundings of the transition a. The marking M2 , which is then reached, enables the transition b, because now values can be assigned to the variables y and z. Every assignment to these variables enables b. Thus, there exists a seof or lection of four modes and hence four steps in M2.
+
+**2.7 System Nets**
+We have now assembled the principal notations that enable us to describe a discrete, dynamic system, as for instance a cookie vending machine. According to the principles, we use an appropriately labeled, finite net structure, N , to do this. A central term is that of a marking of N , that is, a distribution of tokens (multisets) across the places of N . Typically, the initial marking of N is denoted by M0 and is explicitly drawn into N . M0 describes the initial state of the modeled system. A transition t can be labeled with a condition and the arcs around t with expressions. These labelings show the various situations (modes) in which t is enabled, and the respective effects at the occurrence of t. Lastly, every transition is either hot or cold, where cold transitions are indicated by “©”. A net structure together with an initial marking, transition conditions, arc labelings and cold transitions form a system net. System nets are used to model real, discretely changeable systems. Each place of a system net models a state component of the system and each currently existing token in a place models a currently given, but changeable, characteristic of that component. Each transition of a system net represents an action of the system. The occurrence of a transition describes the occurrence system net of the respective action. If, in doing so, a token reaches or leaves a place, the action respectively creates or terminates the corresponding characteristic of the state component.
+
+**2.8 Marking Graph**
+For a system net N and an initial marking M0 , a marking M of N is reachable if there exists a sequence of steps  with Mn D M . In general, infinitely many markings of N are reachable. The reachable markings and steps of a system net N can be compiled into the marking graph of N . Its nodes are the reachable markings, its edges the steps between the reachable markings of N . The initial marking M0 of N is specifically highlighted. The marking graph is also often called the reachability graph. The complete marking graph has approximately 100 nodes. In contrast to the system net it would be extremely laborious and counterintuitive to use the marking graph as a model for the cookie vending machine. In principle, the marking graph of a system net is a suitable starting point for its (automated) analysis, as long as only a finite number of markings are reachable.
+
+**2.9 Final Markings**
+A system has reached a final state if it can remain in this state forever. The marking of the system net models such a state. A final state of a system corresponds to a final marking. In such a marking, no hot transitions are enabled. For instance, in the system net, the initial marking is, at the same time, also a final marking (it only enables the cold transition c).
+
+**Exercises**
+1. The system net in Fig. 2.6 expands the cookie vending machine in Fig. 2.1 by a transition f. In
+your own words, describe the effect and the function of f inside the cookie vending machine.
+2. Which of the markings M0 ; : : : ; M8 in the marking graph are final markings?
+
+
+As is often traditional in mathematics, we do not always distinguish objects and functions from their symbolic representations in expressions, equations, etc. Our distinction between hot and cold transitions is found only sporadically in the literature on Petri nets. Damm and Harel used it in Live Sequence Charts as a very apt way of expressing system specifications. In the historical development, Genrich and Lautenbach [28] introduced nets with individual tokens as predicate/transition nets and in doing so emphasized the connection with logic.
+
+A Universal, Expandable Architecture
+In his dissertation, Petri designed a universal computer architecture that can be expanded an arbitrary number of times. We will explain this idea using the example of a finite, but infinitely expandable stack. It consists of a sequence A0 : : : An of modules, where each module Ai .i D 0; : : : ; n/ has an idle state that stores either a value or – e.g., initially – a “dummy” ?. The net shows the module A0 with its interface to the environment: The transition push accepts a value from the environment via the variable x0 , which may hold any value. The variable x1 holds the previously stored value, which is passed on to the module A1 via the transition a1 . The transition pop extracts the value stored in idle state. Via b1 the module then receives the value stored in A1 . The net combines four modules to form a stack. Each module Ai behaves according to the pattern described for A0 . Each occurrence of push or pop triggers a wave that moves from left to right through the stack. It ends in A4 by popping out the previously stored value or pushing in a “dummy” ? respectively. The transitions a4 and b4 are the extension points where another module A5 can be attached.
+
+##Chapter 3 Common Special Case: Elementary System Nets
+
+Petri nets can be used to describe how the control flow and data flow of a distributed algorithm or system interact. However, one often merely wants to express where a control flow currently stands, whether resources are available, how many messages are pending, etc. For such an abstract view, it is not necessary to distinguish several kinds of tokens: only “black dots” are used as tokens (such tokens already occurred in the cookie vending machine). Whenever a transition occurs, “exactly one black token flows through each adjacent arc”. Because this does not have to be explicitly stated, the arcs do not have any labelings. Such system nets are called elementary. Important aspects of distributed and reactive systems can be modeled appropriately with elementary system nets. We will show this with three examples: an abstract variant of the cookie vending machine, the problem of mutual exclusion, and the crosstalk algorithm.
+
+**3.1 Elementary System Nets**
+An elementary system net N consists of a net structure N D .P; T; F / with finite sets P and T of places and transitions, and an initial marking, M0 W P ! N. Some transitions are marked as cold (via the inscription "). Each marking has the form M W P ! N: Each place p holds M.p/ tokens. The step rule of elementary system nets follows from the step rule of generic system nets: A marking M enables a transition t if M.p/ ' 1 for each place p 2 ! t. For a step M &! M 0 the following holds:
+< M.p/ & 1 if p 2 t and p 62 t
+M .p/ D
+M.p/ C 1 if p 2 t and p 62 t
+M.p/
+otherwise
+
+For an elementary system net N it follows that:
+
+- ! the step sequences that start with the initial marking M0 contain the reachable markings and steps,
+- the marking graph of N has as nodes the reachable markings and as edges the reachable steps of N,
+- a final marking of N does not enable any hot transitions.
+
+**3.2 An Abstract Model of the Cookie Vending Machine**
+An abstract variant of the model of the cookie vending machine in Fig. 1.11: it does not model euro coins and cookie packets anymore, only their respective amounts. Each coin and each packet is represented by a black token, just like a pending (or not pending) signal, or the possibility to insert a coin. The current value of the counter is represented by thencorresponding amount of black tokens. This kind of abstraction of concrete objects simplifies the formal analysis of the model.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig3_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Abstract Cookie Vending Machine - Elementary System Net (Fig. 3.1)</text></name>
+    <page id="page1">
+      <!-- Elementary net: tokens are abstract black dots (natural numbers) -->
+      <place id="coin_slot">
+        <name><text>coin slot</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="insertion_possible">
+        <name><text>insertion possible</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="storage">
+        <name><text>storage</text></name>
+        <initialMarking><text>5</text></initialMarking>
+      </place>
+      <place id="signal">
+        <name><text>signal</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="no_signal">
+        <name><text>no signal</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="cash_box">
+        <name><text>cash box</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="counter">
+        <name><text>counter</text></name>
+        <initialMarking><text>5</text></initialMarking>
+      </place>
+      <place id="compartment">
+        <name><text>compartment</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <transition id="insert_coin">
+        <name><text>insert coin</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <transition id="return_coin">
+        <name><text>return coin</text></name>
+      </transition>
+      <transition id="a">
+        <name><text>a</text></name>
+      </transition>
+      <transition id="b">
+        <name><text>b</text></name>
+      </transition>
+      <transition id="take_packet">
+        <name><text>take packet</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <arc id="a1" source="insert_coin" target="coin_slot"/>
+      <arc id="a2" source="insertion_possible" target="insert_coin"/>
+      <arc id="a3" source="coin_slot" target="a"/>
+      <arc id="a4" source="coin_slot" target="return_coin"/>
+      <arc id="a5" source="a" target="cash_box"/>
+      <arc id="a6" source="a" target="signal"/>
+      <arc id="a7" source="no_signal" target="a"/>
+      <arc id="a8" source="counter" target="a"/>
+      <arc id="a9" source="signal" target="b"/>
+      <arc id="a10" source="storage" target="b"/>
+      <arc id="a11" source="b" target="compartment"/>
+      <arc id="a12" source="b" target="no_signal"/>
+      <arc id="a13" source="compartment" target="take_packet"/>
+      <arc id="a14" source="return_coin" target="insertion_possible"/>
+    </page>
+  </net>
+</pnml>
+Figure 3.1 Abstract variant of Fig. 1.11
+
+**3.3 Mutual Exclusion**
+When it comes to distributed algorithms, the synchronization of actions is often crucial: an action can occur if certain conditions are met or certain local states are reached. It is reasonable to model such a condition or state as a place. This place contains a (black) token if and only if the respective condition is met or the respective local state is reached. Models of mutual exclusion are typical examples of this. In the field of distributed systems, the problem of mutual exclusion manifests itself in a variety of contexts. The simplest case deals with the interaction of two processes and a (scarce) resource that each process occasionally uses. Examples are software processes occasionally using a printer, or vehicles occasionally passing through a traffic bottleneck. At the core of this lies the demand that the two processes never use the scarce resource at the same time. Figure 3.2 shows the essential components: Each of the two processes l and r (denoting left and right) can cycle through three states, local, waiting and critical. In its local state, a process works without the scarce resource. Via the step to waiting (transition a or d, respectively), the process announces its interest in the scarce resource. The transitions a and d are cold. Hence, a process is not obliged to execute this step. From some point forward, it may only work locally. 
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig3_2" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Mutual Exclusion (Fig. 3.2)</text></name>
+    <page id="page1">
+      <!-- Process l (left) -->
+      <place id="local_l">
+        <name><text>local_l</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="waiting_l">
+        <name><text>waiting_l</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="critical_l">
+        <name><text>critical_l</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Process r (right) -->
+      <place id="local_r">
+        <name><text>local_r</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="waiting_r">
+        <name><text>waiting_r</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="critical_r">
+        <name><text>critical_r</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Shared resource -->
+      <place id="key">
+        <name><text>key</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <!-- Transitions for l: a (local->waiting, cold), b (waiting->critical), c (critical->local) -->
+      <transition id="a">
+        <name><text>a</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <transition id="b">
+        <name><text>b</text></name>
+      </transition>
+      <transition id="c">
+        <name><text>c</text></name>
+      </transition>
+      <!-- Transitions for r: d (local->waiting, cold), e (waiting->critical), f (critical->local) -->
+      <transition id="d">
+        <name><text>d</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <transition id="e">
+        <name><text>e</text></name>
+      </transition>
+      <transition id="f">
+        <name><text>f</text></name>
+      </transition>
+      <!-- Arcs for l -->
+      <arc id="a1" source="local_l" target="a"/>
+      <arc id="a2" source="a" target="waiting_l"/>
+      <arc id="a3" source="waiting_l" target="b"/>
+      <arc id="a4" source="key" target="b"/>
+      <arc id="a5" source="b" target="critical_l"/>
+      <arc id="a6" source="critical_l" target="c"/>
+      <arc id="a7" source="c" target="local_l"/>
+      <arc id="a8" source="c" target="key"/>
+      <!-- Arcs for r -->
+      <arc id="a9" source="local_r" target="d"/>
+      <arc id="a10" source="d" target="waiting_r"/>
+      <arc id="a11" source="waiting_r" target="e"/>
+      <arc id="a12" source="key" target="e"/>
+      <arc id="a13" source="e" target="critical_r"/>
+      <arc id="a14" source="critical_r" target="f"/>
+      <arc id="a15" source="f" target="local_r"/>
+      <arc id="a16" source="f" target="key"/>
+    </page>
+  </net>
+</pnml>
+
+The step from waiting to critical (transition b or e, respectively) additionally requires a token in key. The purpose of this is obvious: in its critical state, a process, for instance l, uses the scarce resource. l only reaches this state (via b) by means of the key. However, then the other process (in this case r) cannot reach its critical state via e, because the key is not available anymore. The process l does not return the key until l leaves its critical state via c. Between b and e, a conflict can arise an infinite number of times. No strategy has been modeled to solve this conflict. Because of this, all conceivable occurrence frequencies and sequences are possible. In an extreme case, the conflict will always be resolved in favor of the same process (for instance, in favor of l). Then the other process (in this case r) never reaches its critical state and instead remains waiting forever. In general, one wants to guarantee that every waiting process will eventually become critical. By remaining in its local state, one process can thus prevent the other from repeatedly reaching its critical state.
+
+**3.4 The Crosstalk Algorithm**
+The crosstalk algorithm assumes two agents communicating with each other via a technical channel. The channel works reliably as long as it transmits only one message. However, as soon as both agents’ messages collide on the channel, crosstalk occurs, which may result in corrupted messages reaching their respective recipients. Since both agents can send messages independently from one another, crosstalk cannot be prevented. However, the algorithm allows both agents to recognize crosstalk. In that case they could, for instance, repeat their messages in a predetermined order. We will now introduce an algorithm that works in cycles: during each cycle, either one agent successfully sends a message to the other, or both agents recognize crosstalk. Chapter 5 will show that scenarios structure the algorithm and increase its comprehensibility. Chapter 12 will contain a proof that both agents correctly implement the cyclic behavior.
+
+Figure 3.4 Sender and recipient
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig3_4" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Sender and Recipient - Messages Left to Right (Fig. 3.4)</text></name>
+    <page id="page1">
+      <!-- Left agent (sender) -->
+      <place id="idle_l">
+        <name><text>idle_l</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="waiting">
+        <name><text>waiting</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Shared channel places -->
+      <place id="sent">
+        <name><text>sent</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="confirmed">
+        <name><text>confirmed</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Right agent (recipient) -->
+      <place id="idle_r">
+        <name><text>idle_r</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="replied">
+        <name><text>replied</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Transitions -->
+      <transition id="send">
+        <name><text>send</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <transition id="finish">
+        <name><text>finish</text></name>
+      </transition>
+      <transition id="reply">
+        <name><text>reply</text></name>
+      </transition>
+      <transition id="return_r">
+        <name><text>return</text></name>
+      </transition>
+      <!-- Arcs -->
+      <arc id="a1" source="idle_l" target="send"/>
+      <arc id="a2" source="send" target="waiting"/>
+      <arc id="a3" source="send" target="sent"/>
+      <arc id="a4" source="waiting" target="finish"/>
+      <arc id="a5" source="confirmed" target="finish"/>
+      <arc id="a6" source="finish" target="idle_l"/>
+      <arc id="a7" source="idle_r" target="reply"/>
+      <arc id="a8" source="sent" target="reply"/>
+      <arc id="a9" source="reply" target="replied"/>
+      <arc id="a10" source="reply" target="confirmed"/>
+      <arc id="a11" source="replied" target="return_r"/>
+      <arc id="a12" source="return_r" target="idle_r"/>
+    </page>
+  </net>
+</pnml>
+
+Figure 3.4 shows how the left agent can leave its initial state idlel via send. In doing so, it sends a message (sent) and enters a waiting state. After having received a confirmation (confirmed), it ends its cycle via finish. The right agent leaves its initial state idler via reply and in doing so confirms (confirmed) the message sent by the left agent. It ends its cycle via return.
+
+**Messages in Both Directions**
+We now complement the system symmetrically so that the right agent can also send a message to the left agent. However, the system enters a deadlock (both agents waiting) if both agents send a message during the same cycle. Luckily, each agent can recognize a deadlock: it expects a confirmation (confirmed) but receives a message (sent). Therefore, each agent can resolve the deadlock via an additional transition crosstalk, as Fig. 3.6 shows.
+
+**Preventing Errors**
+The system in Fig. 3.6 is still faulty. It is, for instance, possible for the left agent to send a message (sendl ), which is correctly received and confirmed by the right agent via replyr . The right agent then returns to its initial state and sends a message via sendr . Now the left agent finds a confirmation (confirmedr ) alongside a new message (sentr ), which it cannot identify as already belonging to the next turn. Instead, it falsely recognizes crosstalk. Figure 3.7 solves the problem by adding another message type (finished). This system is actually correct – what that means exactly is covered in Chapter 12. Figure 3.7 shows sendl and sendr as cold transitions: no agent is obliged to send a message. A sent message, however, has to be processed completely. If the system terminates, both agents have returned to their respective initial state idle.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig3_7" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>The Crosstalk Algorithm (Fig. 3.7)</text></name>
+    <page id="page1">
+      <!-- Left agent places -->
+      <place id="idle_l">
+        <name><text>idle_l</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="waiting_l">
+        <name><text>waiting_l</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="replied_l">
+        <name><text>replied_l</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Right agent places -->
+      <place id="idle_r">
+        <name><text>idle_r</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="waiting_r">
+        <name><text>waiting_r</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="replied_r">
+        <name><text>replied_r</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Channel places (left-to-right) -->
+      <place id="sent_l">
+        <name><text>sent_l</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="confirmed_r">
+        <name><text>confirmed_r</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="finished_l">
+        <name><text>finished_l</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Channel places (right-to-left) -->
+      <place id="sent_r">
+        <name><text>sent_r</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="confirmed_l">
+        <name><text>confirmed_l</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="finished_r">
+        <name><text>finished_r</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <!-- Left agent transitions -->
+      <transition id="send_l">
+        <name><text>send_l</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <transition id="finish_l">
+        <name><text>finish_l</text></name>
+      </transition>
+      <transition id="reply_l">
+        <name><text>reply_l</text></name>
+      </transition>
+      <transition id="return_l">
+        <name><text>return_l</text></name>
+      </transition>
+      <transition id="crosstalk_l">
+        <name><text>crosstalk_l</text></name>
+      </transition>
+      <!-- Right agent transitions -->
+      <transition id="send_r">
+        <name><text>send_r</text></name>
+        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
+      </transition>
+      <transition id="finish_r">
+        <name><text>finish_r</text></name>
+      </transition>
+      <transition id="reply_r">
+        <name><text>reply_r</text></name>
+      </transition>
+      <transition id="return_r">
+        <name><text>return_r</text></name>
+      </transition>
+      <transition id="crosstalk_r">
+        <name><text>crosstalk_r</text></name>
+      </transition>
+      <!-- Left agent arcs -->
+      <arc id="a1" source="idle_l" target="send_l"/>
+      <arc id="a2" source="send_l" target="waiting_l"/>
+      <arc id="a3" source="send_l" target="sent_l"/>
+      <arc id="a4" source="waiting_l" target="finish_l"/>
+      <arc id="a5" source="confirmed_r" target="finish_l"/>
+      <arc id="a6" source="finish_l" target="idle_l"/>
+      <arc id="a7" source="waiting_l" target="crosstalk_l"/>
+      <arc id="a8" source="sent_r" target="crosstalk_l"/>
+      <arc id="a9" source="crosstalk_l" target="idle_l"/>
+      <arc id="a10" source="idle_l" target="reply_l"/>
+      <arc id="a11" source="sent_r" target="reply_l"/>
+      <arc id="a12" source="reply_l" target="replied_l"/>
+      <arc id="a13" source="reply_l" target="confirmed_l"/>
+      <arc id="a14" source="reply_l" target="finished_r"/>
+      <arc id="a15" source="replied_l" target="return_l"/>
+      <arc id="a16" source="finished_l" target="return_l"/>
+      <arc id="a17" source="return_l" target="idle_l"/>
+      <!-- Right agent arcs -->
+      <arc id="a18" source="idle_r" target="send_r"/>
+      <arc id="a19" source="send_r" target="waiting_r"/>
+      <arc id="a20" source="send_r" target="sent_r"/>
+      <arc id="a21" source="waiting_r" target="finish_r"/>
+      <arc id="a22" source="confirmed_l" target="finish_r"/>
+      <arc id="a23" source="finish_r" target="idle_r"/>
+      <arc id="a24" source="waiting_r" target="crosstalk_r"/>
+      <arc id="a25" source="sent_l" target="crosstalk_r"/>
+      <arc id="a26" source="crosstalk_r" target="idle_r"/>
+      <arc id="a27" source="idle_r" target="reply_r"/>
+      <arc id="a28" source="sent_l" target="reply_r"/>
+      <arc id="a29" source="reply_r" target="replied_r"/>
+      <arc id="a30" source="reply_r" target="confirmed_r"/>
+      <arc id="a31" source="reply_r" target="finished_l"/>
+      <arc id="a32" source="replied_r" target="return_r"/>
+      <arc id="a33" source="finished_r" target="return_r"/>
+      <arc id="a34" source="return_r" target="idle_r"/>
+    </page>
+  </net>
+</pnml>
+
+Figure 3.6 With crosstalk: errors possible
+
+**3.5 1-Bounded Elementary System Nets**
+Except for the net in Fig. 3.1, all elementary system nets in this chapter can only reach markings in which each place holds at most one token. Also, it is often convenient to conceive of a token as “moving” through a part of the net, for instance through the three local states of the left (or right) process in the system of mutual exclusion. Such system nets have special properties and analysis methods, which we will cover later on. These nets are so important that they deserve a special name: an elementary system net N is called 1-bounded if for each reachable marking M and each place p of N : M.p/ % 1: The elementary system nets in Figures 3.2 through 3.7 are all 1-bounded; the system net in Fig. 3.1, obviously, is not. A marking M of a 1-bounded elementary system net can be described as a string of marked places. For instance, ADE (or DAE, DEA, etc.) describes the initial marking of the system of mutual exclusion according to the notation in Fig. 3.8. Two steps begin with this marking: ADE !
+
+**Exercises**
+1. Add to the system net in Fig. 3.2 a place noncriticall that holds a token if and only if process l is not in the state criticall .
+2. Construct the marking graphs for the system of mutual exclusion and the crosstalk algorithm using the denotations given in Figs. 3.8 and 3.9.
+
+**Further Reading**
+In many, especially older, publications, elementary system nets – treated as “the Petri nets” – constitute the central formalism. Much attention is paid to places that accumulate unboundedly many tokens. After the Third Advanced Course on Petri Nets in 1998, a team of authors compiled a set of lectures on the rich theory of elementary system nets. In practice, places with unboundedly many tokens are needed only rarely.
+
+Visual Formalisms
+Someone who wants to illustrate abstract constructs and relations often uses sketches, diagrams or other graphical notations. Even in the early days of computer science, finite state machines were already modeled as graphs, and programs as flow charts. In the early 1960s, Petri’s proposal to represent formal models primarily graphically rather than textually was nevertheless unusual. Since the advent of state charts in the mid-1980s and of UML in the 1990s, visual formalisms have become established for other modeling techniques as well. The graphical primitives of Petri nets, that is, the depiction of passive and active components as round and rectangular shapes, as well as the representation of causal relations and dynamically changeable objects as arrows and “tokens”, have stood the test of time. They have, in part, been adopted by the UML community.
+
+##Chapter 4 Sequential and Distributed Runs
+This chapter covers the question of how to formulate individual runs (e.g., calculations, behaviors) of distributed, reactive systems, and what insights into a system such runs can provide. At first, we will examine the very intuitive term of a sequential run of a system net. Distributed runs require slightly more effort in understanding, but also describe the behavior more accurately. They form the basis for the concept of scenarios, which is covered in the next chapter.
+
+**4.1 Sequential Runs**
+We can formulate a run of the system net N as a sequence of steps, starting with the initial marking M0. We define a sequential run of a system net N as a sequence t1 t2 M0 &! M1 &! : : : of steps of N , starting with the initial marking M0 of N . A run can be finite or infinite. In general, we are interested in complete runs: A finite run is complete if Mn is a final marking, that is, if Mn does not enable any hot transitions. Thus, the runs (1) and (2) are complete. Every run ending in BE is indeed complete, but can nevertheless be extended. An infinite run is complete if at no point a step with an additional transition can be inserted. The run (3) is complete. The run is incomplete: a step with an additional transition d can be inserted at any point. As explained in Sect. 2.8, it is possible to compile the steps of a system net into a marking graph. Figure 4.2 gives the marking graph of the system net N. An additional arrow indicates the initial marking AD. The dashed circles indicate the final markings D and BE. Each sequential run of a system net N is a path through the marking graph G of N . Vice versa, each path through G that starts with the initial marking M0 of N is a sequential run of N .
+
+**4.2 Tokens as Labeled Places**
+Next to the representation of a run as a sequence of steps, there exists the representation as a labeled net with a special structure, called distributed run. These runs are based on the idea of representing each occurrence of a token in a place as an individual, labeled place.  The labeled places $ and = , for instance, represent tokens in the pre-set of the transition c in Fig. 4.1. For the initial marking of the cookie vending machine, we use 12 places: five are respectively labeled with storage and counter, one with insertion possible, and one with no signal. Likewise, for a generic system net, tokens u1 ; : : : ; un in a place p are represented by n correspondingly labeled places. For the initial marking of the cookie vending machine, for instance, a total of ten places is used.
+
+**4.3 Actions**
+A distributed run consists of actions. An action describes the occurrence of a transition, especially its effect on the tokens involved. Technically, an action A is a loop-free, labeled net with exactly one transition. The net structure of A thus takes the form:
+A represents a transition t of an elementary system net if:
+! the transition a of A is labeled with t,
+! ! a represents the tokens in ! t,
+! a! represents the tokens in t ! .
+
+For a generic system net N , an action A represents a transition of N in the mode ˇ if:
+! the transition a of A is labeled with .t; ˇ/,
+! ! a represents the tokens ˇ.p; t/ for each p 2 ! t,
+! a! represents the tokens ˇ.t; q/ for each q 2 t ! .
+
+**4.4 Distributed Runs**
+A distributed run consists of actions that are assembled in an acyclic fashion. Thus, the basis for a distributed run is a causal net. A causal net K D .P; T; F / has the following characteristics:
+
+! no place branches: at each place, at most one arc starts or ends, respectively;
+! no sequence of arcs forms a loop: for each sequence of the form k0 F k1 : : : kn"1 F kn thus: k0 ¤ kn ;
+! each sequence of arcs has a first element: thus, there exists no string that “starts in infinity” and takes the form : : : kF k 0 :
+The places without an incoming arc form the outset of K. The places without an outgoing arc form the end. We denote the outset and end by ı K and K ı , respectively. In contrast to a system net, a causal net can very well have infinitely many elements. A distributed run of a system net N is a labeled causal net K in which each transition t, together with ! t and t ! , forms an action of N . K thus describes an uninterrupted part of the behavior of N . The upper chain of arcs consists of the actions Na , Nb and Nc (see Fig. 4.3) and describes a cycle of the left process from its initial state A to B and C and back to A. Likewise, the lower chain of arcs describes a cycle of the right process from E to F and G and back to E. In general, a chain of arcs from an element x to an element y intuitively describes that x causally precedes y. The (three) occurrences of D in Fig. 4.4 are in accordance with this: the key is first used by the left process (via b and c), then by the right one (via e and f) and is again available at the end of the run. Thus, the actions Na , Nb , Nc and Nd causally precede Ne . On the other hand, Na and Nd are not linked by a chain of arcs: they are causally independent from each other. This also holds for Nc and Nd . An action can, of course, occur repeatedly in a distributed run. In general, a distributed run can be infinitely long – just as a sequential run.  A distributed run K of a system net N is complete if and only if its outset ı K represents the initial state of N and its end K ı does not enable any hot transitions. For convenience, we will omit the attribute “complete.” Unless noted otherwise, for the rest of this book, with “distributed run” we always mean “complete distributed run.” The end N ı of a finite distributed run of a system net N represents a final state of N . The end of an infinite run, in general, does not represent a reachable state. For a system net with such a simple structure, the distributed runs resemble the sequential runs.
+
+**4.6 The Kindergarten Game**
+The kindergarten game is the distributed version of a program used by Dijkstra to demonstrate the use of formal verification techniques. We use this distributed variant as an example to show the uses of Petri nets and distributed runs. Dijkstra assumes one agent playing with given objects (pebbles). We assume the pebbles themselves to be agents and therefore replace them with children, for descriptive purposes. The kindergarten game starts out with an arbitrary number of children in a playing area. Each child is dressed in either black or white. At any one time, two children can spontaneously leave the playing area together. After that, one child returns, according to the following rules:
+! If the children are dressed in different colors, the one dressed in white returns;
+! If the children are dressed in the same color, a child dressed in black returns (if both are dressed in white, one child changes).
+We want to develop an appropriate model for this game. To do this, we construct a place children, with the group of children as initial marking. If we depict a child dressed in black or white as ! or ı, respectively, and abbreviate (children, !) and (children, ı) as ! and ı, respectively, then Fig. 4.12 shows the three possible actions of the game. As initial marking, a finite number of children, each dressed in either black or white, is assumed. Each transition is hot. Thus, a run terminates only if no transition is enabled, which means that only one child remains. The three runs all start with the initial marking M0. To what extent the color of the last remaining child’s clothes depends on the initial marking and the structure of the respective run is covered.
+
+**4.7 Causal Order**
+In contrast to sequential runs, distributed runs show the causal relations of actions. Fig. 4.15 exemplifies this with two system nets, both of which have the same sequential runs. Their distributed runs, however, are distinct: Nl has a single distributed run, on the other hand, has two distributed runs. In Nr , the place E can be seen as a model of a resource that is used, but not used up. This forces the two actions of a and b into one of two possible orders. If an action ˛ generates tokens that are used by another action ˇ, then ˛ causally precedes ˇ. This “causally precedes” relation is, of course, transitive: if ˛ precedes ˇ and ˇ precedes #, then ˛ also precedes #. Furthermore, causally precedes is irreflexive: no action causally precede itself. Thus, causally precedes is a strict partial order. In general, this order is indeed not total: An action ı may occur independently from ˇ. However, this does not imply that ı and ˇ occur simultaneously. Simultaneity is transitive; independence is not. The relation between the sequential and the distributed runs of a system net N becomes evident if, in every distributed run K of N , the corresponding tokens are put in the places in ı K. Thus, K itself becomes a system net with an initial marking. In this case, every sequential run of K is also a sequential run of N . The run K1 is an example of this. It generates the two sequential runs. Vice versa, every sequential run of N is generated by at least one distributed run K of N .
+
+**4.8 The Composition of Distributed Runs**
+Let K and L be two distributed runs. Their composition K ( L is formed by identifying the end K ı of K with the outset ı L of L. To do this, K ı and ı L have to represent the same marking. K(L contains all the elements of K and L and retains their order. An initial segment of their composition K.
+
+**Exercises**
+1. Consider the system net:
+(a) Determine the number of
+(1) infinite sequential runs,
+(2) infinite distributed runs,
+(3) finite sequential runs,
+(4) finite distributed runs.
+(b) Which of the answers to (a) change if one of the four transitions is assumed to be cold?
+(c) Compare the runs of the system nets in Fig. 4.20 and Fig. 4.1.
+2. (a) Specify the actions of the system net N in Fig. 3.3.
+(b) Characterize all distributed runs of N .
+3. Consider the bell clock in Fig. 4.10:
+(a) Expand the bell clock by a place that shows the current hour between 1 and 12. Modify the chimes so that on each n-th hour, the bell chimes n times.
+(b) Modify the bell clock so that when the tokens 15, 30, 45 and 0 are reached in place p, the bell chimes once, twice, three times and four times, respectively.
+(c) Now combine the two system nets from (a) and (b) so that on each nth hour, the bell first chimes four times and then, after a pause, n times.
+(d) Construct finite initial segments of the runs of all subtasks.
+4. Prove the following: If J can be composed with K, and K with L, then .J ( K/ ( L D J ( .K ( L/:
+
+
+**Further Reading**
+In the literature, sequential runs are by far the predominant formalism. They are technically simple, sufficient to model many situations, and satisfy the common intuition that events occur along a global time scale, or are mapped onto such a scale by an observer. From the beginning, the concept of a distributed run, that is, a partially ordered set of local states and transitions, has been an important part of the theory of Petri nets. In 1981, Nielsen, Plotkin and Winskel put distributed runs in the context of the mathematical structures of other system models. In 1988, Best and Fernandez discussed a multitude of relations between system nets and distributed runs. Two aspects of distributed runs are particularly important today: their use in scenarios (Chapter 5) and their contribution to the control of the state space explosion during verification through model checking. To test interesting characteristics of a system, this process compiles sufficiently long initial segments of all its distributed runs (that start with the inital marking) into a tree-like structure. This structure is then efficiently analyzed. Esparza and Heljanko have shown numerous proof techniques based on temporal logic that make use of this structure.
+Conventional representations of algorithms, especially conventional programming languages, use memory cells, which store their respective current values as state components. Dynamic behavior is described as a value assignment of the form: x0 WD f .x0 ; : : : ; xn /: Depending on the current values in the memory cells x0 ; : : : ; xn , the cell x0 receives a new value. The previous value in x0 is then not accessible anymore. “Read and (over)write” are thus the basic operations of programs. For many algorithms, this is intuitive and appropriate, for example, in Euclid’s algorithm for computing the greatest common divisor of two natural numbers. However, different algorithms have different basic operations, for example, the sending and receiving of messages or objects. Therefore, Petri nets use a different approach: a state component is – intuitively – an object in a certain location. Dynamic behavior moves objects from one location to another. Some objects may be created (coming from an unmodeled environment) or they may disappear (into it) during the process. Thus, “give and take” are the basic operations here. This prompts us to try to translate programs into Petri nets and vice versa: each variable z in a program corresponds to a place pz in a system net N , and the current value w in z corresponds to a token in pz.
+In each run of N , the transitions t and t’ can occur arbitrarily often, but always one after another and never independently. For example, t’ may occur infinitely often and block t. This contradicts the assumption that processes can read a variable independently without interfering with each other. If the updating of the variable z is also modeled as a loop between a transition t” and the place pz , the updating transition t” can be blocked by the reading transition t, in contradiction to the common assumption of concurrent programming in which the updating of a variable is never blocked by the reading of the variable. This observation has far-reaching consequences, some of which will become apparent in the case study of the mutual exclusion system. The translation of a system net N into a program P synchronizes the transitions of N intom one or more control flows. The structure of N generates (among others) a distributed run in which r and t occur independently from each other. A corresponding program would have to organize the nondeterminism between r and s and between t and s and thus force r and s under a central control. Finally, programming languages and many other operational modeling techniques allow for multiple control flows. They are, if necessary, dynamically created or terminated, but rarely reach the necessary flexibility to model, for example, the solution to the kindergarten game.
+
+##Chapter 5 Scenarios
+A user of a technical or organizational system usually does not need each and every possible behavior of the system. The work is often limited to a few activities that are repeatedly executed. Therefore, it is convenient to consider typical scenarios of a system. A scenario consists of a finite number of elementary actions and terminates in the same state in which it started. Because of this, multiple instances of a scenario can occur multiple times in the same run. A scenario often describes an interaction pattern between a process and its environment, or between two processes. Typical scenarios of the systems considered thus far are:
+! selling a packet of cookies,
+! visiting one’s critical state once,
+! sending a message.
+Technically, a scenario is constructed as a finite distributed run, whose final marking equals its initial marking. A run of a distributed, reactive system is often composed of many instances of only a few scenarios. If every run can essentially be constructed like this, the system is scenario-based. Understanding the scenarios of a system is often the easiest way to understand the entire system. We will illustrate this using the examples of the mutual exclusion system, the crosstalk algorithm and the cookie vending machine.
+
+**5.1 Defining Scenarios**
+A scenario of a system net N is a finite partial distributed run K of N in which the outset, ı K, and the end, K ı , represent the same marking. Figure 5.1 shows two scenarios of the mutual exclusion system: one for the left and one for the right process. Each process passes through the cycle of local, to waiting and critical, back to local. The kindergarten game is an example of a system net without scenarios.From the definition of the composition of distributed runs it follows that arbitrarily many instances K0 ; : : : ; Kn of different scenarios with the same initial and final conditions can be assembled into a finite or infinite partial distributed run K0 ( : : : ( Kn or K0 ( K1 ( : : : ; respectively. A system net N is scenario-based if there exists a finite set A of scenarios such that each complete finite or infinite distributed run of N can be written as K1 ( K2 ( : : : ( Kn or K1 ( K2 ( : : : ; respectively, where each Ki is a scenario in A. Multiple instances of the same scenario may, of course, occur in the same run. Occasionally, a run may also have an irregular initial or final segment K0 or Kn , respectively. The mutual exclusion system is obviously scenario-based. An infinite run may also contain an instance of the action a or d.
+
+**5.2 The Scenarios of the Crosstalk Algorithm**
+The two processes l and r of the crosstalk algorithm from cooperate in three scenarios:
+! l sends, r receives;
+! r sends, l receives;
+! both send and receive, and crosstalk occurs.
+One may assume a more abstract view and summarize the first two scenarios as “one sends, one receives”.
+
+**5.3 The Scenarios of the Cookie Vending Machine**
+The cookie vending machine from Chaps. 1 and 2 has only one scenario: the return of an inserted coin. Intuitively, one might also consider selling a cookie packet as a scenario. In its outset, a coin can be inserted, no signal is pending, and the compartment is empty. The partial run shows this behavior of the cookie vending machine. To form a complete scenario, the tokens in the counter, the cash box and the storage would have to match in the outset and at the end. A scenario for a marking M of N is a finite partial distributed run K of N in which a part of ı K and a part of K ı represent the marking M . Figure 4.7 thus shows a scenario of the cookie vending machine for a marking M with M.D/ D M.G/ D Œ!!.
+
+**Exercises**
+1. (a) How many scenarios does the algorithm in Fig. 3.3 have? Give one.
+(b) How many finite sequential runs does that scenario describe?
+2. Does the system net in Fig. 5.6 have scenarios? Is it scenario-based?
+3. (a) Construct a scenario for the system net in Fig. 5.7.
+(b) Is the system net scenario-based?
+
+**Further Reading**
+Thinking in scenarios can significantly simplify and deepen our understanding of a complex system. In connection with Petri nets, in particular, has proposed the use of scenarios. Message sequence charts describe scenarios very explicitly. They form the basis of a modeling and simulation technique in.
+
+**Scenario-Based System Nets**
+The term “scenario” is not used very consistently in the field of software engineering. In general, the term “scenario” is used to describe a coherent section of behavior that is contiguous from the observer’s perspective. Typically, a scenario is used interactively to reach a goal. From the perspective of the system architecture, a scenario generally covers several components and only uses a part of each component. A scenario is usually reactive, because it needs input from the environment during its process. In the mutual exclusion system and the crosstalk algorithm, all scenarios have this characteristic. This also holds for the example of the cookie vending machine if the machine and each user are considered to be components. Because scenarios describe the behavior that a user has envisioned for a specific system, it would be most useful if one could derive a system from a given set of scenarios. In the above systems of the crosstalk algorithm, the cookie vending machine and the mutual exclusion system can, in fact, be derived from the corresponding scenarios by identifying elements with the same denotations. Harel greatly extends this idea for Live Sequence Charts and integrates it into a tool.
+
+##Chapter 6 Further Notations for Elementary System Nets
+In the literature, elementary system nets are often extended by additional notations, especially capacities (“no transition can add an .n C 1/th token to a place p”) and arc weights (“n tokens simultaneously flow through an arc”). We will discuss both of these extensions and show that they do not increase the expressiveness of elementary system nets: they can be simulated and are thus merely syntactic sugar. Occasionally, it is possible to use capacities and arc weights to construct very intuitive and clear models. In such cases, they should definitely be used. However, a transition that is supposed to “test” the number of tokens in a place, or that should be given priority in case of a conflict, is a different matter: such things cannot be simulated within the bounds of elementary system nets.
+
+**6.1 Place Capacities**
+One occasionally wants to express that a place p can hold at most n tokens, and that a transition t that would add an .nC1/th token should thus not be enabled. In the graphical representation of a system net N , the place p could be labeled accordingly and the conditions for the enabling of t in a marking M be expanded by M.p/ % n & 1. This does not increase the expressiveness of elementary system nets. To show this, let N be an elementary system net including a place p with a capacity of n. In particular, let the initial marking M0 of N be n-bounded. We now construct an elementary system net N 0 such that the reachable bounded markings M of N and the markings M 0 of N 0 unambiguously correspond to each other, and that for all bounded markings M1 and M2 of N the following holds:
+M1 &! M2 is a step of N iff
+M10 &! M20 is a step of N 0
+
+**6.2 Arc Weights**
+Occasionally, a model is needed that only contains black tokens (like elementary system nets), but still adds to or removes from a place more than one token during a single step (which is easily achieved for the generic system nets in Chap. 2). To graphically represent such a net, the corresponding arc is labeled with the corresponding factor (arc weight). An elementary system net N with arc weights can, as with place capacities, also be simulated by a net N' without arc weights. However, N and N' are not related as closely anymore: N' contains additional places and transitions, and a single step of N is simulated by a sequence of steps of N' . To be precise, a sequential run of N is called a reduction of a sequential run of N' if the sequence t1 : : : tk is generated from the sequence t1' : : : tk' 0 by eliminating from t10 : : : tk0 0 all the transitions that are not in N. The net N 0 is now constructed such that: The sequential runs of N are the reductions of the sequential runs of N'. For the construction of N' , each place p of N is replaced by a sequence of places and transitions. Figure 6.3 shows an example of this. There the step sequence in N is a reduction of the step sequence in N 0 . Other step sequences in N 0 may generate the same reduction. The general procedure for constructing N' from N replaces each place p with a sequence of places and transitions. Its length n C m & 1 results from the greatest weights n and m of arcs that end and start in p, respectively. Each arc .t; p/ of N that ends in p with an arc weight of k is replaced in N' with k arcs of the form .t; p1 /; : : : ; .t; pk /. Likewise, each arc .p; u/ of N that starts in p with an arc weight of l is replaced in N 0 with l arcs of the form .pnCm"l ; u/; : : : ; .pnCm"1 ; u/. The initial marking M0 .p/ of N is assigned to M0 .p1 / of N 0 . Figure 6.4 outlines this construction. It is easy to show that this construction satisfies (2). In the special case of n = m = 1, the construction leaves the place p and its surroundings unchanged.
+
+**6.3 Real Extensions**
+A transition t of an elementary system net N is a ' n-tester of a place p if for each marking M the following holds: M enables t if M(p) ≥ n. In the construction t is obviously a ' n-tester of p. If t is already a transition of N , this construction also implements the condition “p contains at least n tokens” for the occurrence of t. The construction of a % n-tester of p analogous to (3) is not so simple. Closely related to the test for “D 0” is the increase of expressiveness by means of inhibitor arcs. An inhibitor arc .t; p/ requires for the enabling of t that p does not contain any tokens. Reset arcs also increase the expressiveness of elementary system nets. A reset arc .t; p/ removes all tokens from p at the occurrence of t. Priorities are another example of real extensions: let t and u be two transitions of an elementary system net. The transition t takes priority over u if t always occurs whenever a marking M enables both t and u. As with the test for “0”, priorities cannot be simulated by elementary system nets if t and u are adjacent to an unbounded place. Also, priorities are not compatible with the concept of distributed runs.
+
+**Exercises**
+1. Develop a procedure to simulate a system net with capacities and arc weights with an elementary system net. Apply your procedure to the system net. Hint: At first, generalize the concept of the complement of a place from Section 6.1 to include arc weights. Then, analogously to the approach in Section 6.1, use this to construct a system net without capacities, but with arc weights. Simulate this system net using the method. The result is a system net without arc weights, but with capacities.
+2. Convert the cookie vending machine in Fig. 6.2 into an elementary system net. As a simplification, you may limit the filling of the storage to three tokens.
+
+**Further Reading**
+The novice modeler sometimes perceives the rule for the occurrence of transitions as limiting and cumbersome. Various ways of altering, generalizing or extending it come to mind. However, such additional expressiveness comes at a price: the models quickly become difficult to comprehend, the combination of such concepts is prone to inconsistency, and many analysis techniques fail at first. However, some can be newly devised. An example of this is Busi’s analysis of inhibitor arcs. Among the many other variants and generalizations, three are particularly interesting: Montanari and Rossi propose context places. A context place can be accessed by multiple transitions simultaneously without hindrance. They can, for instance, be used to solve the problem described in the postscript to Chapter 4: Read and Write vs. Give and Take. So-called self-modifying Petri nets, employ arcs with variable arc weights. The actual weight of an arc then corresponds to the current number of tokens in one of the net’s places. The authors propose special signal arcs between transitions. With such an arc between t and u, the two transitions will occur simultaneously if both are enabled. If only t is enabled, then only t will occur. Such behaviour can be simulated with inhibitor arcs. A good historic overview over different extensions can be found in the Advanced Courses on Petri Nets. A range of publications pursue the idea of tokens with a special structure and of using this structure for the formulation of the occurrence rule and for the analysis of system characteristics. An example of this is the “nets as tokens” concept.
+
+##Chapter 7 The Synthesis Problem
+A system is often modeled by a description of its observable behavior, that is, global states and steps. However, to implement a system, it is often more practical to identify local state components and actions whose cause and effect are limited to a few state components. At first, we will discuss this problem using the example of the light/fan system, and then give the problem a precise form and solve it in the rest of this chapter. The techniques presented here will be used in the case study in Chapter 21 to systematically create an asynchronous hardware architecture.
+
+**7.1 Example: The Light/Fan System**
+The reader is probably familiar with the common connection between lighting and air ventilation in (windowless) bathrooms: If the light is switched on while the fan is off, the latter will start as well after some time. If the light is then switched off, the fan will continue running for some time. If the fan is off and the light is first switched on and then quickly switched off again, the fan will not start at all. If the fan is running and the light is switched off and then quickly switched on again, the fan will continue running without interruption. Traditionally, systems are often modeled as state automata: a state automaton consists of states and steps. One state is the initial state. Every step transforms one state into another and thereby executes an action. Several steps may quite well execute one and the same action. Technically, a state automaton can be described as a graph, with states as nodes and steps as labeled edges. It has four places describing the local states as well as four transitions, one for each action of the system. The representation as a system net clearly describes the cause and effect of each action. switch light off, for example, can only occur if the light is on. The current state of the fan is irrelevant for this action. The fan itself, however, only starts if it is not running and the light is on at the same time. It is easy to determine that the system net N has the exact same behavior as the state automaton Z: one constructs the marking graph of N and asserts that it is identical to Z. The synthesis problem of Z is the search for a technique to derive N from Z.
+
+**7.2 The General Question of the Synthesis Problem**
+Each state of the light/fan state automaton is labeled with two conditions. These conditions form places. In general, however, there is no information on the states of a state automaton Z. It is abstract. Every edge of such an automaton is labeled with an action. The same action may occur on more than one edge. The synthesis problem of any (abstract) state automaton Z is the search for a distributed system V that behaves exactly like Z. Instead of global states, only local states may appear in V . Every action appearing in Z has to be described completely and unambiguously through its effect on a few local states in V . To constructively solve this problem, we restrict the candidates for V to 1-bounded elementary system nets. In doing so, V behaves like Z if the marking graph G of V is isomorphic to Z. G is isomorphic to Z if every node k of G maps to exactly one node k 0 of Z such that: ! the initial marking of G is mapped to the initial state of Z. To summarize: a system net N solves the synthesis problem of a given (abstract) state automaton Z if the marking graph G of N is isomorphic to Z. There exist state automata Z whose synthesis problem cannot be solved by any 1-bounded elementary system net. 
+
+**7.3 Regions of State Automata**
+In the following, we will develop an algorithm that takes a state automaton Z and decides whether there exists a 1-bounded elementary system net N that solves the synthesis problem of Z. If it is solvable, a solution that is “as small as possible” is constructed. The construction does not take into account the difference between hot and cold transitions. State automata have an initial state but no final states. To do this, for a given state automaton Z, a system N is constructed. If the marking graph G of N is isomorphic to Z, then N is the sought-after solution. Otherwise, a theorem guarantees that no solution exists. First of all, we have to decide which characteristics of Z can be used for the construction of N . Apart from its structure as a directed graph, Z is characterized particularly by edges with the same labelings. After all, from the set of edges that are labeled with a symbol t, a single transition t has to be derived for N . Therefore, the starting nodes of those edges – if applicable, together with other nodes of Z – represent a place in ! t. Put more generally, a set of nodes of Z can represent a place in N.
+
+**7.4 The System Net of a State Automaton**
+Using the following procedure, we construct from a given state automaton Z an elementary system net N , the system net of Z:
+! each minimal region p of Z is a place of N ;
+! each edge labeling t occurring in Z is a transition of N ;
+! if a region p receives the t-edges of Z, then .t; p/ is an arc of N ;
+! if a region p dispatches the t-edges of Z, then .p; t/ is an arc of N ;
+! if a region p contains all the t-edges of Z, then .t; p/ and .p; t/ are arcs of N
+! if the initial state of Z lies within a region p of Z, the place p of N holds a token.
+
+**7.5 The Solution to the Synthesis Problem**
+The following Synthesis Theorem is the basis for the solution to the synthesis problem:
+Theorem 1 (Synthesis Theorem). If the synthesis problem of a state automaton Z can be solved by a 1-bounded elementary system net, then the system net of Z is a solution. With this, it is possible to solve the general synthesis problem: one constructs the system net N of a given state automaton Z and from this the marking graph G of N . If Z and G are isomorphic, N obviously solves the synthesis problem of Z. Otherwise, the synthesis problem of Z cannot be solved by any 1-bounded elementary system net.
+
+**7.6 The Synthesis Problem of the Light/Fan State Automaton**
+To simplify the argument, we use an abridged version of the denotations of the light/fan system. This state automaton has four minimal regions. Following the procedure explained above, the system net is constructed. The construction of its marking graph is left to the reader, as well as ascertaining that the graph is isomorphic. With this solves the synthesis problem of the state automaton. Changing the abridged denotations back to their longer versions, in fact, results in the system net shown.
+
+**Exercises**
+1. Show that in Fig. 7.4 the synthesis problem for L is solvable, but the one for R is not.
+2. Solve the synthesis problem for the state automaton.
+3. Why is the solution to the synthesis problem for the state automaton especially easy?
+4. Is the elementary system net in Fig. 7.11 a solution to the synthesis problem of a state automaton?
+5. The synthesis problem for the state automaton in Fig. 7.12 cannot be solved by any 1-bounded elementary system net. This is shown in the margin of Sect. 7.5. Construct an elementary system net whose marking graph is isomorphic to the state automaton in Fig. 7.12.
+
+**Further Reading**
+The solution to the synthesis problem belongs to those success stories in the field of Petri nets that emerged only slowly. Now, however, it belongs – in various versions – to the standard repertoire of most Petri net analysis tools. As early as the late 1970s, Carl Adam Petri knew how to reverse calculate any 1-bounded elementary system net N from its marking graph G: a state set A of G forms a place in N if either all or no edges of G that have the same label either start or end in A. He did not consider this to be n particularly interesting, however, because n places of N would result in 2n nodes in G and thus 22 state sets – an unmanageable situation. In the mid-1980s, Ehrenfeucht and Rozenberg solved the synthesis problem of loop-free, 1-bounded elementary system nets as an example of use for their “2-Theory”. To do this, they use all regions of a given state automaton for the construction of a system net. It was not until 1993 that Bernardinello confirmed the assumption that the minimal regions suffice. Only with this restriction does the region theory become usable in practice. By using only the minimal regions, nets of manageable sizes are constructed. Many authors took part in generalizing the 1-boundedness in Theorem 1 to generic elementary system nets and in including even inhibitor edges. With this, the synthesis problem of much more general graphs becomes solvable. The most important authors include Badouel, Bergenthum, Busi, Cortadella, Darondeau, Desel, Gunther, Hoagens, Juhás, Kishinevsky, Kleijn, Kontratyev, Lavagno, Lorenz, Mauser, Mukund, Pietkiewicz-Koutny, Pinna, Thiagarajan, van der Aalst and Yakovlev. An overview of these developments. Also very interesting for practical purposes is a reduction of the criteria for the solution to the synthesis problem: A system net N solves a reduced synthesis problem of a state automaton Z if the marking graph G of N is not necessarily isomorphic to Z, but if G and Z are bisimular or fulfill some other simulation relation. For instance, only a bisimulation is required between the state automaton Z and the marking graph of the synthesized net N . Additionally, the transitions of N may be labeled. Then, one action of Z can be implemented by several transitions of N . Lastly, it is possible to require special characteristics of N , for instance, the free-choice characteristic from Chapter 16. solves the synthesis problem of other, liberal simulation relations and also takes distributed runs into account. Numerous software tools for the analysis of Petri nets offer a synthesis module, for instance, the tool Petrify. Put intuitively, the synthesis problem seeks to construct a distributed system from the observation of its sequential behavior. The fact that this is possible marks Petri nets as a “very natural modeling technique” for distributed systems.
+
+##Chapter 8 Composition of Nets
+It is a general principle of software engineering to assemble small systems into larger ones. This process is called composition. Here we will consider the case of nets with interfaces. Two such nets can be joined together at their interfaces. Interfaces used for asynchronous, directed communication are an important special case. Such open nets are particularly natural: each Petri net can be broken down unambiguously into its set of smallest open nets.
+
+**8.1 Nets with Interfaces**
+Two nets N1 D .P1 ; T1 ; F1 / and N2 D .P2 ; T2 ; F2 / can always also be conceived of as a single net N . Each place, each transition and each arc of N is a place, a transition or an arc of either N1 or N2 : N Ddef .P1 [ P2 ; T1 [ T2 ; F1 [ F2 /. Of interest are those elements that belong to both N1 and N2 : A place p 2 P1 [ P2 consistently appears only once in N . The same is true for shared transitions and arcs. The case of an element appearing in N1 as a place and in N2 as a transition or arc does not appear in any sensible modeling task. We will not consider such cases here. A composition of the form (1) is not sufficiently flexible. An example of this is a net N for which there exist two instances (copies) that should be composed in such a way that only a few specified elements are merged (i.e., identified) and the others are kept separate. To express this, we distinguish between interface elements and inner elements of a net N . The difference becomes important during the composition of N with a net N 0 if N and N 0 share one or more elements: if an element e belongs to the interfaces of both N and N 0 , then during the composition, e should be identified according to (1). Otherwise, contrary to (1), the two examples of e should be kept separate. Technically, this is achieved by means of a new element eQ that does not belong to either N or N' . At first, the net NQ is constructed from N by substituting eQ for e in N . For the composition of N and N 0 , the nets NQ and N are now joined according to (1). A net N D .P; T; F / together with an interface is an interface net. Graphically, the interface of an interface net is often placed on or outside of a border around N . Figure 8.1 shows three interface nets modeling the behavior of a customer, a salesperson and his stock. Their inner elements model appropriate control flows. The composition of two interface nets N1 D .P1 ; T1 ; F1 / and N2 D .P2 ; T2 ; F2 / with the interfaces I1 and I2 is again an interface net, N1 ˚ N2 . In accordance with (2), we assume here that no inner element of N1 or N2 appears in both nets. Then (1) describes the net structure of N1 ˚ N2 . The shared interface elements of N1 and N2 become inner elements of N1 ˚ N2 ; the rest comprise the interface I of N1 ˚ N2 : I Ddef .I1 [ I2 /n.I1 \ I2 /. During the composition of two nets, those two nets are interchangeable (˚ is commutative). If, in the case of multiple interface nets, each shared element appears at most in two interfaces, the order in which the nets are composed is also interchangeable (˚ is occasionally associative). Theorem 2 (Composition Theorem for Interface Nets). For i D 1; 2; 3, let Ni be interface nets with the interfaces Ii . (a) N1 ˚ N2 D N2 ˚ N1 . (b) If I1 \I2 \I3 D ;, then .N1 ˚N2 /˚N3 D N1 ˚.N2 ˚N3 /: Both propositions follow from the known laws of set operations. A set M of interface nets is called associative if no element appears in the interfaces of three or more of the nets in M . The term “associative” follows from Theorem 2(b). The three interface nets in Fig. 8.1 form an associative set.
+
+**8.2 Communicating Nets**
+Shared places in the interfaces of two nets are often used for asynchronous, directed communication. A place p in the interface of a net N is an in-place of N if no arc ends in p, that is, if ! p D ;. Likewise, p is an out-place of N if p ! D ;. OUTN and INN respectively denote the sets of the out- and in-places of N. Two interface nets N1 and N2 communicate via an interface place p if N1 puts tokens into p and N2 takes tokens from p, or vice versa: if N2 puts tokens into p and N1 takes tokens from p, that is, if p 2 .OUTN1 \ INN2 / [ .OUTN2 \ INN1 /: N1 and N2 communicate if for the interfaces I1 and I2 of N1 and N2 each x 2 I1 \ I2 is a place via which N1 and N2 communicate. In practice, sets of pairwise communicating interface nets are common: each interface place is shared by at most two interface nets. For such sets, the following holds. Theorem 3 (Associativity Theorem). Let M be a set of pairwise communicating interface nets. Then M is associative. To prove this, one first shows by contradiction that each shared element x appears at most in two interfaces Ii of nets Ni in M : if x 2 I1 \I2 \I3 , then x is an in-place or an out-place of at least two of the three nets N1 ; N2 ; N3 . Those two nets do not communicate! Thus the proposition follows from Theorem 2.
+
+**8.3 Unambiguous Decomposition into Open Nets**
+Communicating nets often only have in- and out-places in their interfaces, that is, no transitions and no places with transitions in both their pre- and post-sets. Such nets are often called open.  Open nets are a very natural construction: each arbitrary net can be decomposed into a unique set of smallest, pairwise communicating open nets.
+For a net N D .P; T; F / and subsets P 0 # P , T 0 # T and F 0 # F of places, transitions and arcs of N , the net N 0 D .P 0 ; T 0 ; F 0 / is a subnet of N if N 0 inherits all relevant arcs of N , that is, if for each arc .x; y/ 2 F with x; y 2 P 0 [ T 0 : .x; y/ 2 F 0 : Now let IN be the set of in-places and OUT the set of outplaces of N 0 such that in N for each p 2 IN and each q 2 OUT: p ! # T 0 and ! q # T 0 : Then N 0 together with the interface is an open subnet of N . If N 0 itself does not have any proper open subnets, then N 0 is a minimal open subnet of N . The two open nets salesperson and stock in Fig. 8.1 are open subnets of the net in Fig. 8.2. Each minimal open subnet of the examples in Figures 8.1 and 8.2 consists of a single transition t together with its pre- and its post-set ! t [ t ! as interface. The minimal open subnets of N form an associative set and can thus be composed in arbitrary order. Above all, however, their composition again results in N itself. Theorem 4 (Theorem on Minimal Open Subnets). Let N be a net and let N1 ; : : : ; Nk be the minimal open subnets of N . Then: (a) fN1 ; : : : ; Nk g is associative. (b) N D N1 ˚ : : : ˚ Nk . Property (a) follows from the Associativity Theorem and the observation that the Ni are communicating pairwise. The proof of (b) utilizes an equivalence relation ) on the transitions of N : let ) be the strongest equivalence such that t ) u if t ! \ u! D ; or t \ ! u D ;. Each equivalence class K of ) together with the places in ! t [t ! of all transitions t 2 K form a net NK . Together with the in- and out-places of NK as interface I , the net NK is a minimal open subnet of N .
+
+**Exercises**
+1. Model the cookie vending machine shown in Fig. 3.1 as well as one of its customers as open
+nets. Hint: The three transitions insert coin, take packet and return coin in Fig.3.1 describe (in parts) the behavior of the customer. Thus, the interface between the vending machine and the customer consists of transitions there. The behavior of the customer is not explicitly modeled. Construct the interface between the vending machine and the customer as places for the coin slot, the cookie compartment and a slot for returned coins.
+2. Based on Fig. 8.1, construct the nets
+(a) customer ˚ salesperson,
+(b) customer ˚ stock,
+(c) customer ˚ salesperson ˚ stock.
+3. Prove Theorem 2.
+
+##Chapter 9 State Properties
+Important properties of a system pertain to the system’s reachable states. In a system net N , those are the reachable markings. We represent such a state property E of N with an expression a that contains as variables the places of N . If, for a marking M , each place p in a is then replaced with M.p/, the expression can be evaluated to either true (“E holds in M ”) or false (“E does not hold in M ”). State properties are often expressed as linear equations or inequalities. This chapter covers the form and the validity of such equations and inequalities. How to prove their validity is covered in the following chapters. As an example, we start out with properties of the cookie vending machine. The form of linear equations and inequalities is very simple and is explained in the second section. This is followed by further examples, and finally by ideas about variants of linear equations and inequalities.
+
+**9.1 Equations and Inequalities of the Cookie Vending Machine**
+For the model of the cookie vending machine N in Fig. 2.1 and its respective initial marking M0 , the following holds: M0 .A/ C M0 .D/ C M0 .E/ D Œ ! C Œ!! C Œ7! D Œ!; 7!: In particular, the quantity of tokens can be derived from this:
+jM0 .A/j C jM0 .D/j C jM0 .E/j D jŒ!; 7!j D 2:
+Thus, the places A, D and E initially hold a total of two tokens. c
+After the step M0 &! M1 :
+M1 .A/ C M1 .D/ C M1 .E/ D Œ ! ! C Œ ! C Œ7! D Œ ! ; 7!:
+The places now hold different tokens, but the quantity of tokens remains the same:
+jM1 .A/j C jM1 .D/j C jM1 .E/j D jŒ ! ; 7!j D 2:
+Now Eqs. (2) and (4) can be combined. For each of the two markings M D M0 and M D M1 , the following holds:
+jM.A/j C jM.D/j C jM.E/j D 2:
+In fact, Eq. (5) holds not only for the markings M D M0 and M D M1 , but for each reachable marking M of N . The places A, D and E thus always hold two tokens. Equation (5) holds in N , and we write as shorthand: jAj C jDj C jEj D 2:
+Upon closer inspection, it becomes evident that A and D together always hold one token and E another. Thus, for each reachable marking M :
+jM.A/j C jM.D/j D 1 and jM.E/j D 1: As shorthand, we write: jAj C jDj D 1, and jEj D 1:
+
+The relation between A and D can be described even more precisely: in each reachable marking M , either A holds a euro or D holds a black dot. To express this observation as an equation, we count the tokens in D; that is, we calculate jM.D/j, and then generate the respective amount of euro coins: jM.D/j ( Œ ! !: Because M.D/ D Œ!! or M.D/ D Œ !, it follows that jM.D/j D 1 or jM.D/j D 0. The expression (8) thus either evaluates to Œ ! ! or Œ !. If M.A/ (that is, Œ ! or Œ ! !, respectively) is added to this, the result is Œ ! !. Thus, for each reachable marking M : M.A/ C .jM.D/j ( Œ ! !/ D Œ ! ! or simply A C .jDj ( Œ !! !/ D Œ !! !: Intuitively speaking, the token in D corresponds to a euro in A.
+Cardinality and multiplicity are apparently important for the formulation of valid linear equations. However, other functions are often needed as well. An example is the relation between the numeral value w of the token in E and the amount a of coins in F: the sum w C 2a is always 7. To express this relation as an equation, let cont be a function that, for each singleton multiset Œn! with n 2 N, returns the value n. It is thus defined as cont.Œn!/ Ddef n:
+
+**9.2 Valid Equations**
+The most general form of a linear equation of a system net N is equation
+f1 .p1 / C : : : C fk .pk / D a;
+where p1 ; : : : ; pk are the places of N . They are the variables of the equation. f1 ; : : : ; fk are functions of the form fi W M ! A;
+where M is the set of all multisets that can occur as markings of places of N . The set A is an arbitrary set, whose elements can be added. In particular, a is an element of A in Eq. (13). A function fi is often the identity function. In this case, the tokens in pi are themselves used in the equation. fi is also often the cardinality function, in which case the number of tokens in pi is used in the equation. A is often the set M of multisets, as in Eqs. (1) and (3), or the set of natural numbers or integers, as in Eqs. (6), (7) and (10). Other variations will be introduced later. An equation of the form (13) is valid in a marking M of N if f1 .M.p1 // C : : : C fk .M.pk // D a:
+
+An equation is valid in N if it holds in each reachable marking of N . If a subtraction is defined on the set A, then “&” may also occur in place of “C” in Eq. (13), and equations may be transposed in the usual way. In the model of the cookie vending machine in Fig. 2.1, for instance jHj & 2jBj C 2jFj D 7, and jHj D cont.E/ C 2jBj:
+
+**9.3 Example: Dining Philosophers**
+The system of five thinking and dining philosophers was formulated by E.W. Dijkstra in the mid-1960s as an illustration of a synchronization problem. Five philosophers sit around a table. Initially, between each two neighboring philosophers lies a single chopstick. As an example showing the role of functions (and the multiple occurrence of a variable) in valid equations, Fig. 9.1 shows this system in its initial state: all five philosophers p1 ; : : : ; p5 are thinking, no philosopher is dining and all five chopsticks g1 ; : : : ; g5 are available. Obviously, a philosopher needs two chopsticks to start dining (transition t). So in order to do this, a philosopher pi picks up the chopstick gi to his left and the chopstick gi "1 to his right (with g0 Ddef g5 ). Two neighboring philosophers can thus never dine at the same time. When the philosopher has finished dining, he puts his chopsticks back (transition u) and again devotes himself to thinking. The functions l and r are only defined for single philosophers in Fig. 9.1. In Eq. (16), however, we apply them to sets of philosophers. We can generalize a function f from single elements to multisets as follows: f .Œa1 ; : : : ; an !/ Ddef Œf .a1 /; : : : ; f .an /!: A little less transparent is the intuitive meaning of the valid equation l(thinking) + r(thinking) – available D Œg1 ; : : : ; g5 !:
+l.Œp1 ; p3 !/
+D Œl.p1 /; l.p3 /!
+D Œg1 ; g3 !
+
+**9.4 Valid Inequalities**
+Using functions fi W M ! A as in Eq. (14), it is also possible to construct inequalities analogously to equations as shown in (13): f1 .p1 / C : : : C fk .pk / % a: This only works, however, if an order % is defined on the set A. Common examples of this are multisets (see Section 2.3) and the sets of natural numbers or integers. The relation “%” may also be replaced with “<”, “'” or “>” (in principle, predicates that are even more general are possible). Equations (11) and (12) show examples of inequalities. The validity of such an inequality in a marking M of a system net N is defined analogously to Section 9.2. From the definition of markings, it follows that for each system net N and each place p of N : M.p/ ' Œ ! for each marking M . Thus the canonical inequality holds for each place p of N . From this, it also immediately follows that jpj ' 0.
+
+**9.5 Equations and Inequalities of Elementary System Nets**
+For an elementary system net N , equations according to (13) often take the special form n1 ( p1 C ( ( ( C nk ( pk D n0 ; where n0 ; : : : ; nk are integers. Although a place p always holds a natural number M.p/ of tokens, the formalism has to operate on integers to support subtraction. The factors ni often take the value 1 and are not written. In the abstract variant of the cookie vending machine in Fig. 9.2, for instance, the following equations hold. In systems with communicating processes, the control flow of each individual process P can be represented as an equation of the form p1 C : : : C pn D 1; meaning that the control flow of P runs through the places p1 ; : : : ; pn . A valid equation of the form (18) corresponds to a special subgraph of the respective Petri net. This subgraph consists of the places p1 ; : : : ; pn used in the equation, and all adjacent transitions. In the mutual exclusion system with its valid equations (19), for instance, the places A, B and C, together with all adjacent transitions, form a circle (likewise, E, F and G). In general, the subgraph contains with each place pi all its adjacent transitions and with each transition t exactly one place in ! t and one place in t ! .
+
+**9.6 Modulo Equations**
+The value range A of the functions fi in Eq. (14) sometimes consists of the two values 0 and 1 with the modulo-2 addition, that is, 1 + 1 = 0:  As another example, in Section 13.10 we will use a modulo2 equation to prove central properties of the kindergarten game from Section 4.6.
+
+**9.7 Propositional State Properties**
+It is often convenient to formulate state properties as logical expressions, as, for instance, for the cookie vending machine: “If a signal is pending, then the storage contains at least either a rectangular or a round packet.” or “If the storage still contains all the packets of the initial marking, then signal and cash box hold equally many tokens (that is, at most one).” For the mutual exclusion system: “The left process is not critical or the key is not available.” Or for the crosstalk algorithm (Section 3.4): “If the left process is waiting, then either sentl or confirmedr or finishedr contains a token.” To formulate such expressions, it is necessary to combine valid equations and inequalities (i.e., state properties) via logical operations. For two equations or inequalities ˛ and ˇ, we define the logical negation :˛ of ˛ and the logical “and” ˛ ^ ˇ of ˛ and ˇ in a marking M of a system net N as follows:˛ holds in M iff ˛ does not hold in M; ˛ ^ ˇ holds in M iff ˛ and ˇ both hold in M: With this, we can formulate propositional state properties. In the initial marking M0 of Fig. 9.4, for instance, .A D 1/ ^ .B D 1/ as well as :.C D 1/ hold. Other logical operations like ˛ _ ˇ (“˛ or ˇ”) and ˛ ! ˇ (“if ˛, then ˇ”) can then, as usual, be derived as :.:˛ ^ :ˇ/ and :˛ _ ˇ, respectively. A propositional expression ˛ holds in a system net N if ˛holds in each reachable marking of N . The following expressions, for instance, hold ! in the cookie vending machine in Fig. 2.1.
+
+**Exercises**
+1. Which of the following equations and inequalities hold in the system net in Fig. 5.7?
+(a) 2A + B + C + D + E = 2
+(b) 2A + B + C + D + E + F + G = 3
+(c) F + G = 1
+(d) B + C = D + E
+(e) C + E + G % 1
+(f) B + D + F % 1
+2. Construct a valid equation for each of the following system nets. The factor in front of each place
+must not equal 0.
+(a) Fig. 4.1
+(b) Fig. 4.20
+(c) Fig. 9.5
+3. Show that the following equations hold in the system net in Fig. 2.1.
+(a) jHj D cont.E/ C 2jBj
+(b) jHj C 2jGj D cont.E/ C 2
+4. What property follows from the modulo-2 equation A + B + E + F = 0 for the number of tokens
+in the system net in Fig. 9.4?
+5. Prove the five propositions of Theorem 5.
+6. Show that the converse of each proposition (c)–(e) of Theorem 5 does not hold.
+7. Which of the following statements hold in the system net N of the five philosophers in Fig. 9.1?
+(a) N ˆ thinking.pi ! :dining.pi
+(b) N ˆ dining.pi ! :available.l.pi / ^ :available.r.pi /
+(c) N ˆ thinking.pi ! available.l.pi / ^ available.r.pi /
+(d) N ˆ available.gi "1 ! thinking.pi
+(e) N ˆ available.gi ! thinking.pi "1
+(f) N ˆ available.gi ! :thinking.pi "1
+8. The following refers to this chapter’s postcript “The Polite Philosophers” (next page):
+(a) Construct an “impolite” distributed run of the system net in Fig. 9.1.
+(b) Construct three more behavioral patterns of polite philosophers.
+(c) Generalize the case of n D 5 philosophers to an arbitrary number of philosophers. How many
+distributed runs exist? How many runs have distinct structures?
+(d) Expand the system net in Fig. 9.4 such that only the polite runs are generated.
+
+##Chapter 10 Traps and Cotraps of Elementary System Nets
+Traps form the basis of a particularly simple technique for proving inequalities. They take advantage of the structure of Petri nets, in particular, the simple rule for the occurrence of transitions and the alternating pattern of places and transitions. We will consider traps of elementary system nets first.
+
+**10.1 Traps of Elementary System Nets**
+Technically, a trap of an elementary system net N is a subset Q of the places of N such that for each transition t of N the following holds:
+- If there exists a place p 2 Q such that p 2 ! t, then there also exists a place q 2 Q such that q 2 t ! :
+
+**10.2 Cotraps**
+As a counterpart to a trap, a cotrap of an elementary system net N is a subset Q of the places of N such that for each transition t of N the following holds:
+- If there exists a place p 2 Q such that p 2 t ! , then there also exists a place q 2 Q such that q 2 ! t:
+Theorem 7 (Cotrap Theorem). Let N be an elementary system net with an initially unmarked cotrap Q D fq1 ; : : : ; qr g. Then the following equation holds in N : q1 C : : : C qr D 0:
+In particular, an unmarked cotrap occurs during a total system deadlock, that is, when a marking M does not enable a single transition. Of interest is the set R of the places that are unmarked in M : for each transition t there exists a place p 2 ! t such that p 2 R. Thus, R is an unmarked cotrap. The contraposition of this argument results in the following theorem. Theorem 8 (Theorem on Marked Cotraps). Let N be an elementary system net and let M be a marking of N that marks each cotrap of N . Then M enables at least one transition.
+
+**10.3 The Trap/Cotrap Property**
+Sometimes the structure of a net guarantees that each reachable marking marks each cotrap, for instance if each cotrap contains an initially marked trap as a subset. We define a system net N to have the trap/cotrap property if:
+Each cotrap R of N contains as a subset an initially marked trap:
+This definition leads us to: Theorem 9 (Trap/Cotrap Theorem). Let N be an elementary system net that has the trap/cotrap property. Then each reachable marking M of N enables at least one transition. Figure 9.3 shows a technical example in which fA,B,C,Dg is a cotrap that does not contain a trap. Thus, Theorem 9 does not apply. In fact, all tokens can accumulate in E, in which case no more steps are possible.
+
+**Exercises**
+1. Construct either a proof or a counterexample for each of the following propositions:
+(a) The union of two traps is a trap.
+(b) The intersection of two traps is a trap.
+(c) The union of two cotraps is a cotrap.
+(d) The intersection of two cotraps is a cotrap.
+2. Show that in the system net in Fig. 10.1 each cotrap is also a trap. How does this change if the loop between a and C is deleted?
+3. (a) Show that the system net in Fig. 10.2 has the trap/cotrap property.
+(b) Which property follows from the observation in (a)?
+4. Let N be an elementary system net and let Q D fq1 ; :::; qn g be a set of the places of N such that q1 C ::: C qn D 1: Prove or disprove the following propositions.
+(a) Q is a trap.
+(b) Q is a trap if each transition of N is enabled at least once.
+(c) Replace the above equation with the inequality q1 C ::: C qn ' 1: Prove or disprove propositions (a) and (b) for this case.
+5. Is the set P of all places of a system net a trap? Is P a cotrap?
+
+**Further Reading**
+Traps and cotraps have been known since the 1970s [33]. The name “trap” (German, “Falle”; French, “siphon”) directly describes the intuitive meaning of this construction. Cotraps originally came to be known as “deadlocks” or sometimes “siphons” in the literature – a confusing terminology. In modeling practice, traps occur much more often than cotraps. Lautenbach describes linear-algebraic characterizations of and corresponding algorithms for traps and cotraps (called “deadlocks” there). Of particular interest for practical applications are minimal (smallest) traps. How to calculate them efficiently]. To increase efficiency, Wegrzyn and her coauthors utilize satisfiability algorithms found in propositional logic. The paper also describes a range of other procedures for calculating traps and cotraps.
+
+##Chapter 11 Place Invariants of Elementary System Nets
+Place invariants are the most important analysis technique for system nets. They take advantage of the constant effect of transitions: each time a transition t occurs in the mode ˇ, the same multisets are moved. The effect of .t; ˇ/ is linear. For instance, if the places in ! t hold twice as many tokens, then t may occur twice as many times. The mathematics for linear behaviors is the well-known linear algebra with vectors, matrices and systems of equations. In fact, many aspects of Petri nets can be represented and calculated with these structures. We start with linear-algebraic notation for elementary system nets.
+
+**11.1 Vector Representation for Elementary System Nets**
+Chapter 3 defines a marking M of an elementary system net N as a mapping M W P &! N that maps each place p of N to a natural number. It is very easy to impose an order on the places of a system net, for instance, by means of indices of the form p1 ; : : : ; pk or by alphabetical order.  It is generally not possible to reconstruct from the vector t the input and output places ! t and t ! , respectively: zi D 0 if no arc connects pi and t, but also if there exists a loop between pi and t. With the above vectors and the classic definition of the sum t of vectors, for each step M &! M 0 of N : M 0 D M C t: This is called the vector representation of steps.
+
+**11.2 The Matrix N**
+It is equally easy to impose an order of the form t1 ; : : : ; tl on the transitions of N . Then the column vectors t i together form the matrix N of N.
+
+**11.3 Place Invariants**
+Section 9.5 has shown that a valid equation of an elementary system net N often takes the form n1 ( p1 C : : : C nk ( pk D n0 with integers n0 ; : : : ; nk and places p0 ; : : : ; pk . The number 0 is a possible factor, therefore we can always assume all places in their order p1 ; : : : ; pk in (2). Valid equations of the form (2) can be derived from solutions of the system of equations x ( N D 0; where 0E D .0; : : : ; 0/ is an l-dimensional row vector. A vector n D .n1 ; : : : ; nk / solves (3) if and only if n ( t D 0 for each transition t of N . A solution n of (3) is called a place invariant of N . With the initial marking M0 of N , the number n0 Ddef n ( M 0 (i.e. n1 ( M0 .p1 / C : : : C nk ( M0 .pk /) is the constant of n. Equation (2) then is the equation of n. The following theorem motivates this definition: Theorem 10 (Elementary Place Invariants Theorem). Let N be an elementary system net with a place invariant n. Then the equation of n holds in N . The equation derived from a place invariant is often called an invariant itself. To prove this theorem, we have to show that n ( M D n0 for each reachable marking M . The equation trivially holds for M D M0 . Furthermore, each reachable marking M can be reached from M0 with a finite number of steps. Therefore, it suffices to show that n ( M D n ( M 0 for each step M &! M 0 . This is now quite simple: n ( M 0 D n ( .M C t/ (according to (1)) D n ( M C n ( t (linear algebra) D n ( M C 0 (because n is a place invariant) D n ( M (linear algebra). Figure 11.2 shows the initial marking M0 of the system net N in Fig. 11.1 as a vector, as well as four place invariants of N together with their respective valid equations that have been derived from them. The converse of Theorem 10 holds under the mild assumption that each transition is enabled by at least one reachable marking: Theorem 11 (Converted Place Invariants Theorem). Let N be an elementary system net such that for each transition t there exists a reachable marking M that enables t. Furthermore, let Eq. (2) hold in N . Then n D .n1 ; : : : ; nk / is a place invariant of N with the constant n0. For a proof, consider a reachable step M &! M 0 . As in the proof of Theorem 10 above, it follows that n ( t D 0. Such a step exists for each transition t. The same argument can be used to prove the validity of modulo-2 equations. For the net in Fig. 9.4, for instance, .1; 1; 0; 0; 1; 1; 0; 0/ is a place invariant (with the places ordered alphabetically A; : : : ; H). This invariant has the constant 4, which is congruent to 0 (modulo 2). The equation A C B C E C F D 0, already discussed in Section 9.6, can be derived from this. Place invariants offer a powerful technique for proving properties of elementary system nets. For instance, all equations mentioned in Section 9.5 can be directly derived from place invariants.
+
+
+**11.4 Positive Place Invariants**
+The term “invariant” particularly applies to place invariants with nonnegative entries. A place invariant i of an elementary system net N is called positive for a place p of N if i.p/ > 0 and i.q/ ' 0 for each place q of N: From this it follows that: Theorem 12 (Positive Place Invariants Theorem). A place p with a positive place invariant is bounded. p thus has a number n such that M.p/ % n for all reachable markings M of N . The converse is not generally true. Particularly simple and also quite common are positive place invariants with equations of the form p1 C : : : C pk D 1: An example is the equation A C C C E D 1 for Fig. 11.1. These places are connected via arcs and transitions (in this case a, c, d and e) and thus form “paths through the net that a token can traverse.” Such a path contains
+! each involved place with all its incoming and all its outgoing arcs,
+! each involved transition with exactly one incoming and exactly one outgoing arc.
+
+The carrier of a positive place invariant i is the set of all places p with i.p/ > 0. Then: Theorem 13 (Invariant Trap/Invariant Cotrap Theorem). The carrier of a positive place invariant of a system net N is also a trap and a cotrap of N . It is also possible in Eq. (2) to replace the integers n0 ; : : : ; nk with rational numbers. Solving these equations would then be even simpler. However, rational numbers would inhibit an intuitive understanding here.
+
+**Exercises**
+1. Exercises relating to Fig. 11.1:
+(a) Construct two place invariants that are linearly independent. Derive their respective equations.
+(b) Construct a place invariant whose carrier contains all places, and derive its respective equation.
+2. Which of the following equations and propositional formulas hold in the system net in Fig. 11.4? Either prove them with the help of place invariants or construct a counterexample.
+(a) A + 2B + C + D + E = 2
+(b) A + B + C = 1
+(c) E ! A _ C _ D
+(d) A ! E
+3. Construct a counterexample for the converse of each of the two theorems in Section 11.4.
+4. Derive all the equations and inequalities shown in Section 9.5 from place invariants and traps of their respective system nets.
+5. Let N be an elementary system net in which each place has a positive place invariant. Show that there exists a single place invariant that is positive for all places of N .
+
+##Chapter 12 Combining Traps and Place Invariants of Elementary System Nets
+When two valid equations or inequalities are added or subtracted, the result is again a valid equation or inequality. We will show that such calculations substantially increase the expressive power of traps and place invariants. We will start with equations and inequalities of elementary system nets.
+
+**12.1 Calculating with Equations and Inequalities**
+According to Eq. (2) in Section 11.3, an equation of an elementary system net takes the form G1 W n1 ( p1 C : : : C nk ( pk D n0 : The addition of an equation G2 W m1 ( p1 C : : : C mk ( pk D m0 to G1 yields the equation G1 C G2 W .n1 C m1 / ( p1 C : : : C .nk C mk / ( pk D n0 C m0.
+The scalar product of G1 and a factor z yields
+z ( G1 W z ( n1 ( p1 C : : : C z ( nk ( pk D z ( n0 ; where z may very well be a negative number. Likewise, calculations with inequalities are done according to the usual rules. These operations retain the validity of equations and inequalities, and we can exploit this fact for a very powerful proving technique.
+Theorem 14 (Addition Theorem of Valid Equations and Inequalities). Let N be an elementary system net. The sum of two equations or inequalities that hold in N , as well as the product of such an equation or inequality with a factor z, again hold in N . As a proof, consider a marking M that is reachable in N . Thus, G1 and G2 hold in M . Because ni (M.pi /Cmi (M.pi / D .ni Cmi /(M.pi / for .i D 1; : : : ; k/, the sum G1 CG2 also holds in M . For z the argument is analogous. These apparently obvious calculating steps massively increase the expressiveness of the information that can be derived from traps, place invariants and the canonical inequalities p ' Œ !.
+
+**12.2 State Properties of the Mutual Exclusion System**
+The central property of the mutual exclusion system in Fig. 3.2 is C + G ≤ 1.
+
+**12.3 State Properties of the Crosstalk Algorithm**
+Figure 12.2 expands the crosstalk algorithm in Fig. 5.2 by the six places Q, R, S and U, V, W, where Q, R and S “count” the cycles of the left agent l, ordered by three properties:
+
+Q-cycle: l sends a message and receives a confirmation.
+R-cycle: l sends a message and receives a message (crosstalk).
+S-cycle: l receives a message and sends a confirmation.
+Likewise, the places U, V and W “count” the cycles of the right agent r, ordered by the respective properties of r. Now we want to show that the cycles “match each other”: if both agents are in their idle states, each two corresponding places hold equally many tokens.
+
+**12.4 Unstable Properties**
+A majority of the important state properties of an elementary system net N can usually be formulated as valid equations or inequalities. In Sections 9.4, 10.1 and 11.3 we introduced three techniques for deriving valid equations and inequalities. It is irrelevant here whether or not M is reachable in N . It is easily asserted that each canonical inequality as well as each equation or inequality derived from a trap or place invariant is stable. However, important valid equations or inequalities are often unstable. A typical example is the inequality (1) for the system net in Fig. 12.1. This inequality holds in the (unreachable) c marking ABD. The step ABD &! ABE is a step of N , where the reached marking ABE violates the inequality (1). Similarly, the inequality (5) for the mutual exclusion system holds in the (unreachable) – marking BDG. After the step BDG &! CG the reached marking CG violates (5). Nevertheless, it was possible to prove the inequalities (1) and (5) for the system nets in Figs.12.1 and 12.2: the addition of valid, stable equations and inequalities yields valid equations and inequalities that may be unstable. In practice, most important state properties can be proven by adding canonical inequalities as well as equations and inequalities derived from traps and place invariants. Technical examples like modulo equations (cf. Section 9.6) or properties like “The number of tokens in p1 ; : : : ; pn is a prime number.” rarely occur in practical applications.
+
+**Exercises**
+1. Find a proof for each of the inequalities given in (a), (b) and (c), Figs. 12.3–12.5. Do this by adding equations and inequalities derived from place invariants, initially marked traps and canonical inequalities of the respective system nets.
+2. In the light/fan system in Fig. 7.2, the cold transitions switch light on and switch light off are the user’s actions. The transitions fan starts and fan stops are the system’s reactions. Show that there cannot occur more reactions than actions.
+Hint: Expand Fig. 7.2 by a place E, as shown in Fig. 12.6. Evidently, E is marked if and only if there have occurred more actions than reactions. Now show that whenever a reaction is possible in the original system in Fig. 7.2, the place E in the expanded system is marked. (Thus, the corresponding reaction is also possible in the expanded system.)
+3. Show that the propositions (7) and (8) hold in the system net in Fig. 12.2.
+4. Prove the following: each equation derived from a place invariant, each inequality derived from an initially marked trap and each canonical inequality is stable.
+
+##Chapter 13 Traps and Place Invariants of Generic System Nets
+Analogously to Chapters 10 and 11, traps and place invariants can also be formulated for generic system nets. Traps are less important here, and we will show only one example. The placeinvariant calculus uses expressions as they occur in arc labelings.
+
+**13.1 Traps of a System Net**
+Traps of elementary and generic system nets are structurally identical. Condition (1) in Chapter 10 suffices. Of interest is the following inequality derived from an initially marked trap Q D fq1 ; : : : ; qr g: If there exists a place p 2 Q such that p 2 ! t , then there also exists a place q 2 Q such that q 2 t ! . Its validity is obvious. One can often be even more precise, as Fig. 13.1 shows. If f(f(ui )) = ui for i D 1; : : : ; n, then the inequality A C C C f.D/ ' Œu1 ; : : : ; un ! holds for the trap fA,C,Dg.
+
+**13.2 Sum Expressions**
+As described in Chapter 2, the arcs of a system net N are labeled with expressions. Typical expressions of this type are constants like ! , , , !, variables like x, y and expressions like x & 1 or f(x). However, they can also be more complex, as for instance, (x+1)mod 60. In general, an arc can be labeled with several expressions, for instance, with l(x) and r(x). Section 2.6 explains that such a set of expressions (with values assigned to the variables) describes a multiset. We now use expressions to formulate the sum of such multisets: the sum b1 Cb2 of two expressions b1 and b2 as well as the inverse &b of an expression b are again expressions. As with numbers, we write b1 & b2 for b1 C .&b2 / and assume a special expression “0” for the empty multiset.
+
+**13.3 Multiplying Sum Expressions**
+For technical reasons, we need to be able to multiply sum expressions. Let b1 and b2 be sum expressions, where b1 contains at most one variable. However, this one variable may occur several times in b1 , as for instance, the variable z in g.z; h.z//. We define the product b1 ( b2 to be again a sum expression. It is generated by replacing each occurrence of the variable in b1 with b2. As an example, consider the product b1 ( b2 of b1 D g.z; h.z// and b2 D f .x; y/: g.z; h.z// ( f .x; y/ D g.f .x; y/; h.f .x; y//: Likewise, the product b1 ( b2 of b1 D f .x/ and b2 D .y C z/ is generated as follows: f .x/ ( .y C z/ D f .y C z/: In particular, b1 ( b2 D b1 if b1 does not contain any variables at all; and b1 ( b2 D b2 if b1 D x. The product b1 ( b2 evidently contains only the variables of b2 . In particular, “real” sum expressions may also occur in such products as the arguments for functions, as in f .x C y/. With additional arithmetic rules, such expressions can always be transposed into “normal” sum expressions.
+
+**13.4 Applying a Sum Expression to a Multiset**
+As described in Section 2.6, each expression b with at most one variable x for an element u of a universe U can be evaluated by replacing each occurrence of x with u. The result is again an element of U , written as b.u/. Generalized to include multisets, let b.Œu1 ; : : : ; un !/ D Œb.u1 /; : : : b.un /!: If u1 ; : : : ; un are considered expressions (without variables), then (3) together with (2) corresponds to the equation b ( .u1 C : : : C un / D b ( u1 C : : : C b ( un : In (3) the sum expression b represents a function that is applied to a multiset Œu1 ; : : : ; un ! and again yields a multiset.
+
+**13.5 The Matrix N of a System Net N**
+In the following sections, let N be a system net with the places p1 ; : : : ; pk and the transitions t1 ; : : : ; tl . The labeling pi tj of matrix of a system net the arc from pi to tj generally consists of several expressions a1 ; : : : ; an . They are henceforth written as a sum expression a1 C : : : C an . Likewise, the labeling tj pi of the arc from tj to pi forms a sum expression. With this, we construct the entry N .i; j / of the matrix N of N as the sum expression N.i; j / Ddef tj pi & pi tj.
+
+**13.6 The Place Invariants of a System Net**
+Now let b D .b1 ; : : : ; bk / be a vector of sum expressions bi.i D 1; : : : ; k/, each containing at most one variable. b solves the system of equations x(N D0 if and only if for each j : b1 ( N .1; j / C : : : C bk ( N .k; j / D 0. Each solution to (4) is a place invariant of N . The invariant of N5 presupposes the inverse functions f"1 and g"1 . The invariant of N6 only holds if f(f(x)) D x. The variable of each sum expression bi of a place invariant .b1 ; : : : ; bn / of a system net N is arbitrary. However, it is often convenient to use the ith place of N as the variable for bi.
+
+**13.7 The Constant of a Place Invariant**
+The initial marking M0 of N determines the value of the constant of a place invariant b D .b1 ; : : : ; bk /. Thereby, the expressions bi are applied to the initial marking of the places pi. The resulting multisets are then added.
+
+**13.8 The Equation of a Place Invariant**
+We have now gathered everything we need to formulate valid equations: for a place invariant b D .b1 ; : : : ; bk / of N with the constant b0 , b1 .p1 / C : : : C bk .pk / D b0 is the equation of b. Figure 13.2 shows the equations of the place invariants of the system nets N1 ; : : : ; N6 . Section 9.2 describes the validity of such equations in N . With this, we can formulate the central theorem for place invariants of generic system nets: Theorem 15 (Generic Place Invariant Theorem). Let N be a system net and let b be a place invariant of N . Then the equation of b holds in N . The (quite extensive) proof is left to the reader. With this theorem, the derived equations shown in Fig. 13.2 thus hold in the system nets N1 ; : : : ; N6 . The question remains of how to calculate place invariants. This is already quite challenging for elementary system nets, because integer solutions are required there. Otherwise, the invariants would not have any intuitive meaning. At least it is possible to divide and apply the usual Gauss elimination there. However, generic system nets do not know division. In practice, system properties and place invariants are not aimlessly calculated, but are specifically required or assumed. Such an assumption is easily tested by inserting the respective values. Occasionally, an assumed place invariant is “almost” correct and can be adjusted by systematic trial and error.
+
+**13.9 Properties of the Philosophers System**
+According to Theorem 15, they hold in the philosophers system. Intuitively, (5) means for each reachable state of a philosopher pi : either pi is thinking or pi is dining. Equation (6) asserts for each chopstick gi : it is either available or is the left chopstick of a dining philosopher or the right chopstick of a dining philosopher. The intuitive meaning of (7) is better understood when represented as available C Œg1 ; : : : ; g5 ! D l.thinking/ C r.thinking/; where for each chopstick gi we distinguish two cases: 1. gi is not available. Then gi occurs exactly once on the left side of (8). This means that, according to the right side of (8), there exists exactly one thinking philosopher, whose left or right chopstick is gi . Thus, the other user of the chopstick is dining. 2. gi is available. Then gi occurs twice on the left side of (8). This means that there exist two thinking philosophers p and q such that gi is the left chopstick of p and the right chopstick of q.
+
+**13.10 Properties of the Kindergarten Game**
+To understand the model of the kindergarten game, we derive a valid equation from one of its invariants. Figure 13.4 shows its matrix, an invariant b and its initial marking M0 . Together with the modulo-2 equation 1 C 1 D 0 in Fig. 13.4, the function f in b maps each multiset of children to either 0 or 1 (cf. Sect. 9.6). First we show that b is indeed a modulo invariant. For the first and third column, the following holds: f .x/ ( .&Œ!!/ D f .&Œ!!/ D &f .Œ!!/ D &0 D 0: The initial marking M0 consists of two numbers B and W of children dressed in black and white, respectively: M0 .children/ D B ( Œ!! C W ( Œı!. With this marking, the constant of the invariant b has the value f .M0 .children// D f .B ( Œ!! C W ( Œı!/ D f .B ( Œ!!/ C f .W ( Œı!/ D B ( f .Œ!!/ C W ( f .Œı!/ DB (0CW (1 D0CW DW 0; if W is even 1; if W is odd. It follows directly: the dress color of the last remaining child depends neither on the order in which the children form pairs and leave the play area, nor on the number of children initially dressed in black. It depends solely on whether the number of children initially dressed in white is odd or even.
+
+**Exercises**
+1. Construct the matrix of the system net in Fig. 13.1. Find two place invariants and derive their respective equations.
+2. Construct the matrix of the system net in Fig. 13.5. Find two place invariants and derive their respective equations. Let f.f.x// D x in this system net.
+3. Prove Theorem 15.
+
+**Further Reading**
+Typed and Untyped Formalisms
+Most programming languages use explicit data types, typically real, int, char, bool, as well as types like records or arrays composed from them. Each variable of a program is assigned such a type. An attempt to assign to a variable a value that falls outside the variable’s type results in an error message. This typing allows a compiler to generate efficient code and to recognize some inconsistencies in the program during compile time. Similarly to the variables of a program, the places of a system net can be typed: a place p can only hold tokens of specific type (as, for instance, the place available in Fig. 9.1, which can only hold chopsticks) or p may have an upper bound for the number of tokens it can hold. Many variants of Petri nets type their places by extending the rule for the occurrence of transitions: the generated tokens have to fulfill the respective conditions. Jensen’s colored nets [38] are a prominent example. We use an untyped version in this book. It is technically simpler, but is as expressive as a typed calculus. However, a system net is intuitively easier to understand if each place has a specified token type. We suggest to not demand and construct such properties, but to verify them instead. Place invariants are especially suited for this. This suggestion conforms to the approach of numerous other modeling techniques in which properties (e.g., typing) are not demanded, but are verified. Lamport, for instance, uses this approach to motivate the absence of types in TLA.
+
+**Dijkstra’s Pebble Game**
+The Pebble Game originated in the circle around Edsger W. Dijkstra. It is a variant of the kindergarten game described in Section 4.6 that uses black and white pebbles in a pot as well as a game master instead of autonomous children in a play area. The system is modeled nondeterministically and is an example of a program whose complex termination behavior (the last pebble is black if and only if the initial number of white pebbles is even) is easily understood by means of program invariants. The program is very popular in introductory texts. This example clearly shows the general connection between programs and Petri nets: a program is executed by an operating system (here: the game master). The operating system initiates the execution of an instruction. In the case of nondeterminism, it chooses one of several alternatives. Petri nets do not assume such an executing entity. An enabled transition occurs without any external influence. Therefore, the kindergarten game in Section 4.6 does not have a game master. If the play area is “very large” or if “very many” children are playing, nobody can keep track of, much less control, the game. The concept of the distributed run is therefore very appropriate here.
+
+##Chapter 14 Marking and Covering Graphs
+The marking graph G of a system net N has already been introduced in Section 2.8. Its nodes are the reachable states, its edges the reachable steps of N . We will specify a series of properties of N that are mirrored in G. However, G is generally infinitely large. We therefore construct the finite covering graph H , which approximates G. A series of necessary or sufficient conditions for some properties of N can be specified by means of H .
+
+**14.1 Deriving Properties from the Marking Graph**
+Finite marking graphs may very well exceed exponential growth with respect to the size of N . Therefore, they are generally unsuited for manual analysis of properties of N . Nevertheless, a few properties of a system net can be identified by means of its marking graph. We define six such properties of system nets N and immediately characterize them as properties of the marking graph G of N : 
+! N terminates, i.e., each run of N is finite: G is finite and does not contain any loops. 
+! N is deadlock-free, i.e., each reachable marking enables at least one transition: each node of G is the start of at least one edge. 
+! N is live, i.e., for each reachable marking M and each transition t there exists a marking M 0 that is reachable from M and enables t: for each transition t there starts a path at each node of G such that t occurs in its edge labeling.
+! N is weakly live, i.e., for each transition t there exists a reachable marking that enables t: at least one edge of G is labeled with t.
+! N is bounded, i.e., there exists a number b such that each
+place contains at most b tokens in any reachable marking: G
+is finite.
+! N is reversible, i.e., from each reachable marking, the initial marking can be reached: G is strongly connected. With this, a series of properties of system nets are reduced to graph theoretical problems. As an example, Fig. 14.1 shows an elementary system net with two unbounded places B and C. With the above characterizations of properties, N is deadlock-free, not live, weakly live, unbounded and not reversible.
+
+**14.2 The Idea of the Covering Graph**
+An elementary system net N with at least one unbounded place has an infinite marking graph. We therefore construct a finite covering graph H that approximates the marking graph: regular, infinite substructures of the marking graph are condensed into finite subgraphs by means of !-markings. The procedure is ambiguous: N may have several distinct covering graphs. However, they all fulfill the required purpose. Technically, H uses markings M with entries of the form M.p/ D !. Intuitively, such an !-marking indicates that the place p is unbounded: for each bound n there exists a reachable marking M such that M.p/ > n.
+
+**14.3 w-Markings**
+w-markings M generalize the usual markings by indicating the unboundedness of a place p with M.p/ D !. An w-marking M of an elementary system net N with a place set P is thus a mapping.
+
+**14.4 The Construction of the Covering Graph**
+A covering graph H of a system net N is constructed step by step. Each step generates an edge to an existing or to a new node. Initially, H does not have any edges and only one node, the initial marking M0 of N . Now let the graph be partially constructed:
+
+a) Let the w-marking M already be a node of H . t
+b) Let N have a step of the form M &! M 0 .
+c) Let there be no t-labeled edge in H that starts in M . 
+Then the w-marking M 00 is defined for each place p of N as:
+if there exists a path from M0 to M that contains a node L such that L % M and L.p/ < M.p/
+otherwise
+The edge M &! M 00 is now added to the graph. If M 00 is not already a node, it is added as a new one. The algorithm terminates if for each node M and each transition t that is enabled in M , there exists a t-labeled edge that starts in M . During the construction of H there generally exist several nodes with several enabled transitions that have not been processed yet. Depending on the order in which these transitions are processed, different covering graphs may be generated. 
+
+**14.5 The Finiteness of the Covering Graph**
+A covering graph is only useful if its construction terminates. This is always the case: Theorem 16 (Theorem on the Finiteness of Covering Graphs). A covering graph of an elementary system net N is always finite. The theorem’s proof is essentially based on the following property: to each sequence M0 M1 : : : of mutually distinct markings Mi of N there exists an increasing sequence n0 < n1 < : : : of indices such that M n0 < M n1 < : : : ; where M < M 0 for two markings M and M 0 if and only if M.p/ % M 0 .p/ for each place p of N and M.q/ < M 0 .q/
+for at least one place q of N . The proof is left as an exercise.
+Intuitively, (1) is based on the fact that there do not exist any infinitely decreasing sequences k1 > k2 > : : : of natural numbers.For an indirect proof of the theorem, we now assume that an infinite covering graph H of N would indeed exist. According to the construction of covering graphs in the previous section, each node is reachable from M0 and only has a finite number of successors. Therefore, because H is infinite, during its construction, an infinite path According to (1), the (infinite) sequence M0 M1 : : : contains an infinitely increasing subsequence Mn0 < Mn1 < : : :. According to the construction of covering graphs, the number of places p with Mni .p/ D ! increases with each ni . This would require infinitely many places. However, N only has a finite number of places. The proof follows by contradiction.
+
+**14.6 The Covering of Sequential Runs**
+Let N be an elementary system net. An w-marking M of N covers a marking M if for each place p of N : M .p/ D M.p/ or M .p/ D !: This leads to: Theorem 17 (Covering Theorem). The proof follows from the construction of H via induction over i. The converse is generally not true. In general, different system nets may have the same covering graph. The construction of such an example is left as an exercise.
+
+**14.7 Simultaneously Unbounded Places**
+It is easy to construct trivial covering graphs covering each and every sequential run of an elementary system net: each place contains an !-entry. A sensible covering graph only contains !entries for the unbounded places. Furthermore, several !-entries in a single node indicate simultaneously unbounded places: a set Q of places of N is simultaneously unbounded if for each number i 2 N there exists a reachable marking M i of N such that for each q 2 Q: M i .q/ ' i: In fact, the construction procedure in Section 14.4 only generates “sensible” covering graphs. For a node M of a covering graph and a place p of N , let p 2 !M iff M.p/ D !:
+Then: Theorem 18 (Simultaneous Unboundedness Theorem). Let H be a covering graph of an elementary system net. Then, for each node M of H , the set !M is simultaneously unbounded. 
+Then there exists a path in H of the form L &! : : : &! M 0 with L % M 0 and !L ¤ !M 0 . For the construction of M i , we assume according to the induction hypothesis a reachable marking Li with Li .p/ D i C .i C n/ ( m C n if p 2 !L , or Li .p/ D L.p/ otherwise. Now, starting from Li let the transition sequence u1 ; : : : ; um occur i C n times in total, followed by ti ; : : : tn . Each step ui reduces the number of tokens of each place in !L by at most one. Each sequence u1 ; : : : ; um increases the number of tokens of each place in !M i and !L by at least one. Each step ti reduces the number of tokens of each place in !M 0 by at most one. Therefore, the resulting marking has the property required of M 0 .
+
+**14.8 Dead Transitions**
+A transition t is dead if no reachable marking enables t. The following theorem is easily proven: Theorem 19 (Theorem on Dead Transitions). Let H be a covering graph of an elementary system net N . A transition t is dead in N if and only if H does not have a t-labeled edge.
+
+**14.9 Covering Graphs of Generic System Nets**
+The procedure in Section 14.4 can also be applied to construct the covering graph of a generic system net. The order on multisets has already been introduced in Section 2.3. Everything else is analogous. In particular, the properties described in Sections 14.5 through 14.8 also apply to generic system nets.
+
+**Exercises**
+1. Construct two different elementary system nets that have the same covering graph.
+2. In the proof of Theorem 16, the following subtask remains: Let P be a finite set and let M0 M1 : : : be a sequence of mappings Mi W P ! N.i D 0; 1; : : :/. Show that there exists a strictly increasing sequence n0 < n1 < ::: of indices such that Mn0 % Mn1 % ::: . Hint: We recommend induction over the cardinality of P . For jP j D 1 and for the induction step, we recommend the inductive construction of the indices n0 ; n1 ; ::: . 
+3. Construct elementary system nets N with the following properties:
+(a) N is deadlock-free and not live.
+(b) N is unbounded and reversible.
+(c) N is live, bounded and not reversible.
+(d) N is live (i.e., in particular deadlock-free) and reversible and for the initial marking M0 , the following holds:
+If in M0 an additional token is placed on any of the places of N , the net with this new initial marking is no longer deadlock-free.
+4. Show for any given elementary system net N :
+(a) If N is deadlock-free, it does not terminate.
+(b) If N is live, it is deadlock-free.
+(c) N is live if and only if for each reachable marking of N , when treated as the initial marking, there do not exist any dead transitions.
+(d) N is bounded if and only if the number of reachable markings of N is finite.
+(e) If N is bounded, the construction of the covering graph yields the marking graph of N .
+
+## Chapter 15 Reachability in Elementary System Nets
+Determining the reachability of an arbitrary marking is one of the interesting, but also one of the most difficult problems of elementary system nets. How to decide whether a marking M of an elementary system net N is reachable (from the initial marking M0 )? If only a finite number of markings is reachable, it is possible to construct each of them and test whether M is among them. If M is reachable, it is also possible to incrementally construct the (possibly infinite) marking graph until M is eventually encountered. However, if an infinite number of markings is reachable in N , and M is not one of them, then this procedure fails. Nevertheless, the problem can be solved: it is possible to construct a finite set K of reachable markings of N such that M is reachable if and only if M is an element of K. However, this set is incredibly large and it was a long time before the reachability problem was solved. In this chapter, we will discuss a necessary condition for the reachability and thus a sufficient condition for the unreachability of a marking. At the same time, we will formulate criteria for deciding whether a finite or an infinite number of markings are reachable. To do this, we will add the marking equation and transition invariants to our set of linear-algebraic tools. The covering graph, too, yields criteria for the reachability of markings and for the finiteness of the set of reachable markings.
+
+**15.1 Corollaries of Place Invariants**
+Some information on the reachable and unreachable markings of an elementary system net N can be derived from its place invariants. A direct corollary of the Elementary Place Invariants Theorem in Section 11.3 for each marking M of N is: if N has a place invariant i such that i ( M ¤ i ( M 0; then M is unreachable. The converse is not generally true: i (M D i ( M 0 does not guarantee that M is reachable. A direct corollary of the Positive Place Invariants Theorem in Section 11.4: Theorem 20 (Finiteness Theorem of Positive Place Invariants). If each place of an elementary system net N has a positive place invariant, then only a finite number of markings is reachable in N . The converse of this theorem is not generally true.
+
+**15.2 The Marking Equation**
+In general, for each step sequence % from a marking M to a marking M 0 , the following holds: if ti occurs exactly ai times in % (i D 1; : : : ; l), then the vector a D .a1 ; : : : ; al / solves the system of equations. The vector a is called the counting vector of % . Reasonably, we only consider vectors a D .a1 ; : : : ; al / with natural numbers ai solutions of (2).
+Theorem 21 (Theorem on the Marking Equation). Let N be an elementary system net with a step sequence % from a marking M to a marking M 0 . The counting vector of % solves the marking equation for M and M 0 . The converse is not generally true: not each solution a to the marking equation (3) is a counting vector of a step sequence from M to M 0 . However, if it is possible to – figuratively speaking – “borrow” tokens, then each solution to the marking equation is a counting vector of a step sequence: Theorem 22 (Viability Theorem). Let N be an elementary system net with markings M and M 0 and a solution a to the marking equation (3). Then there exists a marking L of N and a step sequence % from M C L to M 0 C L such that a is the counting vector of % . For a proof, one can choose a sufficiently large L such that all transitions in % can occur independently from one another. The “borrowing” of tokens is only necessary if the net N contains a cycle, that is, if a chain of arcs closes a circle. Otherwise, N is acyclic. Each solution to (3) is then the counting vector of a step sequence from M to M 0 : Theorem 23 (Acyclic Viability Theorem). Let N be an acyclic elementary system net with markings M and M 0 , and let a be a solution to the marking equation for M and M 0 . Then a is the counting vector of a step sequence from M to M 0 . The theorem can be proved by induction over the sum of the components of a. The transitions “leading” in N are marked in M. From the Theorem on the Marking Equation, there immediately follows: if there does not exist a solution to (3), then M 0 is unreachable from M .
+
+**15.3 Transition Invariants**
+Of interest is the special case M D M 0 in the marking equation (3). Then the equation is reduced  where the length of the vector 0 D .0; : : : ; 0/ is equal to the number of places of N . Analogously to (3) in Section 11.3, a solution m D .m1 ; : : : ; mk / to (4) with natural numbers m1 ; : : : ; mk is a transition invariant of N 
+Theorem 24 (Transition Invariants Theorem). Let a be a transition invariant of an elementary system net N , and let % be a step sequence from a marking M to a marking M 0 such that a is the counting vector of % . Then M and M 0 are identical.
+The converse also holds and yields: Theorem 25 (Reproducibility Theorem). If an elementary system net N does not have any transition invariants, then no marking is again reachable from itself. Transition invariants are of interest in various contexts. If N is bounded (if covered by a positive place invariant, for instance) and a transition t does not occur in any transition invariant with an entry > 0, then t occurs only a finite number of times. The frequencies of the transitions of a scenario form a transition invariant. Likewise, transition invariants with small entries are candidates for the construction of scenarios.
+
+**Exercises**
+1. Disprove the converse of Theorem 21: Construct an elementary system net N with an unreachable marking M 0 , whose marking equation N ( x D M 0 &M 0 has a solution with natural-number entries.
+2. Calculate three viable transition invariants of the crosstalk algorithm in Fig. 3.9. Hint: Consider the connection between transition invariants and scenarios.
+3. Prove the Acyclic Viability Theorem (Theorem 23).
+
+
+## Chapter 16 Run Properties
+The question raised in the previous chapter, whether or not it is possible to reach a marking M of a system net, is now strengthened to considering whether or not M is definitely reached.
+
+**16.1 Intuitive Question**
+This is an entirely new problem, because each question covered thus far (in Chaps. 9–15) only relates to properties of individual, reachable markings or (like reversibility and liveness) to individual paths in the marking or covering graph. However, the question of whether a marking is definitely reached relates to each and every run of the corresponding system net. The crosstalk algorithm N in Fig. 3.7 contains a typical example: the return of a waiting process to its idle state. In each t1 t2 sequential run w D M0 &! M1 &! : : : of N , each marking Mi with Mi .waitingl / D 1 is followed by a marking Mi Ck , k ' 0, with Mi Ck .idlel / D 1. This is not directly obvious and the question arises how to prove it. In general, questions relating to properties with similar structures arise in many systems: the bell of the bell clock tolls every hour on the hour. In the kindergarten game, only one child will eventually remain in the play area. In the system of the dining philosophers, each chopstick will always become available again. Some properties are composed of elementary properties. For instance, for each inserted coin, the cookie vending machine either gives out a cookie packet or returns the coin. When the light of the light/fan system is switched on, either the fan starts at some point or the light is switched off again. Occasionally, it is of interest that a certain property is not valid: the mutual exclusion system  does not guarantee that each waiting process will eventually become critical. The crosstalk algorithm does not require a process to leave its idle state. All these properties are run properties of a system net.
+
+**16.2 Defining Run Properties**
+In order to comprehend run properties, we fall back on state properties (Chap. 9) of the form p ' 1 for places p. As explained in Sect. 9.7, we write for a marking M M ˆ p; (“p is valid in M ”) if M.p/ ' 1. For instance, locall is valid in the initial marking M0 of the mutual exclusion system. The logical combination localr ^ key: is also valid in M0 . Technically, a run property is constructed from two state properties e and f of N and written as (“e leads to f ”). The validity of e 7! f does not relate to an individual marking, but to a sequential run % D M0 &! M1 &! ( ( ( of N . Property (2) is valid in % if for each index i the following holds: if Mi ˆ e, then Mj ˆ f for a j ' i. Property (3) is valid in a system net N if and only if (3) is valid in each complete sequential run of N .
+
+**16.2 Defining Run Properties**
+One often wants to express that from each marking M a marking M 0 with a property f is reached. For instance, from each reachable marking of the crosstalk algorithm, a marking that marks idlel is reached. To express this as a property of the form (2), a state property e is needed that is valid in each reachable marking. In the world of logic we obviously choose e = t rue. Thus, for the crosstalk algorithm, the following is valid: t rue 7! idlel : Thus far, we have covered run properties of elementary system nets. Run properties of generic system nets are formulated entirely analogously. The only difference is that individual tokens u in a place p are described as propositional atoms, analogously to (1). As explained in Section 9.7, we write p:u. With this notation, for instance, the return of the left and right chopstick of each dining philosopher in the system net in Fig. 9.1 is described as dining:a 7! .available:l.a/ ^ available:r.a//: For each inserted coin, the cookie vending machine in Fig. 1.10 either gives out a cookie packet or returns the coin. For the bell clock and for the kindergarten game, the respective properties t rue 7! on and t rue 7! jchildrenj D 1 are obviously valid.
+
+**16.3 The Deduction Rule**
+Section 16.2 defined the validity of a run property in a system net N over the set of all complete sequential runs of N . The net N may very well have infinitely many such runs and each may be infinitely long. To show that a run property e 7! f is valid in a system net, it is obviously impossible to assert for each individual run that e 7! f is valid in it. However, it is possible to deduce simple, valid run properties directly from the static structure of a system net and then use them to derive more complex properties. Figure 16.3 shows five examples of small subnets. They are to be seen as being embedded into a larger net N , indicated by the dashed arcs. Each subnet’s corresponding property is then valid in N. Consider, for instance, the case of the subnet (1) occurring in N : let w be a complete run of N , and let M be a marking of w with a token in A. Since M enables the transition t and there are no other transitions in A! , the transition t will eventually occur in w. In doing so, a marking M 0 with a token in B is reached. Therefore, A 7! B is valid in N . The case of the subnet (4) occurring in N is completely analogous: let M be a marking of w with a token in A. The marking M thus enables the transition t. Now, during the course of w, the place C may also receive a token. In this case, u may occur instead of t. Therefore, we may only conclude that either B or D receives a token. The example list of valid run properties in Fig. 16.3 is by no means complete. The general case of elementary system nets is described by a deduction rule for run properties. For an elementary system net N with the set P of places, this rule generates valid properties of the form Q 7! .f1 _ : : : _ fn /; where Q; f1 : : : : ; fn # P . With the shorthand of (25) from Section 9.7, a set fp1 ; : : : ; pk g of places describes the logical expression p1 ^ : : : ^ pk . To formulate the deduction rule, we define the effect that a transition t of N has on a set Q # P as the set of tokens of Q that remain after the occurrence of t or are newly generated: eff .Q; t/ Ddef .Qn! t/ [ t ! : eff .Q; t / eff .A; t/ D eff .AB; t/ D C eff .D; t/ D eff .AD; t/ D eff .ABD; t/ D CD All this leads to the following deduction rule for run properties of a system net N with a given set Q of places of N :
+1. Test applicability: does N have a hot transition t such that t # Q? If not, the rule is not applicable.
+2. Exclude transitions: choose T D ft1 ; : : : ; tn g # Q! such that for each t 2 Q! the following holds: either t 2 T or N ˆ Q ! :! t.
+3. Derive property: the property Q 7! eff .Q; t1 / _ : : : _ eff .Q; tn / is valid in N . As an example, we prove AC 7! BC for (5) in Fig. 16.3 under the assumption that A ! : E:
+1. t is a hot transition with ! t D A. Thus, the rule is applicable.
+2. .AC/! D ft; ug. From the assumption that A ! : E, it follows that A ! :! u. Thus, we can exclude u and choose T D f t g.
+3. The proof follows, since eff . AC,t / D BC.
+
+**16.4 Proof Graphs**
+The following theorem asserts that each property derived via this rule is actually valid in N : Theorem 26 (Theorem on Deduced Run Properties). Let N be an elementary system net, and let Q be a subset of its places such that Q enables at least one hot transition of N . Let T D ft1 ; : : : ; tn g # Q! such that N ˆ Q ! :! t for each t 2 Q! nT . Then N ˆ Q 7! eff .Q; t1 / _ : : : _ eff .Q; tn /: With this theorem, the properties shown in Figs. 16.3 and 16.4 follow immediately. When testing the rule’s applicability, it is important that t is hot. If, in the examples in Fig. 16.3, the transition t was cold and u was hot, only (3) would be valid. A property of the form C 7! q cannot be derived for any of the examples in Fig. 16.3, because C alone does not enable any transition. Such simple run properties, deduced directly from the net structure, can be used in proof graphs to assert more complex properties. This technique exploits a series of characteristics of run properties. The most important is transitivity: If N ˆ e 7! f and N ˆ f 7! g; then also N ˆ e 7! g: With this, it is possible to form chains e0 7! e1 7! : : : en to prove that e0 7! en . Another important characteristic is the rather simple observation that “7!” is weaker than the logical implication: If N ˆ e ! f , then N ˆ e 7! f:
+As to the proof: (3) requires j ' i; here j D i suffices. Finally, the logical disjunction and “7!” can be combined: If N ˆ e 7! .f1 _ f2 /, N ˆ f1 7! g and N ˆ f2 7! g; then also N ˆ e 7! g:
+Obviously, the propositional conjunction N ˆ e 7! .f1 ^f2 / implies that N ˆ e 7! f1 and N ˆ e 7! f2 ; and for the propositional disjunction, N ˆ e 7! f1 or N ˆ e 7! f2 implies that N ˆ e 7! .f1 _f2 /: The respective converse does not hold. We now define a proof graph as a finite, acyclic graph with state properties as nodes. A proof graph graph G for N ˆ p 7! q has p as its initial and q as its final node. For each node r with let N ˆ r 7! .r1 _ : : : _ rn /. Figure 16.5 shows a proof graph for N ˆ A 7! E with N from Fig. 16.1. To aid an intuitive understanding, we write “7!”-edges as “!” if “7!” represents the propositional implication according to (7). Edge labelings indicate the transitions that occur.
+
+**Exercises**
+1. Construct elementary system nets that disprove each of the following propositions:
+(a) If N ˆ p 7! q and N ˆ r 7! s, then N ˆ p ^ r 7! q ^ s.
+(b) If N ˆ q ^ r 7! s, then N ˆ q 7! s or N ˆ r 7! s.
+2. Prove the following for the crosstalk algorithm in Fig. 3.9: if the left process leaves its initial state, A, it returns there.
+3. (a) The run property N ˆ AB 7! C holds in the system net in Fig. 16.6. Show that this cannot be proved by means of a proof graph.
+4. Prove or disprove:
+(a) If N ˆ e1 7! f and N ˆ e2 7! f , then N ˆ .e1 _ e2 / 7! f .
+(b) If N ˆ .e1 _ e2 / 7! f , then N ˆ e1 7! f and N ˆ e2 7! f .
+5. Prove the reading rule for run properties (Theorem 26).
+
+## Chapter 17 Free-Choice Nets
+Traps and place invariants exploit the general structure of Petri nets. For nets with particular structural properties, like the freechoice property, there are further analysis techniques.
+
+**17.1 Defining Free-Choice Nets**
+Essentially, two structural properties describe the dynamics of a system net:
+
+- Places with multiple succeeding transitions: such a place can describe different alternatives and continue a certain behavior.
+- Transitions with multiple preceding places: such a transition can synchronize multiple behavioral strands. 
+These two structural properties may be closely intertwined in a system net, for instance, if a place has multiple succeeding transitions and (at least) one of them has another preceding place. In this case, the local behavior may depend on the entire system net: a token in a place p does not necessarily enable each succeeding transition t of p. Additional tokens may independently appear or disappear in other preceding places of t. Likewise, it is not guaranteed that a synchronizing transition actually occurs. A free-choice net does not allow such structures: an elementary system net N is called a free-choice net. There is also a completely different motivation for this type of net: The synchronization of tokens is deterministic. The tokens required for the occurrence of a transition accumulate and do not get lost again. For each transition t of N with j! tj ' 2 and each place p 2 ! t, we now require that p ! D ftg:
+These two definitions, (1) and (2), actually describe the same nets:
+- A third, symmetrical definition also describes the same nets: for each arc p 
+- t of N , either t D fpg or p ! D ftg:
+
+**17.2 The Trap/Cotrap Theorem for Free choice nets**
+Chapter 10 has shown that in each elementary system net with the trap/cotrap property, each reachable marking enables at least one transition. For free-choice nets with the trap/cotrap property, an even more powerful theorem holds: each transition can always become enabled again (the net is live, as defined in Chap. 10). Theorem 27 (Trap/Cotrap Theorem for Free-Choice Nets). Let N be a free-choice net. Then N is live if and only if N has the trap/cotrap property. The proof is not easy. From this theorem, there immediately follows: if further tokens are added to the initial marking of a live free-choice net, the result is again a live net. This does not hold for common elementary system nets. A series of properties of free-choice nets can be decided comparatively efficiently.
+
+**17.3 Clusters**
+A cluster is a particularly simple subnet. It turns out that freechoice nets consist of such clusters. A cluster of a net N is a subset of its places and transitions. There exist two different types: 
+
+1. For a place p with p ! D ft1 ; : : : ; tn g .n ' 0/, let the input elements ! ti of each transition ti .i D 1; : : : ; n/ contain only p. The particularly simple structure fp; tg with p ! D ftg and ! t D fpg is obviously a cluster of both types. Then fp; t1 ; : : : ; tn g is a free-choice cluster of N : a token in p has a “free choice” between the transitions ti .
+2. For a transition t with ! t D fp1 ; : : : ; pm g .m ' 0/ let the post-set pj! of each place pj .j D 1; : : : ; m/ contain only t. Then ft; p1 ; : : : ; pm g is a deterministic synchronization cluster of N . The transition t occurs after it has “waited” for the places p1 ; : : : ; pm to become marked.
+
+The clusters of a free-choice net N partition N :
+Theorem 28 (Cluster Theorem for Free-Choice Nets). An elementary system net N is a free-choice net if and only if each place and each transition of N lies in exactly one cluster of N . The proof uses definition (3) of free-choice nets. If N is a free-choice net, then for each arc .p; t/ there exist two possibilities: either ! t D fpg, in which case there exists a free-choice cluster .p; : : : ; t; : : :/, or p ! D ftg, in which case there exists a deterministic synchronization cluster .t; : : : ; p; : : :/. If N is not a free-choice net, then there exist an arc .p; t/, a transition u and a place q such that t; u 2 p ! and p; q 2 ! t. Thus, p and t are not part of any cluster.
+
+**17.4 The Rank Theorem**
+A net that adequately models a real system is often live (each transition may always become enabled again) and bounded (no place may accumulate unboundedly many tokens). For a freechoice net N , liveness and boundedness can essentially be characterized with a connection between the clusters and the matrix of N : the rank of the matrix N of N is 1 less than the number of clusters of N . The rank of N is, as usual, the number of linearly independent columns of N . This yields the following theorem: Theorem 29 (Rank Theorem for Free-Choice Nets). For a connected free-choice net N , there exists an initial marking with which N is live and bounded if and only if (a) N has a positive place invariant i, whose carrier contains each place of N . (b) N has a transition invariant j whose carrier contains each transition of N . (c) If the rank of N is k, then N has exactly k C 1 clusters.
+
+**Exercises**
+1. Construct the clusters of the free-choice net in Fig. 17.2. Determine the type of each cluster.
+2. Show that the free-choice net in Fig. 17.3 is live if its initial marking marks either of the places B, D or E.
+3. Verify by means of the Rank Theorem whether there exists an initial marking for the free-choice net in Fig. 17.4 with which it is live and bounded.
+
+##Chapter 18 Marked Graphs
+If the free-choice structure is further restricted such that it does not allow any choices at all, the result is a marked graph. This restriction greatly simplifies the analysis. In particular, for each marked graph N , there exists an initial marking such that N is live and 1-bounded.
+
+**18.1 Defining Marked Graphs**
+An elementary system net N is a marked graph if for each place p of N : j! pj D jp ! j D 1: shows a marked graph. The central structural properties of marked graphs are paths and cycles. A path of N is a sequence w D p1 : : : pn of mutually distinct places with pi ! D ! pi C1 for .i D 1; : : : ; n & 1/. The marked graph in Fig. 18.1 has eight cycles: AB, CD, EF, ACDB, ACEFDB, CEFD, BGFD, HFD. It is easy to see that each cycle is a positive place invariant. Therefore: Theorem 30 (Cycle Theorem for Marked Graphs). Let N be a marked graph and let p1 : : : pn be a cycle of N , initially holding a total of k tokens. Then the following equation holds in N : p1 C : : : C pn D k.
+
+**18.2 Liveness of Marked Graphs**
+Section 14.1 has defined the liveness of a system net N . A net N is live if for each transition t and each reachable marking M of N , the following holds: from M there can be reached a marking M 0 that enables t. For a marked graph, this property directly follows from its structure: Theorem 31 (Liveness Theorem for Marked Graphs). A marked graph N is live if and only if each cycle of N contains at least one initially marked place. The if-part is obvious: without an initially marked place, a cycle w D p1 : : : pn is unmarked in each reachable marking, because w is a place invariant. Thus, no transition in pi! can ever occur. To show the only-if-part, let M be a reachable marking and t a transition of N . According to our assumption, each cycle of N contains at least one initially marked place. Thus, according to the above theorem, M also marks each cycle. Then there exists a path p1 ; : : : ; pn with pn! D t such that the transition t 0 in ! p1 t0 is enabled in M . The step M &! M 00 reduces the length of this path. Via induction over the length of such a path, a marking that enables t is eventually reached. Each of the eight cycles of the system net N in Fig. 18.1 contains at least one initially marked place. Thus, N is live.
+
+**18.3 1-Bounded Marked Graphs**
+Section 3.5 shows the important role of 1-bounded system nets. Live, 1-bounded marked graphs are easily characterized: Theorem 32 (Theorem on Live and 1-Bounded Marked Graphs). A live marked graph N is 1-bounded if and only if each place of N is part of a cycle that initially contains exactly one token. We show the if-part indirectly: Let p be a place that only belongs to cycles initially containing more than one token. Because N is live, a marking M is reachable that enables the transition in p ! and thus marks p itself. We now temporarily delete this token from p. The net N stays live, because the resulting marking M 0 still marks each cycle. Therefore, another marking M 00 that marks p is reachable from M 0 . With the temporarily deleted token, p now holds two tokens. The only-if-part immediately follows from Theorem 30. With the exception of the three cycles ACDB, CEFD and ACEFDB, each cycle of the system net N contains exactly one initially marked place. Each place of N lies on one of these cycles. Thus, N is 1-bounded.
+
+**18.4 Liveness of 1-Bounded Marked Graphs**
+The question arises: Which marked graphs are live and 1bounded at the same time? The answer may be surprising: each strongly connected marked graph N can be marked such that N is live and 1-bounded. A net is strongly connected if for each two places there exists a path that connects them. Theorem 33 (Theorem on Initial Markings of Marked Graphs). For each strongly connected marked graph N there exists an initial marking such that N is both live and 1-bounded. For a proof, we start with a marking M0 that marks each cycle with at least one token: a simple task. If now there exists a place that only lies on c ycles with more than one token, individual tokens are deleted according to the procedure described in the proof of Theorem 32 until a cycle with only one token remains.
+
+**Exercises**
+1. With the help of Theorems 31 and 32, test the marked graphs of the following figures for liveness and 1-boundedness.
+2. Let N be a marked graph, let t and u be transitions and let p be a place of N . The transition t is connected to u via p if ! p D ftg and p ! D fug. N is weakly connected if for each two transitions t and u there exists a sequence t0 ; : : : ; tn of transitions such that to D t, tn D u and, for i D 1; : : : ; n, either ti "1 is connected to ti or ti is connected to ti "1 . Show that for each transition invariant m D .m1 ; : : : ; mk / of a weakly connected marked graph, the following holds: m1 D m2 D : : : D mk .
+
+##Chapter 19 Well-Formed System Nets
+
+Many real systems have a special state in which each individual instance of the system terminates. The system can then be newly instantiated. A corresponding system net designates one of its reachable markings as the final marking. Furthermore, it satisfies three rather intuitive conditions:
+
+- The final marking is reachable from any reachable marking.
+- At the end of an instance, no tokens generated in between remain.
+- Each transition can become enabled.
+We will see how these three conditions can be verified rather easily.
+
+**19.1 Example: Models of Business Processes**
+A business process is a standardized process for implementing organizational procedures, as they usually occur in administrations. A business process contains activities that are connected to each other. In a Petri net model of a business process, each activity is modeled as a transition. The model itself is a wellformed system net. Figure 19.1 shows a Petri net model of a business process for developing an offer. Its final marking has a token in the place stop.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="fig19_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <name><text>Business Process for Developing an Offer (Fig. 19.1)</text></name>
+    <page id="page1">
+      <place id="start">
+        <name><text>start</text></name>
+        <initialMarking><text>1</text></initialMarking>
+      </place>
+      <place id="p1">
+        <name><text>receive order</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="p2">
+        <name><text>start receive answer</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="p3">
+        <name><text>adjust due date</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="p4">
+        <name><text>determine macrostructure</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="p5">
+        <name><text>develop design</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="p6">
+        <name><text>send offer</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="p7">
+        <name><text>determine microstructure</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <place id="stop">
+        <name><text>stop</text></name>
+        <initialMarking><text>0</text></initialMarking>
+      </place>
+      <transition id="t_send_inquiry">
+        <name><text>send inquiry</text></name>
+      </transition>
+      <transition id="t_receive_answer">
+        <name><text>receive answer</text></name>
+      </transition>
+      <transition id="t_adjust">
+        <name><text>adjust due date</text></name>
+      </transition>
+      <transition id="t_determine_macro">
+        <name><text>determine macrostructure</text></name>
+      </transition>
+      <transition id="t_develop">
+        <name><text>develop design</text></name>
+      </transition>
+      <transition id="t_determine_micro">
+        <name><text>determine microstructure</text></name>
+      </transition>
+      <transition id="t_send_offer">
+        <name><text>send offer</text></name>
+      </transition>
+      <arc id="a1" source="start" target="t_send_inquiry"/>
+      <arc id="a2" source="t_send_inquiry" target="p1"/>
+      <arc id="a3" source="t_send_inquiry" target="p2"/>
+      <arc id="a4" source="p1" target="t_receive_answer"/>
+      <arc id="a5" source="t_receive_answer" target="p3"/>
+      <arc id="a6" source="p2" target="t_adjust"/>
+      <arc id="a7" source="t_adjust" target="p4"/>
+      <arc id="a8" source="p3" target="t_determine_macro"/>
+      <arc id="a9" source="p4" target="t_determine_macro"/>
+      <arc id="a10" source="t_determine_macro" target="p5"/>
+      <arc id="a11" source="t_determine_macro" target="p7"/>
+      <arc id="a12" source="p5" target="t_develop"/>
+      <arc id="a13" source="p7" target="t_determine_micro"/>
+      <arc id="a14" source="t_develop" target="p6"/>
+      <arc id="a15" source="t_determine_micro" target="p6"/>
+      <arc id="a16" source="p6" target="t_send_offer"/>
+      <arc id="a17" source="t_send_offer" target="stop"/>
+    </page>
+  </net>
+</pnml>
+Figure 19.1 Business process for developing an offer
+
+**19.2 Well-Formed Elementary System Nets**
+Let N be an elementary system net and E an arbitrary reachable marking of N . Then N together with the final marking E is well-formed if N has the following three properties:
+
+- The final marking E is unique: no marking of the form E CL is reachable if L marks at least one place.
+- N is weakly live: for each transition t there exists a reachable marking that enables t.
+- N is terminable: from each reachable marking, the final marking can be reached.
+
+**19.3 Deciding Well-Formedness**
+To decide whether an elementary system net N with the initial marking M0 and the final marking E is well-formed, we expand N to a net N # and decide whether N # is live and bounded. Specifically, we construct a new transition tE . To this end, we construct for each place p an arc .p; tE / with the arc weight E.p/ and an arc .tE ; p/ with the arc weight M0 .p/. Arcs with an arc weight of 0 are omitted. The addition of tE to N yields N # . The final marking of the system net N has exactly one token in stop. Thus, the net N # is generated from N by adding a new transition t such that ! t D fstopg and t ! D fstartg. The two (omitted) arc weights both have the value 1. With the concepts of liveness (each transition can always become enabled again) and boundedness (for each place p there
+
+Exercises
+1. Does there exist a final marking E such that the system net in Fig. 19.2 is well-formed with E?
+2. Prove the Well-Formedness Theorem.
+3. Show by means of the Well-Formedness Theorem and the Rank Theorem that the system net in Fig. 19.1 with the final marking stop is well-formed.
+
+Further Reading
+Safety and Liveness
+Since the 1970s, a system net has been called n-safe if each reachable marking marks each place with at most n tokens. We call such system nets n-bounded in this book. Back then, liveness and many of its variants stood for aspects of the reachability of markings and the possibility to enable transitions (starting from the initial marking, or an arbitrary reachable marking). Since the early 1980s, temporal logic has distinguished safety properties (intuitively: “something bad” never happens) and liveness properties (intuitively: eventually, “something good” happens). Each property of a system net can be composed from its safety and liveness properties. A sensible description of the requirements of a system always includes properties of both types. State and run properties, as defined in Chapters 9 and 16, are special safety and liveness properties, respectively. Usually, they are fully sufficient to describe the central requirements of a system model. Typical properties that cannot be formulated this way pertain to individual steps (for instance: “each step increases the number of tokens by 1”). However, such properties directly follow the step rule for transitions. Moreover, interesting system properties are interesting precisely because they do not only pertain to individual steps.
+
+##Chapter 20 Mutual Exclusion
+By the 1960s, mutual exclusion was recognized as one of the central problems in the organization of computer systems. It arises whenever a resource can be accessed by only one of many processes at any one time (for instance, a processor, a printer or a communications device). While a process is using the resource, it is in its critical state. An agreement between the processes has to guarantee that no two processes can be in their critical states at the same time. We will introduce such an agreement in which processes can only communicate via asynchronous messages.
+
+
+**20.1 The Problem**
+With the system net we have already introduced a model that guarantees the mutual exclusion of the two processes l and r: they never reside in their critical states simultaneously. A mutex algorithm also guarantees that each process that wants to enter its critical state will eventually be able to do so. To specify this, we take another detailed look at the three states local, waiting and critical as well as the steps between them:
+(1) State local: this is a state in which the process only works with its own data.
+(2) Step from local to waiting: with this step a process announces its intention to use the limited resource. This step can be executed spontaneously at any time. A mutex algorithm cannot influence this step. A process is not obliged to execute this step. It may forever remain local. Thus, a is a cold transition.
+(3) State waiting: in this step the process expects the mutex algorithm to permit it to enter its critical state. The algorithm may break down waiting into several intermediate states.
+(4) Step from waiting to critical: a mutex algorithm may require certain preconditions to be met before a process can execute this step. Eventually, however, this step always has to be possible: the mutex algorithm has to allow this step (and its intermediate steps) not only for a few time intervals, but continuously until the process has reached critical. At the same time, the mutex algorithm can rely on the process to actually execute this step (and its intermediate steps). We will see that the algorithm in Fig. 3.2 does not guarantee this.
+(5) State critical: this is the state in which the process uses the limited resource.
+(6) Step from critical to local: the process may execute this step spontaneously at any time. A mutex algorithm cannot influence this step. A process is obliged to execute this step. It must not remain critical forever.
+
+**20.2 Realizability**
+An elementary system net that models a mutex algorithm (i.e., requirements (1)–(6) in the previous section) sensibly describes each of the three local states of each process with a 1-bounded place. (2) requires a cold transition from local to waiting for each process. (6) requires a hot transition from critical to local. Figure 20.1 outlines these connections. The “cloud” indicates the scope of the mutex algorithm. We now assume an elementary system net N and derive a contradiction. With this, we show that no elementary system net can model a mutex algorithm. Figure 20.2 shows a complete distributed run of the system net N outlined in Fig. 20.1. In this run, the left process l (top row) becomes critical infinitely often, while the right process r (bottom row) remains local forever. (For our purposes, r could become critical a finite number of times and then remain local.) This run meets all six requirements from Section. 20.1. Figure 20.3 shows an extension of this run: the right process executed a step to waiting. This is possible, because of requirement (2). This run is also complete. However, it violates requirement (4). Therefore, N is not a mutex algorithm. 
+
+**20.3 Fairness Assumptions**
+With the help of a new notation we can nevertheless construct mutex algorithms. To do this, we take another detailed look at the system net N in Fig. 3.2: it approximates a mutex algorithm A, because each “intended” run of A is also a run of N . However, N also has additional, “unintended” runs, for instance (with a coherent renaming of the places and transitions), the sequential run. This run enables transition e an infinite number of times, without e ever actually occurring. This is (intuitively) an “unfair” treatment of e. Likewise, all runs that treat b unfairly are “unintended”. This observation motivates the following definition of a sequential run w D S0 &! S1 &! : : : of an elementary system net N and a transition t of N : w ignores fairness for t if t is enabled in infinitely many markings Si , but occurs only a finite number of times in w (for only a finite number of indices i: t D ti ). The run w respects fairness for t if w does not ignore fairness for t. A distributed run K respects fairness for t if each sequential run of K (as described in Section 4.1) respects fairness for t. To limit the set of runs of a system net Nto those runs respecting fairness for a transition t, the transition t is labeled with “'” in the graphical representation of N . Thus, the system net N in Fig. 3.2 describes a correct mutex algorithm if the two transitions b and e are labeled with “'”. Even without formally defining “implementability”, it is easy to see that fairness cannot be implemented. The observation that fairness cannot be approximated with finite means makes this particularly clear: each finite initial segment of an unfair distributed run can be continued as a fair distributed run. Whether or not fairness is correctly implemented could only be decided “after an infinite amount of time.” The assumption of fairness for transitions thus increases the expressive power of Petri nets. However, a fairness requirement of the form “the transition t eventually occurs” can be implemented more strictly as “t occurs after at most k cycles.” Such an algorithm regulates the flow of tokens in ! t. For the left process this applies to transition b with the places B and D. The algorithms of both processes access the place D. Thus, they have to synchronize themselves. Instead, we look for a mutex algorithm whose transitions that require fairness have their pre-sets entirely within the respective processes.
+
+**20.4 Mutex with Autonomous Fairness**
+We construct an algorithm with a token that only one of the processes can possess at any one time. The process possessing the token can immediately execute its step from waiting to critical. The process not possessing the token can, while waiting, send a message to its partner to request the token. As soon as the partner yields the token, the process will become critical. A process possessing the token, when receiving such a request from its partner, will eventually yield the token. Figure 20.4 replaces the “cloud” in Fig. 20.1 and shows the algorithm. In the given initial marking, the left process is in possession of the token (availablel ). Therefore, the left process can immediately execute the step from waitingl to criticall via transition a. The right process does not possess the token, but can, once it reaches waitingr , execute the step to activatedr via transition h, thereby sending a message to the left process (requestedl ). The left process can respond to this message by yielding the token via transition c (yieldedr ), whereupon the right process reaches criticalr via transition k. The label “'” (indicating “fairness”) in transition c rules out “unfair” behavior. The left process would be unfair if it always ignored a pending request from the right process (requestedl ), i.e., the choice between transitions a and c was always decided in favor of a and thus to the disadvantage of c.
+
+**20.5 The Scenarios of the Algorithm**
+For a systematic understanding of the algorithm, it is helpful to examine its scenarios. In fact, the algorithm is scenario-based. With the denotations in Fig. 20.5, the scenario Sl in Fig. 20.6 describes the cycle in which the owner of the token becomes critical. The corresponding scenario Sr (with a token initially in M instead of N) is obvious. Figure 20.7 shows the partial run Ar in which the right process:
+
+- requests the token via h,
+- receives the token and becomes critical via k
+- and yields the token via j. 
+The corresponding partial run Al (with a token initially in C
+instead of B) is obvious.
+
+Figure 20.8 shows the partial run Bl in which the left process
+
+- yields the token via c,
+- requests the token via b
+- and receives the token and becomes critical via d.
+The corresponding partial run Br (with a token initially in M
+instead of N) is obvious. The communication channels G, K, H and J of the algorithm occur in both Ar and Bl as labeled places. By merging those places of Ar and Bl that have the same label, a scenario, S1 , is generated in which at first the right and then the left process becomes critical. Likewise, let the scenario S2 be composed of Al and Br . Each distributed run of the system net consists of instances of the four scenarios Sl , Sr , S1 and S2 . Thus, the mutex algorithm is indeed scenario-based.
+
+**20.6 Correctness of the Algorithm**
+As for each mutex algorithm, we have to show that, next to the actual mutual exclusion property, the six requirements from Section 20.1 are satisfied by the algorithm in Fig. 20.4. With the exception of requirement (4) they are all obviously fulfilled. With the denotations in Fig. 20.5, the logical expression :(E ^ Q/ and thus the inequality ECQ%1 describes the mutual exclusion property. Its validity follows immediately by subtracting the canonical inequalities of B, K, M and J from the place invariant E C B C K C Q C M C J D 1: Next to the state property (1), the algorithm has to satisfy the run property (4) from Section 20.1: in each run, each waiting process will eventually become critical. In Fig. 20.5, for the left process, this is the property A 7! E: We will show (2) by means of a proof graph, as introduced in Chapter 16. Figure 20.9 shows this proof graph. The correctness of both proof graphs follows from the reading rule and place invariants, with the exception of step 5 in Fig. 20.9: HM 7! J. This step needs a rule exploiting the fairness assumption for transig tion j. It prevents the infinite repetition of the cycle M &! Q &! M.
+
+**Exercises**
+1. Show the correctness of the proof graphs in Figs. 20.9 and 20.10.
+2. Construct the scenarios S1 and S2 described in Section 20.5.
+
+**Further Reading**
+A series of solutions to the mutual exclusion problem originally formulated in programming languages were also reproduced as Petri nets [64]. The postscript to Chapter 4 discusses some general problems of such Petri net reproductions. Kindler and Walter show in [40] that each mutex algorithm for autonomous processes requires some form of fairness assumption.
+
+**The Problem of Mutual Exclusion**
+The problem of mutual exclusion occurs in many variations. Those variations differ particularly with respect to: ! the number of processes and the topology of their networking: Chapter 20 introduced a solution for two processes, Section 9.3 for five processes (“philosophers”). If we call two processes neighbors if they share a limited resource (“chopstick”), then the neighbor relation of the five philosophers forms a circle. In general, there exists an arbitrary number of processes and very different patterns of the neighbor relation. Apart from circles, other common patterns are stars, grids, trees and n-dimensional cubes (“hypercubes”). Furthermore, the number of simultaneous users of a limited resource is not necessarily two. ! the assigning of the limited resource: so far, we have only seen examples in which each limited resource has a predefined set of users. This is not always the case. For instance, it may be irrelevant to which of two available printers a process sends its documents. ! the communication between the processes: in the solution in Fig. 20.4, the processes communicate via messages. In other solutions, they access a shared variable or execute joint activities. ! the influence of a global instance: an example of such an instance is an operating system managing the processes and resources. In contrast, the solution in Chapter 20 uses homogeneous processes, which are not controlled by any global instance. The formulations of and solutions to the different variants of the problem depend heavily on the modeling technique employed. Shared variables are commonly used. Thereby, each variable is owned by a process that can update it. Other processes may only read the variable. The necessary fairness assumptions are integrated into the modeling language itself: an unbounded sequence of reading operations of a variable x can be interrupted by the variable’s owner in order to update x. During the modeling of such variables with Petri nets these fairness assumptions become obvious. In Lamport’s “Bakery Algorithm”, the fairness assumption is incorporated into a display panel of which all processes require an unimpeded view. In practice, such fairness assumptions can often be neglected: “long-lasting” accesses to limited resources can be organized by “short” accesses to other resources.
+
+##Chapter 21 Asynchronous Hardware
+This case study describes the systematic construction of asynchronous hardware. It uses the example of an extremely dynamic architecture of a processor that adapts to the current availability of data packets and functions, as well as the varying durations of individual calculation steps.
+
+**21.1 The Counterflow Pipeline Processor (CFPP): The Problem**
+The Sprout counterflow pipeline processor is a well-known, complex, asynchronous hardware architecture. We model the abstract principle of its behavior on the level of its data and control flows: a stream d1 : : : dn of data packets and a stream f1 : : : fm of instructions both reach a processor P . The processor then sequentially applies all instructions f1 ; : : : ; fm to each data packet di and then outputs the resulting data packets ei Ddef fm .: : : f2 .f1 .di // : : :/ for i D 1; : : : ; n in sequence. After P has processed a pair of data and instruction streams, it becomes ready for a new pair. In each case, the two streams may be of different lengths. The data packets and instructions reach P asynchronously, not in predetermined time intervals. The time it takes to apply fj to the data packet fj "1 .: : : f2 .f1 .di // : : :/ is unknown for all i and j . The processor should work as fast as possible, that is, it should execute as many operations as possible in parallel. At the same time, it should react as flexibly as possible to different speeds and different lengths of data and instruction streams, as well as different durations of instruction calculations.
+
+**21.2 The Solution Idea**
+To solve this problem, the CFPP architecture utilizes a sequence P D M1 : : : Mk of consecutively linked modules. The data packets d1 , . . . , dn flow from the left, that is, via M1 , into P . The computed data packets e1 , . . . , en leave P on the right, via Mk . Vice versa, the instructions flow from the right into P and leave P via M1 . All modules work according to the same pattern. A module Mi can receive data packets from its left neighbor Mi "1 and give out instructions to it. To its right neighbor Mi C1 , it can give out data packets and receive instructions from it. The modules communicate synchronously: Mi can give out a data packet to Mi C1 as Mi C1 receives it. Likewise, Mi gives out an instruction to Mi "1 as Mi "1 receives it. Figure 21.2 shows the behavior of an “inner” module Mi .i D 2; : : : ; k &1/ as a state automaton. Initially, Mi can receive a data packet d (from Mi "1 ) and an instruction f (from Mi C1 ). When Mi has received both – in arbitrary order – it is ready for computation and applies f to d. Mi can then – in arbitrary order – give out the newly computed data packet and the instruction to Mi C1 and Mi "1 , respectively. Mi does not store anything, then reorganizes itself and returns to its initial state. Of particular interest are the two states in which Mi stores either only a data packet or only an instruction: Mi can give out the unprocessed data packet to Mi C1 , or the unused instruction to Mi "1 . The module M1 on the left edge of the CFPP architecture essentially behaves like an inner module. However, it only gives out an instruction fi to the environment after fi has been applied to the last data packet dn . Likewise, the module Mk on the right edge only gives out a data packet ei to the environment after the last instruction fm has been applied to ei . We do not explicitly model those two modules. An architecture with k modules can process a stream d1 , . . . , dn of data packets and a stream f1 , . . . , fm of instructions if and only if n and m are not both greater than k: In that case, the data packets or instructions can all be stored simultaneously inside the modules. A CFPP can compensate for the different durations of instructions only if k is greater than either n or m.
+
+**21.3 The Synthesis Problem for the CFPP**
+The state automaton in Fig. 21.2 uses six different actions, four of which can occur in two states each. We now ask for the pre-, post- and side conditions of their occurrences and thus for the local states that organize a CFPP module. For this purpose, we solve the synthesis problem for the state automaton. Using the denotations in Fig. 21.3, its eight minimal regions generate the elementary system net N. Therefore, N solves the synthesis problem for the CFPP.
+
+**21.4 Structural Simplification of a Module**
+The structure of the system net N in Fig. 21.4 can be simplified. At first, we derive for this:
+A+H+E+D = 2 place invariant
+E + F = 1 place invariant
+-B - D = -1 place invariant
+-2E ≤ 0 canonical inequality of E
+Their addition yields: A + F + H - B ≤ 2.
+From this it follows for each reachable marking that marks A, F and H, that it also marks B. This renders the loop between B and c redundant. The argument about the loop between C and f is analogous.
+
+**21.5 The Model of the CFPP**
+To form the CFPP P as a sequence M1 . . . Mk of modules, k instances of the module in Fig. 21.5 have to be combined. It is rather simple to combine a module Mi with its right neighbor Mi C1 : the transition e of Mi is merged with the transition a of Mi C1 and b of Mi with d of Mi C1.
+
+**21.6 Analysis of the Model**
+For a better understanding of the model in Fig. 21.5, the model in Fig. 21.7 describes the intuitive meanings of some of its components. An intuitive description of the meanings of the places E, F, G and H is left to the reader. The arcs labeled with the variable x describe the path of the data packets through the processor. Likewise, the arcs labeled with y describe the path of the instructions. The invariant A + C = 1 in Fig. 21.5 guarantees that data packets and instructions cannot overtake each other. Accordingly, B + D = 1 holds for instructions: a module M, indeed, never stores more than one data packet d and never more than one instruction f. If Mi stores both, the module computes, i.e., f is applied to d. From that follows for each reachable marking M in Fig. 21.5: if a data packet has been received, that is transition a has occurred, i.e., M(A) = M(F) = 1, and if an instruction has been received, that is, transition b has occurred, i.e., M(B) = M(H) = 1, then c is the only enabled transition. Because of the invariants A + C = 1, E + F = 1, G + H = 1 and B + D = 1, the places C, E, G, D are not marked and thus the transitions a, d, e, b, f are not enabled. If Mi stores a data packet d and Mi C1 an instruction f, both of the shared transitions are enabled. In that case, it is decided nondeterministically whether Mi or Mi C1 computes f(d).
+
+**Exercises**
+1. Describe the intuitive meanings of the places E, F, G and H.
+2. Construct the model of the module in Fig. 21.5 for two neighboring modules Mi and Mi C1 . Let Mi store a data packet, but no instruction, and let Mi C1 store an instruction, but no data packet. Show that Mi and Mi C1 share two transitions that are in conflict with each other if both are enabled.
+
+##Chapter 22 Network Algorithms
+Nowadays, computers often function as nodes of a network. In such a network, two nodes can be connected to each other by a communications channel via which they can exchange messages. Such nodes are neighbors. Figure 22.1 shows two networks, N1 and N2 , with the nodes ˛; ˇ; : : :. Both are connected. In contrast to N1 , the network N2 is acyclic: no sequence of edges forms a cycle. In a network, there exist some typical tasks: a node sends a message over the network to all other nodes, the nodes synchronize themselves (as far as possible) in cycles or they reach mutual agreements. In this chapter, we discuss solutions to such tasks. Other typical tasks relate to the organization of limited resources, the distribution of tasks or the reinitialization after a critical error. Such tasks are not easy to solve, because each node generally only has a small number of neighbors. No node “knows” the entire network. Furthermore, a solution is supposed to work not only for a specific network, but for infinitely many, for instance, for all connected or for all acyclic networks.
+
+**22.1 Some Conventions for the Representation of Network Algorithms**
+We model algorithms for the solution of the types of tasks described above as Petri net schemata. Such a schema is a net structure, labeled with symbols that can be interpreted. Each sensible interpretation generates its own concrete, finite agent network.We typically use the symbol U to denote the set of agents in a network. The neighbors of a network are given as a relation. A tuple .u; v/ 2 N thus describes a communications channel. We assume symmetrical communications channels, which means that .u; v/ 2 N implies .v; u/ 2 N . In the network N1 in Fig. 22.1, U D Œ˛; ˇ; #; ı! and N D Œ.˛; ˇ/; .ˇ; ˛/; .˛; #/; .#; ˛/; .ˇ; ı/; .ı; ˇ/; .ˇ; #/; .#; ˇ/; .#; ı/; .ı; #/!.1 We also use a tuple .u; v/ to denote a message from v to u. In general, a message is always of the form .recipient, sender/: For an agent u, let N.u/ be the set of messages .v; u/ to all its neighbors v and let N .u/ be the set of messages .u; v/ from all its neighbors v.  With these conventions, we first explain the idea of Petri net schemata, using the example of the Echo Algorithm.
+
+**22.2 The Echo Algorithm**
+For a connected network with a distinguished “initiator” node i, this algorithm organizes the distribution of a message from the initiator to all other nodes of the network. The initiator terminates when all nodes have confirmed the receipt of the message. We denote U and N as well as several other sets as multisets here, in order to stay consistent with the arc labelings of the nets. As an example, let alpha be the initiator of the network N1. The net models this possibility by means of the variable y. The current choice of a pivot neighbor determines the value of y and thus the mode of transition c. Each non-initiator node behaves according to the pattern given for the node #. An agent u with only one neighbor v (for instance, ˛; ˇ or " in N2) can only choose v as its pivot neighbor. In this case, the transition c only has the mode in which x D u and y D v. The arc label M.x/ & .y; x/ is then reduced to N.u/ & .v; u/ D .v; u/ & .v; u/ D Œ !. The transition c thus does not send any message. Accordingly, d also does not expect a message. For the final model of the Echo Algorithm, the four places for sent, but not yet received messages are combined into a single place D. Furthermore, the agent # is replaced with the symbol i for the initiator. To begin with, i, U0 , N and N are merely symbols. To describe a concrete agent network A, the symbol i has to be interpreted as the initiator, U0 as the set of all other agents of A, and N as well as N as functions for the generation of the network’s messages. On this schema level, we can now show the correctness of the algorithm for each concrete connected network A. Two properties characterize the correctness of the algorithm:
+1. The state property “If the initiator terminates, all other nodes have been informed”: N ˆ C:i &! G.U0 :
+2. The run property “Starting from the initial state, the initiator terminates”: N ˆ A:i ^ E.U0 7&! C:i: The properties can be proved with the help of three equations:
+A + B + C = i;
+E + pr1(F) + G = U0 and
+N(A) + N(C) + D C N(E) + F + F- + -N(G) = N(U):
+
+In the second equation, pr1 denotes the projection onto the first component. The validity in N can be easily asserted by means of place invariants.
+
+**22.3 Synchronization in Acyclic Networks**
+Network algorithms often operate in cycles: each node alternates between the states “active” and “passive” and starts each successive cycle with “active.” We describe an algorithm that synchronizes the nodes as tightly as possible: simultaneously active nodes are in the same cycle. Initially, each node is active in the 0th cycle. As in the Echo Algorithm, each node u has a pivot neighbor v in each cycle. Here, however, u initially does not expect a message from v, but from each of the other neighbors. The occurrence of a sends the message .#; ı/ from ı to its current pivot neighbor y. In the state passive, # waits for a message .#; ı/ from ı and sends messages to its two other neighbors. To express that, in principle, each neighbor of # can play the role of the pivot neighbor, we replace the node ı with the variable y. Each node behaves according to the pattern shown for the node #. Analogously the arc labelings, the node # is replaced with the variable x and the constant cycle number 0 with the variable i. In the place “active in cycle i,” the node # with the cycle number 0 is replaced with the set of nodes U of an arbitrary network. Thereby, each node in U has the cycle number 0.2 In the place “active in cycle i,” a node u with only a single neighbor v enables the transition a in the mode x=u without any pending messages to u. Thus, those nodes start a new cycle. Our algorithm is correct for acyclic, finite networks. Each such network has at least two nodes with only one neighbor each. Technically, a cycle of all nodes together forms a scenario for markings M with pr1 .M.A// D U. Three properties characterize the correctness of the algorithm:
+1. the state property “two active nodes are in the same cycle”: A:.u; n/ ^ A:.v; m/ &! n D m; In analogy to the Cartesian product, let Œa1 ; : : : ; an ! $ Œb! Ddef
+Œ.a1 ; b/; : : : ; .an ; b/!.
+2. the state property “the cycle number of a passive and an active node differs by at most 1”: A:.u; n/ ^ C:.v; m/ &! jn & mj % 1;
+3. the run property “if the agent u has reached its ith cycle, it will eventually reach the .i C 1/th cycle as well”: A:.u; i/ 7&! A:.u; i C 1/:
+
+The properties can be proved with the help of three equations:
+1. Each node is either active or passive: pr1 .A/ C pr1 .C/ D U; where pr1 maps a tuple to its first component, i.e. pr1 ..u; i// D u and pr1 .Œ.u1 ; i1 /; : : : ; .un ; in /!/ D Œu1 ; : : : ; un !.
+2. From and to passive components, messages are underway: B C B C N.pr1 .C// C N.pr1 .C// D 2.pr1;2 (C) C pr2;1 (C)/; where pr1;2 .a; b; c/ D pr2;1 .b; a; c/ D .a; b/ and .a; b/ D .b; a/.
+3. The third equation covers all the places and includes the cycle number. Furthermore, it uses four functions that map each agent and each number to a multiset of node pairs: ˛.u; n/ Ddef 2n ( N.u/; ˛.u; n/ Ddef 2n ( N .u/;
+
+**22.4 Consensus in the Network**
+The nodes of a network often want to reach a mutual agreement. To do this, each node can send its neighbors a request and respond to requests from its neighbors. The algorithm terminates when all nodes have reached an agreement. To this end, each message contains not only the recipient and the sender, but also a “tag” with “?” or “!” that indicates whether the message is a request of the sender to the recipient or a response of the sender to a previous request of the recipient. Thus, a message is of the form .recipient; sender; ?/ or .recipient; sender; !/: Let Q(u) denote the set of all requests (v,u,?) of a node u to its neighbors v, and let R(u) denote the set of all responses (u,v,!) from its neighbors v to u. If all neighbors of ˛ have responded to its requests (place “˛ is informed”) and ˛ is still negotiating, there exist two possibilities: either ˛ agrees (transition a) or ˛ sends new requests Q(˛) (see (3)) via the place “requests from ˛ ” to its neighbors ˇ and # (transition c) and then waits until both neighbors have responded with tokens R(˛) (see (4)) in the place “responses to alpha .” If alpha is still negotiating anyway, it will stay in this state (transition e). We derive the Consensus Algorithm by
+! combining the two figures,
+! expanding the behavior to include all nodes in U, thereby replacing the constant ˛ with the variable x,
+! combining the four places with sent, but not yet received requests and responses into a single place D. 
+
+Three properties characterize the correctness of the algorithm:
+1. the state property “if the node u has agreed, then u is informed”: B:u ! C:u;
+2. the state property “if all nodes have agreed, then no more messages are underway”: B:U ! D D Œ !;
+3. the run property “each node u always becomes informed again”: t rue 7&! C:u: The properties can be proved with the help of two valid equations and one inequality: 
+1. Each node is still negotiating or has agreed: A + B = U:
+2. Each node is either informed, or messages from or to it are underway: Q.C/ C R.C/ C D C pr2;1;3 .D/ D Q.U/ C R.U/; where pr2;1;3 .a; b; c/ Ddef .b; a; c/.
+3. Each node is still negotiating or is informed: A + C ≥ U:
+
+As with the previous two algorithms, the two equations are directly derived from place invariants. The inequality follows from an initially marked trap.
+
+**Exercises**
+1. For the Echo Algorithm in Fig. 22.6: construct its matrix and the initial marking in vector notation and find three place invariants that prove the equations at the end of Section 22.2.
+2. For the Consensus Algorithm in Fig. 22.13: (a) Construct its matrix and the initial marking in vector notation and find two place invariants with the carriers fA; Bg and fC; Dg, respectively. (b) Show that fA,Cg is a trap. (c) From the place invariants and the trap, derive the three properties discussed in Section 22.4.
+ 
+
+##Chapter 23 Closing Remarks
+**23.1 A Brief History of Petri Nets**
+In the 1960s, Carl Adam Petri’s proposals for the modeling of discrete, asynchronous systems were too advanced for practical application and the “wrong” topic for the theory at that time. Accordingly, the responses were limited at first, but at least the MAC project at MIT picked up Petri nets in the late 1960s. In the 1970s, Petri nets were often used (inappropriately) to characterize formal languages. The reachability problem was long regarded as the central challenge in this area. In the early 1980s, “colored” tokens significantly increased the expressive power of Petri nets, and modeling tools enhanced their applicability in larger projects. At the same time, Petri nets entered into a fierce competition with other modeling techniques. The general interest in modeling techniques, especially graphical ones, which had been growing since the 1990s, eventually established Petri nets as an important contribution to computer science. Since 1979, an annual conference, summer schools, workshops and anthologies on specific topics have come on the scene. The number of publications on Petri nets is in the five-digit range.
+
+**23.2 Properties of the Elementary Formalisms of Petri Nets**
+Every technique for the modeling of discrete, dynamic systems describes states and steps. Apart from this, their elementary formalisms can differ fundamentally. State charts, for instance, use hierarchically and parallelly composed state components. Process algebras emphasize the binary synchronization of actions in steps and the inductive buildup of models. Petri nets use multisets as state components. Steps are linear, local and reversible. For Petri net schemata (Chapter 22), they are also universal. The following explains what this means in detail, what advantages it brings and which other modeling techniques partially work according to similar principles. Multisets are an appropriate data structure: a series of modeling techniques for discrete systems with asynchronous components use multisets as their primary data structure, among them LINDA, the Chemical Abstract Machine and DNA Computing. Figuratively speaking, there exists a “pot” and processes can add elements to and remove them from it. This pot metaphor exists in many variants. A Petri net models such “pots” as places. The reason for choosing multisets instead of regular sets is obvious: to put an element into a “pot,” it would otherwise be necessary to search the whole pot for another occurrence of the element. This would prevent the mutually independent (“asynchronous”) access of multiple processes to such a pot. Steps are “linear”: Let M1 &! M2 be a step. Then M1 C M &! M2 C M is also a step for each marking M . In particular, with the marking n ( M1 , the transition t can occur at least n times: steps behave in a linear fashion. All modeling techniques that use multisets as their elementary data structure also use linear steps. The linearity of steps is also essential for the calculi of place and transition invariants. Transitions have local causes and effects. The preconditions for the occurrence of a transition t are entirely located in ! t. Its effect pertains to ! t and t ! . This locality of t immensely simplifies the intuitive understanding. Other modeling techniques, for instance, automata and process algebras, use actions to model elementary steps. In such a model, one and the same action may be noted down multiple times and in different contexts. In the automaton in Fig. 7.1, for instance, the action “switch light off” occurs in the labelings of two arcs. (In the corresponding Petri net in Fig. 7.2, there exists only a single transition “switch light off.”) To fully understand an action t in an automaton or process expression, it is necessary to take into account each and every occurrence of t: the description of the meaning of a single action is scattered across the entire model. This problem is even more evident in structured or hierarchical modeling techniques, such as state charts or message sequence charts (MSC). For large systems in particular, the locality of transitions is of great value. Exponentially growing state spaces stand in contrast to transitions, whose pre- and post-sets generally do not grow significantly, even in larger systems. Thus, the matrix N of a large system N is sparse. Therefore, finding place and transition invariants is often not much more complex than in small systems. Locality offers additional structural arguments. This is the reason that traps, cotraps and freechoice structures are possible in Petri nets and that they can be exploited in their analysis. The occurrences of two locally independent transitions t and u (i.e. ! t \ ! u D ;) are orderless in a distributed run. Locality is thus the basis for distributed runs and thus for scenarios and ultimately also for the stubborn set method of temporal logic, which increases efficiency. Steps are “reversible”: in each modeling technique, steps of the form M &! M 0 are formed such that M 0 can be derived from M and t. A step is reversible if also M can be derived from M 0 and t. A step of a Petri net is always reversible: M D M 0 & t : In contrast to this, value assignments are generally not reversible. An example of this is the value assignment x WD 0. Intuitively speaking, given information can be returned, but deleted information cannot be brought back. The reversibility of steps is ultimately the reason that place and transition invariants are so powerful. Petri net schemata are uninterpreted: the network algorithms in Chapter 22 are formulated as Petri net schemata. They contain the symbols i, u, N and N , which first have to be interpreted. Only then is a Petri net generated. Considering all interpretations of symbols to be sets or functions is well-known from predicate logic. This technique is extremely powerful and flexible. In computer science, this idea is used for describing static structures in algebraic specifications and dynamic steps, especially in abstract state machines (ASM).
+
+**23.3 Speculative Questions**
+In his presentation at the 26th annual meeting of the International Conference on Applications and Theory of Petri Nets in Miami in June 2005, Carl Adam Petri praised the diversity of theory construction and areas of application that had been achieved since his dissertation. At the same time, he urged people to pose more fundamental questions. Petri himself formulated a few such proposals and, in his presentations in later years, he emphasized physics as the basis for his motivation. His concepts always had the goal to formulate information processing independently from the current technological standards. In fact, it is likely that hitherto unknown or unused atomic or even biological effects will be employed for future calculations or conceived of as data processing units. How can Petri nets contribute to the explanation or use of such effects? Let us first consider an analogy from chemistry and physics: Among the fundamental insights of these areas are laws of conservation. If a system does not exchange matter or energy with its environment, both can be transformed in various ways in the system’s interior. The sum total, however, stays the same. Nothing is lost and nothing is added. The – not very intuitive – terms of matter and energy are defined in exactly such a way that these conservation laws hold. Does there exist a corresponding term for a science of information transformation? What is conserved in the interior of a dynamic system that does not exchange any information with its environment? Currently used terms for “information” are obviously not very helpful here. Petri nets may help to coin an appropriate term: their elementary dynamic concept is reversible. If the marking M 0 and the transition t are known for a step M &! M 0 , then the initial marking M can be back-calculated. For a classic value assignment, for instance, x WD 1, the original value of x cannot be back-calculated. Reversibility in dynamic processes supports fundamental invariance from which, already in 1967, Petri constructed a reversible propositional logic. The insight that the partial independence of components decisively structures a system is equally important: the causal partial order of events is in itself objective and does not need an “observer,” who forces events into a “temporal” order. It is currently not foreseeable how far-reaching these and others of Petri’s proposals are. With the currently available concepts of Petri nets, we are able to build better systems. At the same time, we should be prepared for surprises in the future.
+
+**23.4 Petri Nets in Software Engineering**
+Because software and computer-integrated systems are more and more often abstractly modeled before their actual implementation, the role of Petri nets grows as they successfully combine intuition and precision during the planning and configuration of IT products. The techniques introduced in this book are sufficient to represent causal interrelations in the control flow and simple structures in the data space. However, not all important aspects of complex software models can be expressed in this way. There are two groups of aspects that have not been covered here: the first group is temporal and stochastic interrelations of actions, which need to be expressible. Petri nets were extended very early to allow for these aspects to be modeled. Thus, a series of variants were created and many software tools support these aspects. The second group of aspects that were not covered in this book relates to the appropriate handling of large system models. Such models have to be systematically composed from smaller ones. Basic ideas for this have been discussed in Chapter 8. Equally important is the refinement of components. In the simplest case, a transition t is replaced with an interface net whose interface consists of the places in ! t [ t ! . An overview of the different variants of refinement and composition. Large systems are nowadays designed in a systematic process, aided by software tools. There is a series of such design procedures that are based on Petri nets. The most universal and most common approach is based on “colored nets”, a special variant of system nets. Numerous other proposals pick up the idea of incorporating the concept of object orientation into Petri nets. With activity diagrams, the currently dominant “Universal Modeling Language” (UML) adopted some ideas of Petri nets. A more fundamental connection between Petri nets and UML.
+
+**23.5 Reference to Other System Models and Analysis Techniques**
+Next to the usual automaton models, particularly finite automata with their graph representation, there are also some models that, like Petri nets, propose some elementary formalisms and thus specify a class of systems. The formalisms of Petri nets are described in this book and summarized. Process algebras are noted for their inductive design and their focus on pairwise “handshake synchronization” of actions. Abstract State Machines (ASM) pursue the idea of leaving the interpretations of all data and function symbols in an algorithm’s specification completely open. This results in a concept of algorithms that is more general than usual. The concept of Petri net schemata in Chapter 22 is based on this idea. For the analysis methods presented in Part II, the question of the complexity of their algorithmic solutions arises. This text addressed these issues only rarely. There are numerous studies in the literature that sometimes bring up very fundamental questions of complexity theory.
+
+**23.6 Other Introductory Texts**
+The most recent comprehensive introduction to Petri nets was written by a team of authors after the Third Advanced Course on Petri Nets in 1998. Compared to that text, this one is shorter and focuses on fundamental terms, accurate analysis techniques and case studies. At the same time, it contains a few new items:
+
+- As far as possible, elementary and generic systems nets are not treated separately.
+- State properties written as equations and inequalities are separated from the question of how to prove their correctness.
+- Scenario-based runs and run properties are emphasized.
+- Hot and cold transitions are distinguished.
+- In some instances, new terminology is used. In particular, the term “system net” is new for an initially marked net structure. The prefix “elementary” denotes the special case of “black” tokens. The term “Petri net” is used to denote the entire field of study. All this is meant to emphasize the advantages of Petri nets and to intuitively, conceptually and terminologically simplify their comprehensibility.
