@@ -1,163 +1,20 @@
 What Are Petri Nets and What Should They Be?
-A central challenge of computer science is the appropriate construction of systems that contain IT-based components and that are embedded in an automated or organizational environment. Such systems are modeled so that clients, manufacturers, users, etc., can, with the help of the model, better understand what a system is supposed to do and how it can be implemented, used, varied and improved.
-In the past 50 years, a multitude of modeling techniques has been proposed for such systems. They all have their strengths and weaknesses, as well as their preferred fields of application, user groups and tools. Petri nets are among the oldest modeling techniques of computer science. For decades now, interesting theoretical questions about Petri nets have been posed and solved. Special subclasses have been studied and tools have been developed. Case studies have been conducted and successful projects have been implemented. In contrast to some other methods, which were favored for a short time and then forgotten, Petri nets have kept their place as one of the well-established modeling techniques. Initially, there was an interest in integrating Petri nets with other methods. However, over time, this has given way to a tendency to keep them separate.
-With a lively, steadily growing group of interested researchers and users as well as ever-new software tools, for decades Petri nets have been in the best position to shape some foreseeable developing lines of computer science and to contribute to novel concepts like “model-based,” “ubiquitous,” “pervasive” or “disappearing” software engineering. The Petri net portal www.informatik.uni-hamburg.de/TGI/PetriNets/ index.html offers rich material on this. Carl Adam Petri himself originally designed his approach even more broadly. He looked for a theory of information processing in accord with the laws of physics, with deep-seated invariants in the traditions of the natural sciences and with formalisms that would allow for the description of a human-oriented, pragmatic handling of the technical possibilities of computer science.
+A central challenge of computer science is the appropriate construction of systems that contain IT-based components and that are embedded in an automated or organizational environment. Such systems are modeled so that clients, manufacturers, users, etc., can, with the help of the model, better understand what a system is supposed to do and how it can be implemented, used, varied and improved. In the past 50 years, a multitude of modeling techniques has been proposed for such systems. They all have their strengths and weaknesses, as well as their preferred fields of application, user groups and tools. Petri nets are among the oldest modeling techniques of computer science. For decades now, interesting theoretical questions about Petri nets have been posed and solved. Special subclasses have been studied and tools have been developed. Case studies have been conducted and successful projects have been implemented. In contrast to some other methods, which were favored for a short time and then forgotten, Petri nets have kept their place as one of the well-established modeling techniques. Initially, there was an interest in integrating Petri nets with other methods. However, over time, this has given way to a tendency to keep them separate. With a lively, steadily growing group of interested researchers and users as well as ever-new software tools, for decades Petri nets have been in the best position to shape some foreseeable developing lines of computer science and to contribute to novel concepts like “model-based,” “ubiquitous,” “pervasive” or “disappearing” software engineering. The Petri net portal www.informatik.uni-hamburg.de/TGI/PetriNets/ index.html offers rich material on this. Carl Adam Petri himself originally designed his approach even more broadly. He looked for a theory of information processing in accord with the laws of physics, with deep-seated invariants in the traditions of the natural sciences and with formalisms that would allow for the description of a human-oriented, pragmatic handling of the technical possibilities of computer science.
 
-##Chapter 1
+# Chapter 1
 In this chapter, we will use an example to explain the basic graphical components of Petri nets and how they can be used to model discrete systems.
 
 **1.1 A Cookie Vending Machine**
 For this introductory example, we describe a vending machine that sells cookies. The machine has a coin slot and a compartment into which the packets of cookies are dropped. In the initial state of the cookie vending machine, the coin slot contains a coin. The cookie compartment is empty. Figure 1.1 models this as a Petri net: coin slot and compartment, both depicted as ellipses, are the places of the Petri net. The coin slot contains a euro coin, which is a token of the net in Fig. 1.1. The compartment does not contain any tokens. A distribution of tokens across places is a marking of a Petri net. The machine can now collect the coin and produce a packet of cookies. In the Petri net in Fig 1.1, this is modeled as a transition t, depicted as a square (or rectangle). In Fig. 1.1, the transition t is enabled, because its incoming arc starts at a place containing a coin token, as required by the arc’s label. Therefore, t can occur and thereby change the current marking. Intuitively, this can be understood as a movement or flow of tokens. As the directions and labelings of the arrows in Fig. 1.1 show, the coin “flows” out of the coin slot, and a cookie packet “flows” into the compartment. Arrows depict the arcs of the net.
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig1_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Cookie Vending Machine (Fig. 1.1) - Initial State</text></name>
-    <page id="page1">
-      <place id="coin_slot">
-        <name><text>coin slot</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="compartment">
-        <name><text>compartment</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <transition id="t">
-        <name><text>t</text></name>
-      </transition>
-      <arc id="a1" source="coin_slot" target="t">
-        <inscription><text>coin</text></inscription>
-      </arc>
-      <arc id="a2" source="t" target="compartment">
-        <inscription><text>cookie_packet</text></inscription>
-      </arc>
-    </page>
-  </net>
-</pnml>
-
-
-Figure 1.1 The cookie vending machine in its initial state
-
-1.2 A Look Inside
-If we look inside the machine, we will find several components that store coins and cookie packets and handle the sale. Figure 1.3 in turn models the interior of the vending machine as a Petri net: there is a storage filled with five cookie packets and one – initially empty – cash box.
-
-Figure 1.3 A look inside the cookie vending machine
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig1_3" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Cookie Vending Machine Interior (Fig. 1.3)</text></name>
-    <page id="page1">
-      <place id="coin_slot">
-        <name><text>coin slot</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="storage">
-        <name><text>storage</text></name>
-        <initialMarking><text>5</text></initialMarking>
-      </place>
-      <place id="signal">
-        <name><text>signal</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="cash_box">
-        <name><text>cash box</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="compartment">
-        <name><text>compartment</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <transition id="a">
-        <name><text>a (collect coin)</text></name>
-      </transition>
-      <transition id="b">
-        <name><text>b (give out cookie packet)</text></name>
-      </transition>
-      <arc id="a1" source="coin_slot" target="a"/>
-      <arc id="a2" source="a" target="cash_box"/>
-      <arc id="a3" source="a" target="signal"/>
-      <arc id="a4" source="signal" target="b"/>
-      <arc id="a5" source="storage" target="b"/>
-      <arc id="a6" source="b" target="compartment"/>
-    </page>
-  </net>
-</pnml>
-
-a – collect coin
-b – give out cookie packet
-
-In the marking shown, transition a can occur. Its effect can be deduced from the arrows starting or ending in a: the coin disappears from the coin slot and appears in the cash box. Simultaneously, a signal for transition b is generated, depicted by a black dot. Figure 1.4 shows the marking after the occurrence of a.
+## 1.2 A Look Inside
+If we look inside the machine, we will find several components that store coins and cookie packets and handle the sale. Figure 1.3 in turn models the interior of the vending machine as a Petri net: there is a storage filled with five cookie packets and one – initially empty – cash box. In the marking shown, transition a can occur. Its effect can be deduced from the arrows starting or ending in a: the coin disappears from the coin slot and appears in the cash box. Simultaneously, a signal for transition b is generated, depicted by a black dot. Figure 1.4 shows the marking after the occurrence of a.
 
 **The Interface**
 Now, transition b can occur, because the arrows ending in b are labeled with objects that are actually present in the respective places: a black dot in signal and a cookie packet (even several) in the storage. No more transitions can occur now.
 
 **1.3 The Interface**
-So far, we have modeled the vending machine as a closed system: coins and cookie packets are distributed across places and the occurrence of transitions redistributes them. What is missing are actions of the environment: someone inserts a coin, for example, or takes out a cookie packet. How do we model this? As Fig. 1.6 shows, a transition insert coin sits in front of the – empty – coin slot. insert coin does not have any preconditions, so it can occur anytime. In the real world, of course, this action, in fact, does have further preconditions. Most importantly, the environment has to provide a coin. Likewise, the transition take packet models the taking of a packet out of the compartment.
-
-Figure 1.6 The cookie vending machine with the cold transitions of its interface
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig1_6" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Cookie Vending Machine with Interface (Fig. 1.6)</text></name>
-    <page id="page1">
-      <!-- Places -->
-      <place id="coin_slot">
-        <name><text>coin slot</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="storage">
-        <name><text>storage</text></name>
-        <initialMarking><text>5</text></initialMarking>
-      </place>
-      <place id="signal">
-        <name><text>signal</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="cash_box">
-        <name><text>cash box</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="compartment">
-        <name><text>compartment</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Transitions: insert_coin and take_packet are cold (epsilon-labeled) -->
-      <transition id="insert_coin">
-        <name><text>insert coin</text></name>
-        <toolspecific tool="cold" version="1.0">
-          <cold>true</cold>
-        </toolspecific>
-      </transition>
-      <transition id="a">
-        <name><text>a</text></name>
-      </transition>
-      <transition id="b">
-        <name><text>b</text></name>
-      </transition>
-      <transition id="take_packet">
-        <name><text>take packet</text></name>
-        <toolspecific tool="cold" version="1.0">
-          <cold>true</cold>
-        </toolspecific>
-      </transition>
-      <!-- Arcs -->
-      <arc id="a1" source="insert_coin" target="coin_slot"/>
-      <arc id="a2" source="coin_slot" target="a"/>
-      <arc id="a3" source="a" target="cash_box"/>
-      <arc id="a4" source="a" target="signal"/>
-      <arc id="a5" source="signal" target="b"/>
-      <arc id="a6" source="storage" target="b"/>
-      <arc id="a7" source="b" target="compartment"/>
-      <arc id="a8" source="compartment" target="take_packet"/>
-    </page>
-  </net>
-</pnml>
-
-
-The two transitions insert coin and take packet model the vending machine’s interface. Both are enabled in the marking of Fig. 1.6. Connected with this is the label “©”, which we will deal with next.
+So far, we have modeled the vending machine as a closed system: coins and cookie packets are distributed across places and the occurrence of transitions redistributes them. What is missing are actions of the environment: someone inserts a coin, for example, or takes out a cookie packet. How do we model this? As Fig. 1.6 shows, a transition insert coin sits in front of the – empty – coin slot. insert coin does not have any preconditions, so it can occur anytime. In the real world, of course, this action, in fact, does have further preconditions. Most importantly, the environment has to provide a coin. Likewise, the transition take packet models the taking of a packet out of the compartment. The two transitions insert coin and take packet model the vending machine’s interface. Both are enabled in the marking of Fig. 1.6. Connected with this is the label “©”, which we will deal with next.
 
 **1.4 Hot and Cold Transitions**
 So far, we have tacitly assumed that an enabled transition is actually going to occur. For the transitions a and b of the cookie vending machine, this is appropriate: A coin in the coin slot, after all, is supposed to generate a signal, which in turn triggers the transport of a cookie packet. a and b are hot transitions. However, insert coin is a different matter. In the real world, a customer triggers this transition by inserting a coin into the coin slot. Whether or not this will ever happen is not guaranteed. Therefore, we want to allow that insert coin stays forever enabled without ever actually occurring. In the model, insert coin is a cold transition. The transition take packet is cold as well: no customer is forced to take his paid-for packet out of the compartment. In general, the majority of a system model’s transitions are hot. Cold transitions are much rarer. As in our example, cold transitions are often found at the interface to the unmodeled environment. To distinguish them from hot transitions, cold transitions are labeled with “©” (as an indication of their often “external” character).
@@ -167,63 +24,6 @@ A run of a system model describes how transitions occur consecutively. A typical
 
 **1.6 Alternatives**
 Our cookie vending machine does not accept every coin. Maybe the machine has a coin verifier that rejects faulty coins. Maybe the customer can manually eject the coin from the coin slot by pushing an appropriate button. The vending machine can return a coin to its environment for various reasons. However, we do not want to model all those details. For us, it is sufficient to model that a coin in the coin slot either reaches the cash box or is returned to the environment. We do not model why each alternative occurs. After the insertion of the coin, the marking is reached. Now, all preconditions for the occurrence of return coin as well as a are met. However, only one of the two will actually occur: if a occurs, the coin slot will lose its token, and return coin will no longer be enabled. However, if coin occurs, a will no longer be enabled.
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig1_7" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Cookie Vending Machine with Return Coin (Fig. 1.7)</text></name>
-    <page id="page1">
-      <place id="coin_slot">
-        <name><text>coin slot</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="storage">
-        <name><text>storage</text></name>
-        <initialMarking><text>5</text></initialMarking>
-      </place>
-      <place id="signal">
-        <name><text>signal</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="cash_box">
-        <name><text>cash box</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="compartment">
-        <name><text>compartment</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <transition id="insert_coin">
-        <name><text>insert coin</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <transition id="a">
-        <name><text>a</text></name>
-      </transition>
-      <transition id="return_coin">
-        <name><text>return coin</text></name>
-      </transition>
-      <transition id="b">
-        <name><text>b</text></name>
-      </transition>
-      <transition id="take_packet">
-        <name><text>take packet</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <arc id="a1" source="insert_coin" target="coin_slot"/>
-      <arc id="a2" source="coin_slot" target="a"/>
-      <arc id="a3" source="coin_slot" target="return_coin"/>
-      <arc id="a4" source="a" target="cash_box"/>
-      <arc id="a5" source="a" target="signal"/>
-      <arc id="a6" source="signal" target="b"/>
-      <arc id="a7" source="storage" target="b"/>
-      <arc id="a8" source="b" target="compartment"/>
-      <arc id="a9" source="compartment" target="take_packet"/>
-    </page>
-  </net>
-</pnml>
-
 
 **1.7 Fine Tuning**
 After five coins have been inserted and five cookie packets have been given out, the storage is empty and the cash box contains five coins. The sixth inserted coin also reaches the cash box. It generates a signal which cannot be processed, however, because there are no more cookie packets in the storage. The sixth customer has paid, but does not get any cookies! Therefore, we have to prevent a from occurring a sixth time. The sixth coin always has to be returned to the environment. It now contains an additional counter. The counter is modeled as a place that always contains exactly one token. This token is always a natural number. Initially, this is the number of cookie packets in the storage. Every occurrence of the transition a reduces its value by one. Technically, we achieve this with the help of a parameter, x. The preconditions for the occurrence of a now include an occurrence mode, that is, the replacing of x with a concrete value. From the marking shown in Fig. 1.10 with the occurrence mode x = 5, the marking is reached. The label x > 0 in a states an additional precondition for the occurrence of a. It will prevent a from occurring, if the counter holds the token “0”.
@@ -253,7 +53,7 @@ By modeling all these diverse components with a uniform formalism, their recipro
 **How It Began**
 In the late 1950s, Carl Adam Petri, at the time a research associate at the Department for Instrumental Mathematics at the University of Bonn, Germany, thought very pragmatically about the implementation of recursive functions. After all, for such functions, it is generally not possible to predict how much space their calculations will consume. If the available resources are insufficient for a calculation, the data processing system should be expandable, to continue the calculation. This is more efficient than starting over with a larger system. So Petri sought a system architecture that can be expanded indefinitely. Such an architecture does not have any central components, most of all no central, synchronizing clock, because every expansion enlarges the system in space. Connections to the clock would become longer, and longer cycles would demand lower clocking frequencies. At some point, the limitations of the laws of physics would have to be broken in order to further expand the system. Therefore, such an architecture inevitably has to make do without any synchronizing clocks. In his famous dissertation “Kommunikation mit Automaten” (Communication with Automata), Petri shows that it is actually possible to construct such an indefinitely expandable, asynchronous system architecture. It incorporates locally confined components communicating with each other via local interfaces. Actions with locally confined causes and effects are the central idea of the nets proposed by Petri in. Termed “Petri nets”, they became one of the most popular concepts of computer science. Only later did Petri start to use a graphical representation. Thus, the first text on Petri nets does not contain a single Petri net!
 
-##Chapter 2
+## Chapter 2
 
 **The Basic Concepts**
 Now we take a little closer look at Petri nets, that is, at their structure of places, transitions and arcs, the fundamental data structure of multisets, the structure of markings and steps and lastly the reachable markings and the final markings. We explain this with the help of the (slightly modified) cookie vending machine.
@@ -345,384 +145,27 @@ For an elementary system net N it follows that:
 - a final marking of N does not enable any hot transitions.
 
 **3.2 An Abstract Model of the Cookie Vending Machine**
-An abstract variant of the model of the cookie vending machine in Fig. 1.11: it does not model euro coins and cookie packets anymore, only their respective amounts. Each coin and each packet is represented by a black token, just like a pending (or not pending) signal, or the possibility to insert a coin. The current value of the counter is represented by thencorresponding amount of black tokens. This kind of abstraction of concrete objects simplifies the formal analysis of the model.
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig3_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Abstract Cookie Vending Machine - Elementary System Net (Fig. 3.1)</text></name>
-    <page id="page1">
-      <!-- Elementary net: tokens are abstract black dots (natural numbers) -->
-      <place id="coin_slot">
-        <name><text>coin slot</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="insertion_possible">
-        <name><text>insertion possible</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="storage">
-        <name><text>storage</text></name>
-        <initialMarking><text>5</text></initialMarking>
-      </place>
-      <place id="signal">
-        <name><text>signal</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="no_signal">
-        <name><text>no signal</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="cash_box">
-        <name><text>cash box</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="counter">
-        <name><text>counter</text></name>
-        <initialMarking><text>5</text></initialMarking>
-      </place>
-      <place id="compartment">
-        <name><text>compartment</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <transition id="insert_coin">
-        <name><text>insert coin</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <transition id="return_coin">
-        <name><text>return coin</text></name>
-      </transition>
-      <transition id="a">
-        <name><text>a</text></name>
-      </transition>
-      <transition id="b">
-        <name><text>b</text></name>
-      </transition>
-      <transition id="take_packet">
-        <name><text>take packet</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <arc id="a1" source="insert_coin" target="coin_slot"/>
-      <arc id="a2" source="insertion_possible" target="insert_coin"/>
-      <arc id="a3" source="coin_slot" target="a"/>
-      <arc id="a4" source="coin_slot" target="return_coin"/>
-      <arc id="a5" source="a" target="cash_box"/>
-      <arc id="a6" source="a" target="signal"/>
-      <arc id="a7" source="no_signal" target="a"/>
-      <arc id="a8" source="counter" target="a"/>
-      <arc id="a9" source="signal" target="b"/>
-      <arc id="a10" source="storage" target="b"/>
-      <arc id="a11" source="b" target="compartment"/>
-      <arc id="a12" source="b" target="no_signal"/>
-      <arc id="a13" source="compartment" target="take_packet"/>
-      <arc id="a14" source="return_coin" target="insertion_possible"/>
-    </page>
-  </net>
-</pnml>
-Figure 3.1 Abstract variant of Fig. 1.11
+An abstract variant of the model of the cookie vending machine in Fig. 1.11: it does not model euro coins and cookie packets anymore, only their respective amounts. Each coin and each packet is represented by a black token, just like a pending (or not pending) signal, or the possibility to insert a coin. The current value of the counter is represented by then corresponding amount of black tokens. This kind of abstraction of concrete objects simplifies the formal analysis of the model.
 
 **3.3 Mutual Exclusion**
 When it comes to distributed algorithms, the synchronization of actions is often crucial: an action can occur if certain conditions are met or certain local states are reached. It is reasonable to model such a condition or state as a place. This place contains a (black) token if and only if the respective condition is met or the respective local state is reached. Models of mutual exclusion are typical examples of this. In the field of distributed systems, the problem of mutual exclusion manifests itself in a variety of contexts. The simplest case deals with the interaction of two processes and a (scarce) resource that each process occasionally uses. Examples are software processes occasionally using a printer, or vehicles occasionally passing through a traffic bottleneck. At the core of this lies the demand that the two processes never use the scarce resource at the same time. Figure 3.2 shows the essential components: Each of the two processes l and r (denoting left and right) can cycle through three states, local, waiting and critical. In its local state, a process works without the scarce resource. Via the step to waiting (transition a or d, respectively), the process announces its interest in the scarce resource. The transitions a and d are cold. Hence, a process is not obliged to execute this step. From some point forward, it may only work locally. 
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig3_2" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Mutual Exclusion (Fig. 3.2)</text></name>
-    <page id="page1">
-      <!-- Process l (left) -->
-      <place id="local_l">
-        <name><text>local_l</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="waiting_l">
-        <name><text>waiting_l</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="critical_l">
-        <name><text>critical_l</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Process r (right) -->
-      <place id="local_r">
-        <name><text>local_r</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="waiting_r">
-        <name><text>waiting_r</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="critical_r">
-        <name><text>critical_r</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Shared resource -->
-      <place id="key">
-        <name><text>key</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <!-- Transitions for l: a (local->waiting, cold), b (waiting->critical), c (critical->local) -->
-      <transition id="a">
-        <name><text>a</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <transition id="b">
-        <name><text>b</text></name>
-      </transition>
-      <transition id="c">
-        <name><text>c</text></name>
-      </transition>
-      <!-- Transitions for r: d (local->waiting, cold), e (waiting->critical), f (critical->local) -->
-      <transition id="d">
-        <name><text>d</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <transition id="e">
-        <name><text>e</text></name>
-      </transition>
-      <transition id="f">
-        <name><text>f</text></name>
-      </transition>
-      <!-- Arcs for l -->
-      <arc id="a1" source="local_l" target="a"/>
-      <arc id="a2" source="a" target="waiting_l"/>
-      <arc id="a3" source="waiting_l" target="b"/>
-      <arc id="a4" source="key" target="b"/>
-      <arc id="a5" source="b" target="critical_l"/>
-      <arc id="a6" source="critical_l" target="c"/>
-      <arc id="a7" source="c" target="local_l"/>
-      <arc id="a8" source="c" target="key"/>
-      <!-- Arcs for r -->
-      <arc id="a9" source="local_r" target="d"/>
-      <arc id="a10" source="d" target="waiting_r"/>
-      <arc id="a11" source="waiting_r" target="e"/>
-      <arc id="a12" source="key" target="e"/>
-      <arc id="a13" source="e" target="critical_r"/>
-      <arc id="a14" source="critical_r" target="f"/>
-      <arc id="a15" source="f" target="local_r"/>
-      <arc id="a16" source="f" target="key"/>
-    </page>
-  </net>
-</pnml>
-
 The step from waiting to critical (transition b or e, respectively) additionally requires a token in key. The purpose of this is obvious: in its critical state, a process, for instance l, uses the scarce resource. l only reaches this state (via b) by means of the key. However, then the other process (in this case r) cannot reach its critical state via e, because the key is not available anymore. The process l does not return the key until l leaves its critical state via c. Between b and e, a conflict can arise an infinite number of times. No strategy has been modeled to solve this conflict. Because of this, all conceivable occurrence frequencies and sequences are possible. In an extreme case, the conflict will always be resolved in favor of the same process (for instance, in favor of l). Then the other process (in this case r) never reaches its critical state and instead remains waiting forever. In general, one wants to guarantee that every waiting process will eventually become critical. By remaining in its local state, one process can thus prevent the other from repeatedly reaching its critical state.
 
 **3.4 The Crosstalk Algorithm**
-The crosstalk algorithm assumes two agents communicating with each other via a technical channel. The channel works reliably as long as it transmits only one message. However, as soon as both agents’ messages collide on the channel, crosstalk occurs, which may result in corrupted messages reaching their respective recipients. Since both agents can send messages independently from one another, crosstalk cannot be prevented. However, the algorithm allows both agents to recognize crosstalk. In that case they could, for instance, repeat their messages in a predetermined order. We will now introduce an algorithm that works in cycles: during each cycle, either one agent successfully sends a message to the other, or both agents recognize crosstalk. Chapter 5 will show that scenarios structure the algorithm and increase its comprehensibility. Chapter 12 will contain a proof that both agents correctly implement the cyclic behavior.
-
-Figure 3.4 Sender and recipient
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig3_4" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Sender and Recipient - Messages Left to Right (Fig. 3.4)</text></name>
-    <page id="page1">
-      <!-- Left agent (sender) -->
-      <place id="idle_l">
-        <name><text>idle_l</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="waiting">
-        <name><text>waiting</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Shared channel places -->
-      <place id="sent">
-        <name><text>sent</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="confirmed">
-        <name><text>confirmed</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Right agent (recipient) -->
-      <place id="idle_r">
-        <name><text>idle_r</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="replied">
-        <name><text>replied</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Transitions -->
-      <transition id="send">
-        <name><text>send</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <transition id="finish">
-        <name><text>finish</text></name>
-      </transition>
-      <transition id="reply">
-        <name><text>reply</text></name>
-      </transition>
-      <transition id="return_r">
-        <name><text>return</text></name>
-      </transition>
-      <!-- Arcs -->
-      <arc id="a1" source="idle_l" target="send"/>
-      <arc id="a2" source="send" target="waiting"/>
-      <arc id="a3" source="send" target="sent"/>
-      <arc id="a4" source="waiting" target="finish"/>
-      <arc id="a5" source="confirmed" target="finish"/>
-      <arc id="a6" source="finish" target="idle_l"/>
-      <arc id="a7" source="idle_r" target="reply"/>
-      <arc id="a8" source="sent" target="reply"/>
-      <arc id="a9" source="reply" target="replied"/>
-      <arc id="a10" source="reply" target="confirmed"/>
-      <arc id="a11" source="replied" target="return_r"/>
-      <arc id="a12" source="return_r" target="idle_r"/>
-    </page>
-  </net>
-</pnml>
-
-Figure 3.4 shows how the left agent can leave its initial state idlel via send. In doing so, it sends a message (sent) and enters a waiting state. After having received a confirmation (confirmed), it ends its cycle via finish. The right agent leaves its initial state idler via reply and in doing so confirms (confirmed) the message sent by the left agent. It ends its cycle via return.
+The crosstalk algorithm assumes two agents communicating with each other via a technical channel. The channel works reliably as long as it transmits only one message. However, as soon as both agents’ messages collide on the channel, crosstalk occurs, which may result in corrupted messages reaching their respective recipients. Since both agents can send messages independently from one another, crosstalk cannot be prevented. However, the algorithm allows both agents to recognize crosstalk. In that case they could, for instance, repeat their messages in a predetermined order. We will now introduce an algorithm that works in cycles: during each cycle, either one agent successfully sends a message to the other, or both agents recognize crosstalk. Chapter 5 will show that scenarios structure the algorithm and increase its comprehensibility. Chapter 12 will contain a proof that both agents correctly implement the cyclic behavior. Figure 3.4 shows how the left agent can leave its initial state idlel via send. In doing so, it sends a message (sent) and enters a waiting state. After having received a confirmation (confirmed), it ends its cycle via finish. The right agent leaves its initial state idler via reply and in doing so confirms (confirmed) the message sent by the left agent. It ends its cycle via return.
 
 **Messages in Both Directions**
 We now complement the system symmetrically so that the right agent can also send a message to the left agent. However, the system enters a deadlock (both agents waiting) if both agents send a message during the same cycle. Luckily, each agent can recognize a deadlock: it expects a confirmation (confirmed) but receives a message (sent). Therefore, each agent can resolve the deadlock via an additional transition crosstalk, as Fig. 3.6 shows.
 
 **Preventing Errors**
-The system in Fig. 3.6 is still faulty. It is, for instance, possible for the left agent to send a message (sendl ), which is correctly received and confirmed by the right agent via replyr . The right agent then returns to its initial state and sends a message via sendr . Now the left agent finds a confirmation (confirmedr ) alongside a new message (sentr ), which it cannot identify as already belonging to the next turn. Instead, it falsely recognizes crosstalk. Figure 3.7 solves the problem by adding another message type (finished). This system is actually correct – what that means exactly is covered in Chapter 12. Figure 3.7 shows sendl and sendr as cold transitions: no agent is obliged to send a message. A sent message, however, has to be processed completely. If the system terminates, both agents have returned to their respective initial state idle.
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig3_7" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>The Crosstalk Algorithm (Fig. 3.7)</text></name>
-    <page id="page1">
-      <!-- Left agent places -->
-      <place id="idle_l">
-        <name><text>idle_l</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="waiting_l">
-        <name><text>waiting_l</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="replied_l">
-        <name><text>replied_l</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Right agent places -->
-      <place id="idle_r">
-        <name><text>idle_r</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="waiting_r">
-        <name><text>waiting_r</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="replied_r">
-        <name><text>replied_r</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Channel places (left-to-right) -->
-      <place id="sent_l">
-        <name><text>sent_l</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="confirmed_r">
-        <name><text>confirmed_r</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="finished_l">
-        <name><text>finished_l</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Channel places (right-to-left) -->
-      <place id="sent_r">
-        <name><text>sent_r</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="confirmed_l">
-        <name><text>confirmed_l</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="finished_r">
-        <name><text>finished_r</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <!-- Left agent transitions -->
-      <transition id="send_l">
-        <name><text>send_l</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <transition id="finish_l">
-        <name><text>finish_l</text></name>
-      </transition>
-      <transition id="reply_l">
-        <name><text>reply_l</text></name>
-      </transition>
-      <transition id="return_l">
-        <name><text>return_l</text></name>
-      </transition>
-      <transition id="crosstalk_l">
-        <name><text>crosstalk_l</text></name>
-      </transition>
-      <!-- Right agent transitions -->
-      <transition id="send_r">
-        <name><text>send_r</text></name>
-        <toolspecific tool="cold" version="1.0"><cold>true</cold></toolspecific>
-      </transition>
-      <transition id="finish_r">
-        <name><text>finish_r</text></name>
-      </transition>
-      <transition id="reply_r">
-        <name><text>reply_r</text></name>
-      </transition>
-      <transition id="return_r">
-        <name><text>return_r</text></name>
-      </transition>
-      <transition id="crosstalk_r">
-        <name><text>crosstalk_r</text></name>
-      </transition>
-      <!-- Left agent arcs -->
-      <arc id="a1" source="idle_l" target="send_l"/>
-      <arc id="a2" source="send_l" target="waiting_l"/>
-      <arc id="a3" source="send_l" target="sent_l"/>
-      <arc id="a4" source="waiting_l" target="finish_l"/>
-      <arc id="a5" source="confirmed_r" target="finish_l"/>
-      <arc id="a6" source="finish_l" target="idle_l"/>
-      <arc id="a7" source="waiting_l" target="crosstalk_l"/>
-      <arc id="a8" source="sent_r" target="crosstalk_l"/>
-      <arc id="a9" source="crosstalk_l" target="idle_l"/>
-      <arc id="a10" source="idle_l" target="reply_l"/>
-      <arc id="a11" source="sent_r" target="reply_l"/>
-      <arc id="a12" source="reply_l" target="replied_l"/>
-      <arc id="a13" source="reply_l" target="confirmed_l"/>
-      <arc id="a14" source="reply_l" target="finished_r"/>
-      <arc id="a15" source="replied_l" target="return_l"/>
-      <arc id="a16" source="finished_l" target="return_l"/>
-      <arc id="a17" source="return_l" target="idle_l"/>
-      <!-- Right agent arcs -->
-      <arc id="a18" source="idle_r" target="send_r"/>
-      <arc id="a19" source="send_r" target="waiting_r"/>
-      <arc id="a20" source="send_r" target="sent_r"/>
-      <arc id="a21" source="waiting_r" target="finish_r"/>
-      <arc id="a22" source="confirmed_l" target="finish_r"/>
-      <arc id="a23" source="finish_r" target="idle_r"/>
-      <arc id="a24" source="waiting_r" target="crosstalk_r"/>
-      <arc id="a25" source="sent_l" target="crosstalk_r"/>
-      <arc id="a26" source="crosstalk_r" target="idle_r"/>
-      <arc id="a27" source="idle_r" target="reply_r"/>
-      <arc id="a28" source="sent_l" target="reply_r"/>
-      <arc id="a29" source="reply_r" target="replied_r"/>
-      <arc id="a30" source="reply_r" target="confirmed_r"/>
-      <arc id="a31" source="reply_r" target="finished_l"/>
-      <arc id="a32" source="replied_r" target="return_r"/>
-      <arc id="a33" source="finished_r" target="return_r"/>
-      <arc id="a34" source="return_r" target="idle_r"/>
-    </page>
-  </net>
-</pnml>
-
-Figure 3.6 With crosstalk: errors possible
+The system in Fig. 3.6 is still faulty. It is, for instance, possible for the left agent to send a message (sendl ), which is correctly received and confirmed by the right agent via replyr . The right agent then returns to its initial state and sends a message via sendr . Now the left agent finds a confirmation (confirmedr) alongside a new message (sentr ), which it cannot identify as already belonging to the next turn. Instead, it falsely recognizes crosstalk. Figure 3.7 solves the problem by adding another message type (finished). This system is actually correct – what that means exactly is covered in Chapter 12. Figure 3.7 shows sendl and sendr as cold transitions: no agent is obliged to send a message. A sent message, however, has to be processed completely. If the system terminates, both agents have returned to their respective initial state idle.
 
 **3.5 1-Bounded Elementary System Nets**
 Except for the net in Fig. 3.1, all elementary system nets in this chapter can only reach markings in which each place holds at most one token. Also, it is often convenient to conceive of a token as “moving” through a part of the net, for instance through the three local states of the left (or right) process in the system of mutual exclusion. Such system nets have special properties and analysis methods, which we will cover later on. These nets are so important that they deserve a special name: an elementary system net N is called 1-bounded if for each reachable marking M and each place p of N : M.p/ % 1: The elementary system nets in Figures 3.2 through 3.7 are all 1-bounded; the system net in Fig. 3.1, obviously, is not. A marking M of a 1-bounded elementary system net can be described as a string of marked places. For instance, ADE (or DAE, DEA, etc.) describes the initial marking of the system of mutual exclusion according to the notation in Fig. 3.8. Two steps begin with this marking: ADE !
 
 **Exercises**
-1. Add to the system net in Fig. 3.2 a place noncriticall that holds a token if and only if process l is not in the state criticall .
+1. Add to the system net in Fig. 3.2 a place non critically that holds a token if and only if process l is not in the state critically.
 2. Construct the marking graphs for the system of mutual exclusion and the crosstalk algorithm using the denotations given in Figs. 3.8 and 3.9.
 
 **Further Reading**
@@ -790,13 +233,12 @@ Let K and L be two distributed runs. Their composition K ( L is formed by identi
 (d) Construct finite initial segments of the runs of all subtasks.
 4. Prove the following: If J can be composed with K, and K with L, then .J ( K/ ( L D J ( .K ( L/:
 
-
 **Further Reading**
 In the literature, sequential runs are by far the predominant formalism. They are technically simple, sufficient to model many situations, and satisfy the common intuition that events occur along a global time scale, or are mapped onto such a scale by an observer. From the beginning, the concept of a distributed run, that is, a partially ordered set of local states and transitions, has been an important part of the theory of Petri nets. In 1981, Nielsen, Plotkin and Winskel put distributed runs in the context of the mathematical structures of other system models. In 1988, Best and Fernandez discussed a multitude of relations between system nets and distributed runs. Two aspects of distributed runs are particularly important today: their use in scenarios (Chapter 5) and their contribution to the control of the state space explosion during verification through model checking. To test interesting characteristics of a system, this process compiles sufficiently long initial segments of all its distributed runs (that start with the inital marking) into a tree-like structure. This structure is then efficiently analyzed. Esparza and Heljanko have shown numerous proof techniques based on temporal logic that make use of this structure.
 Conventional representations of algorithms, especially conventional programming languages, use memory cells, which store their respective current values as state components. Dynamic behavior is described as a value assignment of the form: x0 WD f .x0 ; : : : ; xn /: Depending on the current values in the memory cells x0 ; : : : ; xn , the cell x0 receives a new value. The previous value in x0 is then not accessible anymore. “Read and (over)write” are thus the basic operations of programs. For many algorithms, this is intuitive and appropriate, for example, in Euclid’s algorithm for computing the greatest common divisor of two natural numbers. However, different algorithms have different basic operations, for example, the sending and receiving of messages or objects. Therefore, Petri nets use a different approach: a state component is – intuitively – an object in a certain location. Dynamic behavior moves objects from one location to another. Some objects may be created (coming from an unmodeled environment) or they may disappear (into it) during the process. Thus, “give and take” are the basic operations here. This prompts us to try to translate programs into Petri nets and vice versa: each variable z in a program corresponds to a place pz in a system net N , and the current value w in z corresponds to a token in pz.
 In each run of N , the transitions t and t’ can occur arbitrarily often, but always one after another and never independently. For example, t’ may occur infinitely often and block t. This contradicts the assumption that processes can read a variable independently without interfering with each other. If the updating of the variable z is also modeled as a loop between a transition t” and the place pz , the updating transition t” can be blocked by the reading transition t, in contradiction to the common assumption of concurrent programming in which the updating of a variable is never blocked by the reading of the variable. This observation has far-reaching consequences, some of which will become apparent in the case study of the mutual exclusion system. The translation of a system net N into a program P synchronizes the transitions of N intom one or more control flows. The structure of N generates (among others) a distributed run in which r and t occur independently from each other. A corresponding program would have to organize the nondeterminism between r and s and between t and s and thus force r and s under a central control. Finally, programming languages and many other operational modeling techniques allow for multiple control flows. They are, if necessary, dynamically created or terminated, but rarely reach the necessary flexibility to model, for example, the solution to the kindergarten game.
 
-##Chapter 5 Scenarios
+## Chapter 5 Scenarios
 A user of a technical or organizational system usually does not need each and every possible behavior of the system. The work is often limited to a few activities that are repeatedly executed. Therefore, it is convenient to consider typical scenarios of a system. A scenario consists of a finite number of elementary actions and terminates in the same state in which it started. Because of this, multiple instances of a scenario can occur multiple times in the same run. A scenario often describes an interaction pattern between a process and its environment, or between two processes. Typical scenarios of the systems considered thus far are:
 ! selling a packet of cookies,
 ! visiting one’s critical state once,
@@ -886,7 +328,7 @@ To simplify the argument, we use an abridged version of the denotations of the l
 5. The synthesis problem for the state automaton in Fig. 7.12 cannot be solved by any 1-bounded elementary system net. This is shown in the margin of Sect. 7.5. Construct an elementary system net whose marking graph is isomorphic to the state automaton in Fig. 7.12.
 
 **Further Reading**
-The solution to the synthesis problem belongs to those success stories in the field of Petri nets that emerged only slowly. Now, however, it belongs – in various versions – to the standard repertoire of most Petri net analysis tools. As early as the late 1970s, Carl Adam Petri knew how to reverse calculate any 1-bounded elementary system net N from its marking graph G: a state set A of G forms a place in N if either all or no edges of G that have the same label either start or end in A. He did not consider this to be n particularly interesting, however, because n places of N would result in 2n nodes in G and thus 22 state sets – an unmanageable situation. In the mid-1980s, Ehrenfeucht and Rozenberg solved the synthesis problem of loop-free, 1-bounded elementary system nets as an example of use for their “2-Theory”. To do this, they use all regions of a given state automaton for the construction of a system net. It was not until 1993 that Bernardinello confirmed the assumption that the minimal regions suffice. Only with this restriction does the region theory become usable in practice. By using only the minimal regions, nets of manageable sizes are constructed. Many authors took part in generalizing the 1-boundedness in Theorem 1 to generic elementary system nets and in including even inhibitor edges. With this, the synthesis problem of much more general graphs becomes solvable. The most important authors include Badouel, Bergenthum, Busi, Cortadella, Darondeau, Desel, Gunther, Hoagens, Juhás, Kishinevsky, Kleijn, Kontratyev, Lavagno, Lorenz, Mauser, Mukund, Pietkiewicz-Koutny, Pinna, Thiagarajan, van der Aalst and Yakovlev. An overview of these developments. Also very interesting for practical purposes is a reduction of the criteria for the solution to the synthesis problem: A system net N solves a reduced synthesis problem of a state automaton Z if the marking graph G of N is not necessarily isomorphic to Z, but if G and Z are bisimular or fulfill some other simulation relation. For instance, only a bisimulation is required between the state automaton Z and the marking graph of the synthesized net N . Additionally, the transitions of N may be labeled. Then, one action of Z can be implemented by several transitions of N . Lastly, it is possible to require special characteristics of N , for instance, the free-choice characteristic from Chapter 16. solves the synthesis problem of other, liberal simulation relations and also takes distributed runs into account. Numerous software tools for the analysis of Petri nets offer a synthesis module, for instance, the tool Petrify. Put intuitively, the synthesis problem seeks to construct a distributed system from the observation of its sequential behavior. The fact that this is possible marks Petri nets as a “very natural modeling technique” for distributed systems.
+The solution to the synthesis problem belongs to those success stories in the field of Petri nets that emerged only slowly. Now, however, it belongs – in various versions – to the standard repertoire of most Petri net analysis tools. As early as the late 1970s, Carl Adam Petri knew how to reverse calculate any 1-bounded elementary system net N from its marking graph G: a state set A of G forms a place in N if either all or no edges of G that have the same label either start or end in A. He did not consider this to be n particularly interesting, however, because n places of N would result in 2n nodes in G and thus 22 state sets – an unmanageable situation. In the mid-1980s, Ehrenfeucht and Rozenberg solved the synthesis problem of loop-free, 1-bounded elementary system nets as an example of use for their “2-Theory”. To do this, they use all regions of a given state automaton for the construction of a system net. It was not until 1993 that Bernardinello confirmed the assumption that the minimal regions suffice. Only with this restriction does the region theory become usable in practice. By using only the minimal regions, nets of manageable sizes are constructed. Many authors took part in generalizing the 1-boundedness in Theorem 1 to generic elementary system nets and in including even inhibitor edges. With this, the synthesis problem of much more general graphs becomes solvable. The most important authors include Badouel, Bergenthum, Busi, Cortadella, Darondeau, Desel, Gunther, Hoagens, Juhás, Kishinevsky, Kleijn, Kontratyev, Lavagno, Lorenz, Mauser, Mukund, Pietkiewicz-Koutny, Pinna, Thiagarajan, van der Aalst and Yakovlev. An overview of these developments. Also very interesting for practical purposes is a reduction of the criteria for the solution to the synthesis problem: A system net N solves a reduced synthesis problem of a state automaton Z if the marking graph G of N is not necessarily isomorphic to Z, but if G and Z are bi simular or fulfill some other simulation relation. For instance, only a bi simulation is required between the state automaton Z and the marking graph of the synthesized net N . Additionally, the transitions of N may be labeled. Then, one action of Z can be implemented by several transitions of N . Lastly, it is possible to require special characteristics of N , for instance, the free-choice characteristic from Chapter 16. solves the synthesis problem of other, liberal simulation relations and also takes distributed runs into account. Numerous software tools for the analysis of Petri nets offer a synthesis module, for instance, the tool Petrify. Put intuitively, the synthesis problem seeks to construct a distributed system from the observation of its sequential behavior. The fact that this is possible marks Petri nets as a “very natural modeling technique” for distributed systems.
 
 ##Chapter 8 Composition of Nets
 It is a general principle of software engineering to assemble small systems into larger ones. This process is called composition. Here we will consider the case of nets with interfaces. Two such nets can be joined together at their interfaces. Interfaces used for asynchronous, directed communication are an important special case. Such open nets are particularly natural: each Petri net can be broken down unambiguously into its set of smallest open nets.
@@ -1322,91 +764,6 @@ We will see how these three conditions can be verified rather easily.
 **19.1 Example: Models of Business Processes**
 A business process is a standardized process for implementing organizational procedures, as they usually occur in administrations. A business process contains activities that are connected to each other. In a Petri net model of a business process, each activity is modeled as a transition. The model itself is a wellformed system net. Figure 19.1 shows a Petri net model of a business process for developing an offer. Its final marking has a token in the place stop.
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig19_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Business Process for Developing an Offer (Fig. 19.1)</text></name>
-    <page id="page1">
-      <place id="start">
-        <name><text>start</text></name>
-        <initialMarking><text>1</text></initialMarking>
-      </place>
-      <place id="p1">
-        <name><text>receive order</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="p2">
-        <name><text>start receive answer</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="p3">
-        <name><text>adjust due date</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="p4">
-        <name><text>determine macrostructure</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="p5">
-        <name><text>develop design</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="p6">
-        <name><text>send offer</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="p7">
-        <name><text>determine microstructure</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <place id="stop">
-        <name><text>stop</text></name>
-        <initialMarking><text>0</text></initialMarking>
-      </place>
-      <transition id="t_send_inquiry">
-        <name><text>send inquiry</text></name>
-      </transition>
-      <transition id="t_receive_answer">
-        <name><text>receive answer</text></name>
-      </transition>
-      <transition id="t_adjust">
-        <name><text>adjust due date</text></name>
-      </transition>
-      <transition id="t_determine_macro">
-        <name><text>determine macrostructure</text></name>
-      </transition>
-      <transition id="t_develop">
-        <name><text>develop design</text></name>
-      </transition>
-      <transition id="t_determine_micro">
-        <name><text>determine microstructure</text></name>
-      </transition>
-      <transition id="t_send_offer">
-        <name><text>send offer</text></name>
-      </transition>
-      <arc id="a1" source="start" target="t_send_inquiry"/>
-      <arc id="a2" source="t_send_inquiry" target="p1"/>
-      <arc id="a3" source="t_send_inquiry" target="p2"/>
-      <arc id="a4" source="p1" target="t_receive_answer"/>
-      <arc id="a5" source="t_receive_answer" target="p3"/>
-      <arc id="a6" source="p2" target="t_adjust"/>
-      <arc id="a7" source="t_adjust" target="p4"/>
-      <arc id="a8" source="p3" target="t_determine_macro"/>
-      <arc id="a9" source="p4" target="t_determine_macro"/>
-      <arc id="a10" source="t_determine_macro" target="p5"/>
-      <arc id="a11" source="t_determine_macro" target="p7"/>
-      <arc id="a12" source="p5" target="t_develop"/>
-      <arc id="a13" source="p7" target="t_determine_micro"/>
-      <arc id="a14" source="t_develop" target="p6"/>
-      <arc id="a15" source="t_determine_micro" target="p6"/>
-      <arc id="a16" source="p6" target="t_send_offer"/>
-      <arc id="a17" source="t_send_offer" target="stop"/>
-    </page>
-  </net>
-</pnml>
-Figure 19.1 Business process for developing an offer
-
 **19.2 Well-Formed Elementary System Nets**
 Let N be an elementary system net and E an arbitrary reachable marking of N . Then N together with the final marking E is well-formed if N has the following three properties:
 
@@ -1422,13 +779,12 @@ Exercises
 2. Prove the Well-Formedness Theorem.
 3. Show by means of the Well-Formedness Theorem and the Rank Theorem that the system net in Fig. 19.1 with the final marking stop is well-formed.
 
-Further Reading
+**Further Reading**
 Safety and Liveness
 Since the 1970s, a system net has been called n-safe if each reachable marking marks each place with at most n tokens. We call such system nets n-bounded in this book. Back then, liveness and many of its variants stood for aspects of the reachability of markings and the possibility to enable transitions (starting from the initial marking, or an arbitrary reachable marking). Since the early 1980s, temporal logic has distinguished safety properties (intuitively: “something bad” never happens) and liveness properties (intuitively: eventually, “something good” happens). Each property of a system net can be composed from its safety and liveness properties. A sensible description of the requirements of a system always includes properties of both types. State and run properties, as defined in Chapters 9 and 16, are special safety and liveness properties, respectively. Usually, they are fully sufficient to describe the central requirements of a system model. Typical properties that cannot be formulated this way pertain to individual steps (for instance: “each step increases the number of tokens by 1”). However, such properties directly follow the step rule for transitions. Moreover, interesting system properties are interesting precisely because they do not only pertain to individual steps.
 
-##Chapter 20 Mutual Exclusion
+## Chapter 20 Mutual Exclusion
 By the 1960s, mutual exclusion was recognized as one of the central problems in the organization of computer systems. It arises whenever a resource can be accessed by only one of many processes at any one time (for instance, a processor, a printer or a communications device). While a process is using the resource, it is in its critical state. An agreement between the processes has to guarantee that no two processes can be in their critical states at the same time. We will introduce such an agreement in which processes can only communicate via asynchronous messages.
-
 
 **20.1 The Problem**
 With the system net we have already introduced a model that guarantees the mutual exclusion of the two processes l and r: they never reside in their critical states simultaneously. A mutex algorithm also guarantees that each process that wants to enter its critical state will eventually be able to do so. To specify this, we take another detailed look at the three states local, waiting and critical as well as the steps between them:
@@ -1456,9 +812,6 @@ For a systematic understanding of the algorithm, it is helpful to examine its sc
 - and yields the token via j. 
 The corresponding partial run Al (with a token initially in C
 instead of B) is obvious.
-
-Figure 20.8 shows the partial run Bl in which the left process
-
 - yields the token via c,
 - requests the token via b
 - and receives the token and becomes critical via d.
@@ -1478,7 +831,7 @@ A series of solutions to the mutual exclusion problem originally formulated in p
 **The Problem of Mutual Exclusion**
 The problem of mutual exclusion occurs in many variations. Those variations differ particularly with respect to: ! the number of processes and the topology of their networking: Chapter 20 introduced a solution for two processes, Section 9.3 for five processes (“philosophers”). If we call two processes neighbors if they share a limited resource (“chopstick”), then the neighbor relation of the five philosophers forms a circle. In general, there exists an arbitrary number of processes and very different patterns of the neighbor relation. Apart from circles, other common patterns are stars, grids, trees and n-dimensional cubes (“hypercubes”). Furthermore, the number of simultaneous users of a limited resource is not necessarily two. ! the assigning of the limited resource: so far, we have only seen examples in which each limited resource has a predefined set of users. This is not always the case. For instance, it may be irrelevant to which of two available printers a process sends its documents. ! the communication between the processes: in the solution in Fig. 20.4, the processes communicate via messages. In other solutions, they access a shared variable or execute joint activities. ! the influence of a global instance: an example of such an instance is an operating system managing the processes and resources. In contrast, the solution in Chapter 20 uses homogeneous processes, which are not controlled by any global instance. The formulations of and solutions to the different variants of the problem depend heavily on the modeling technique employed. Shared variables are commonly used. Thereby, each variable is owned by a process that can update it. Other processes may only read the variable. The necessary fairness assumptions are integrated into the modeling language itself: an unbounded sequence of reading operations of a variable x can be interrupted by the variable’s owner in order to update x. During the modeling of such variables with Petri nets these fairness assumptions become obvious. In Lamport’s “Bakery Algorithm”, the fairness assumption is incorporated into a display panel of which all processes require an unimpeded view. In practice, such fairness assumptions can often be neglected: “long-lasting” accesses to limited resources can be organized by “short” accesses to other resources.
 
-##Chapter 21 Asynchronous Hardware
+## Chapter 21 Asynchronous Hardware
 This case study describes the systematic construction of asynchronous hardware. It uses the example of an extremely dynamic architecture of a processor that adapts to the current availability of data packets and functions, as well as the varying durations of individual calculation steps.
 
 **21.1 The Counterflow Pipeline Processor (CFPP): The Problem**

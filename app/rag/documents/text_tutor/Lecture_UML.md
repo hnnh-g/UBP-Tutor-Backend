@@ -53,36 +53,6 @@ Konzeptuelle und spezifizierende Sicht auf eine Software:
 - Konzeptuelle Sicht: Beziehungen und Abhängigkeiten zwischen einzelnen Klassen
 - Implementierungsnah, Grundlage für automatische Code-Generierung
 
-Notation der spezifischen Sicht – Klasse mit Attributen und Methoden:
-
-```plantuml
-@startuml
-class Konto {
-  bezeichnung: String
-  --
-  saldo(): GeldBetrag
-  einzahlen(betrag: GeldBetrag)
-}
-
-abstract class Kunde {
-}
-
-class Privatkunde {
-  vorname: String
-  nachname: String
-}
-
-class Geschäftskunde {
-  firmenname: String
-}
-
-interface Brandschutzverordnung {
-  getAnzahlSprinkleranlagen(): int
-  getAnzahlGaslöschanlagen(): int
-}
-@enduml
-```
-
 Notation der konzeptuellen Sicht – Assoziationen:
 - Ungerichtete Assoziation: Beschreibt Semantik zwischen Klassen (bidirektional)
 - Gerichtete Assoziation: Beschreibt Semantik von einer Klasse zu einer anderen, aber nicht umgekehrt
@@ -162,24 +132,6 @@ Generalisierung / Spezialisierung:
 Realisierung:
 - Implementierung einer oder mehrerer Schnittstellenklassen und derer Attribute sowie Operationen durch eine Klasse
 
-```plantuml
-@startuml
-interface Brandschutzverordnung {
-  getAnzahlSprinkleranlagen(): int
-  getAnzahlGaslöschanlagen(): int
-}
-
-class Gebäude {
-}
-
-class Wohnhaus {
-}
-
-Gebäude <|-- Wohnhaus
-Brandschutzverordnung <|.. Wohnhaus
-@enduml
-```
-
 Generalisierung in Java:
 ```java
 public class Wohnhaus extends Gebäude {
@@ -202,74 +154,9 @@ public class Wohnhaus implements Brandschutzverordnung {
 
 Klassendiagramm mit Assoziation, Generalisierung und Komposition:
 
-```plantuml
-@startuml
-class Konto {
-  bezeichnung: String
-  --
-  saldo(): GeldBetrag
-  einzahlen(betrag: GeldBetrag)
-}
-
-abstract class Kunde {
-}
-
-class Privatkunde {
-  vorname: String
-  nachname: String
-}
-
-class Geschäftskunde {
-  firmenname: String
-}
-
-class Adresse {
-}
-
-Konto "1..*" -- "1..*" Kunde : zeichnungsberechtiger
-Kunde <|-- Privatkunde
-Kunde <|-- Geschäftskunde
-Privatkunde "0..*" -- "1..1" Adresse : postAdresse
-Geschäftskunde "0..*" -- "1..1" Adresse : domizilAdresse
-@enduml
-```
-
 ### Übersicht Gebäudeumfeld
 
 Klassendiagramm: Beschreibung des Umfelds von Gebäuden:
-
-```plantuml
-@startuml
-interface Brandschutzverordnung {
-}
-
-class Wohnhaus {
-}
-
-class Gebäude {
-}
-
-class Bewohner {
-}
-
-class Raum {
-}
-
-class Brandschutzbehörde {
-}
-
-class Straße {
-}
-
-Brandschutzverordnung <|.. Wohnhaus
-Wohnhaus <|-- Gebäude
-Gebäude "0..*" o-- "1" Wohnhaus : komposition
-Bewohner "0..*" -- "0..*" Gebäude
-Gebäude *-- "1..*" Raum
-Brandschutzbehörde "0..*" -- "1..*" Gebäude : überprüft
-Gebäude "0..*" -- "0..*" Straße
-@enduml
-```
 
 ## UML-Methodikleitfaden für Analyse und Design
 
@@ -360,63 +247,6 @@ Notation:
 - Bereitgestellte Schnittstelle (Stecker): Von einer Komponente angeboten
 - Abhängigkeits-Beziehung: Verbindung zwischen Schnittstellen
 
-### 3-Tier-Architektur
-
-Komponentendiagramm: 3-Tier-Architektur einer Web-Applikation:
-
-```plantuml
-@startuml
-package "Präsentationslogik" {
-  [View]
-}
-
-package "Anwendungslogik" {
-  [Controller]
-  [Model]
-}
-
-[ORM-Framework]
-
-database "Datenbank" {
-}
-
-[View] --> [Controller] : HTTP
-[Controller] o-- [Model]
-[Controller] --> [ORM-Framework]
-[ORM-Framework] --> [Datenbank] : SQL
-@enduml
-```
-
-## Einsatz- und Verteilungsdiagramm
-
-Strukturdiagramm, das die physische Verteilung von Artefakten auf Knoten (Hardware, Ausführungsumgebungen) beschreibt.
-
-Beispiel – Beschreibung eines Bringdiensts:
-
-```plantuml
-@startuml
-node "Kundenbrowser" {
-  artifact "Web-Frontend"
-}
-
-node "Webserver" {
-  artifact "Web-Applikation"
-}
-
-node "Datenbankserver" {
-  database "Bestelldatenbank"
-}
-
-node "Mobilgerät (Fahrer)" {
-  artifact "Fahrer-App"
-}
-
-"Kundenbrowser" --> "Webserver" : HTTPS
-"Webserver" --> "Datenbankserver" : JDBC
-"Mobilgerät (Fahrer)" --> "Webserver" : HTTPS
-@enduml
-```
-
 ## Verhaltensdiagramme: Anwendungsfalldiagramm
 
 - Abbildung von Anwendungsfällen (Use Cases), Akteuren und deren Beziehungen in einem System
@@ -434,66 +264,6 @@ Notation:
 - Generalisierung: Akteure und Anwendungsfälle; Kommunikationsbeziehungen werden weiter vererbt
 - Include-Beziehung: Import des Verhaltens eines Anwendungsfalls durch einen anderen; Verbot zyklischer Abhängigkeiten
 - Extend-Beziehung: Das Verhalten eines Anwendungsfalls kann durch einen anderen erweitert werden; Erweiterung an Bedingung geknüpft
-
-### Anwendungsfalldiagramm – Beispiel: Post
-
-```plantuml
-@startuml
-left to right direction
-
-actor Mensch
-actor Versender
-actor Empfänger
-
-Mensch <|-- Versender
-Mensch <|-- Empfänger
-
-rectangle Post {
-  usecase "Paket versenden" as UC1
-  usecase "Paket sortieren" as UC2
-  usecase "Paket ausliefern" as UC3
-}
-
-usecase "Paket verpacken" as UC4
-
-Versender -- UC4
-Versender -- UC1
-Empfänger -- UC1
-
-UC1 .> UC2 : <<include>>
-UC1 .> UC3 : <<include>>
-@enduml
-```
-
-### Anwendungsfalldiagramm – Beispiel: Qualifizieren
-
-Anwendungsfalldiagramm: Beschreibung des Anwendungsfalls „Qualifizieren":
-
-```plantuml
-@startuml
-left to right direction
-
-actor Student
-
-usecase "Qualifizieren" as UC0
-
-rectangle Universität {
-  usecase "Studieren" as UC1
-  usecase "Lernen" as UC2
-  usecase "Verstehen" as UC3
-  usecase "Arbeiten\nextension points:\nMiete zahlen" as UC4
-  usecase "Bücher ausleihen" as UC5
-}
-
-Student -- UC0
-UC0 <|-- UC1
-
-UC5 --> UC1
-UC1 --> UC2
-UC2 .> UC3 : <<include>>
-UC1 <. UC4 : <<extend>>\n{Student muss Miete zahlen}
-@enduml
-```
 
 ## Verhaltensdiagramme: Aktivitätsdiagramm
 
@@ -515,40 +285,6 @@ Notation:
 - Objektfluss: Instanziierung oder Zuführung eines Objekts zu einem Ablauf
 - Partition: Bereich mit gemeinsamen Verantwortlichkeiten (z.B. Swimlanes)
 - Signal senden/empfangen: Abbildung asynchroner Abläufe
-
-### Aktivitätsdiagramm: Beispiel Auftragsbearbeitung
-
-Vereinfachte Darstellung einer Auftragsbearbeitung mit drei Swimlanes (Kunde, Unternehmen, Lieferant):
-
-```plantuml
-@startuml
-|Kunde|
-start
-:Auftrag erstellen;
-:Auftrag;
-
-|Unternehmen|
-:Auftrag bearbeiten;
-note right: dataStore: Kundendaten\ndataStore: Artikeldaten
-:Auftrag annehmen;
-fork
-  :Bestellung abwickeln;
-  :Bestellung;
-  :Ware ausliefern;
-fork again
-  :Produkt erstellen;
-end fork
-
-|Lieferant|
-:Ware annehmen;
-:Ware;
-:Ware liefern;
-
-|Kunde|
-:Ware erhalten;
-stop
-@enduml
-```
 
 ## Verhaltensdiagramme: Sequenzdiagramm
 
@@ -576,28 +312,6 @@ Kombinierte Fragmente (Interaktionsoperatoren):
 | opt | Optionales Fragment | Optionaler Teil |
 | par | Paralleles Fragment | Nebenläufiger Teil |
 
-### Sequenzdiagramm – Übersicht: Haus betreten
-
-```plantuml
-@startuml
-participant ":Bewohner" as B
-participant ":Wohnhaus" as W
-participant ":Schlüsseldienst" as S
-
-B -> W : Türschlosszustand abfragen()
-W --> B : :Türschlosszustand
-
-alt Zustand Türschloss
-  [Türschloss in Ordnung]
-  B -> W : Tür aufschließen()
-  W --> B : :Offen
-else [Türschloss defekt]
-  B -> S : Schlüsseldienst rufen()
-  S --> B : :Ankunftszeit
-end
-@enduml
-```
-
 ## Verhaltensdiagramme: Zustandsdiagramm
 
 - Genaue Darstellung des dynamischen Verhaltens eines Systems
@@ -619,66 +333,6 @@ Notation:
 - Entscheidung: Verzweigt Transitionen dynamisch; ausgehende Transition wird beim Erreichen anhand der Guards gewählt
 - Gabelung: Teilt eine eingehende Transition in mehrere parallel geschaltete ausgehende Transitionen
 - Vereinigung: Verbindet mehrere parallel geschaltete eingehende Transitionen in eine ausgehende Transition
-
-### Zustandsdiagramm – Beispiel
-
-Verhaltenszustandsautomat: Kaffeemaschine:
-
-```plantuml
-@startuml
-[*] --> kocht_Kaffee : Angeschaltet / Kaffee kochen
-
-kocht_Kaffee --> [*] : Vorgang beendet
-kocht_Kaffee --> ausgeschaltet : Ausschalter betätigt / unterbrechen
-ausgeschaltet --> kocht_Kaffee : Anschalter betätigt / wiederaufnehmen
-@enduml
-```
-
-Protokollzustandsautomat: Reservierung:
-
-```plantuml
-@startuml
-[*] --> reserviert : reservieren()
-
-reserviert --> storniert : stornieren()
-reserviert --> Berechnung : Leistung zustellen()
-
-Berechnung --> zugestellt : [Zustellung möglich]
-Berechnung --> storniert : [Zustellung nicht möglich]
-
-zugestellt --> [*]
-storniert --> [*]
-@enduml
-```
-
-### Zustandsdiagramm – Beispiel: Fahrkartenautomat
-
-```plantuml
-@startuml
-[*] --> wartend
-
-wartend --> Geldaufnahme : Betrag erhöht [Münze eingegeben]
-Geldaufnahme --> Geldaufnahme : do / [Münze eingeben] / Betrag erhöhen\n[Betrag < Preis]
-Geldaufnahme --> Berechnung : Fahrkarte ausgewählt
-Geldaufnahme --> Abbruch : Cancel gewählt
-
-Berechnung : do / Preis berechnen
-Berechnung --> Ausgabe_Fahrkarte : [Betrag = Preis]
-Berechnung --> Ausgabe_Wechselgeld : [Betrag > Preis]
-Berechnung --> Abbruch : after (Timeout)
-
-Ausgabe_Wechselgeld : do / Wechselgeld ausgeben
-Ausgabe_Wechselgeld --> Ausgabe_Fahrkarte
-
-Ausgabe_Fahrkarte : entry / Fahrkarte ausgeben
-Ausgabe_Fahrkarte --> wartend
-
-Abbruch : entry / Betrag ausgeben
-Abbruch --> wartend : Stop gedrückt
-@enduml
-```
-
-Quelle: http://se.cs.uni-magdeburg.de/tutorial/UML2/Zustandsdiagramm.htm
 
 ## Zusammenfassung UML
 

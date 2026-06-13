@@ -34,47 +34,6 @@ Abstract A net consists of three kinds of elements,namely transitions, places an
 ####2.1.1 What Is Around Us: Nets
 There are two kinds of elements around us, static elements and dynamic elements. These elements relate with each other to form invisible nets and to make our surroundings alive. Petri nets are an abstraction of reality in which static elements are called tokens and dynamic elements are called transitions. Tokens are classiﬁed according to the roles they play and reside in places they belong to. Here “place” is a term in Nets, irrelevant to geographic position. Transitions and places are connected by arrows along which tokens ﬂow from place to place when a transition ﬁres (occurs). Thus, arrows are called a ﬂow relation. Tokens may be consumed (to vanish) or produced (to appear) in the course of transition ﬁrings. It must be made clear that a transition in Nets is of an atomic nature. It either occurs completely or does not occur at all. In other words, once it starts, it would not be interrupted, unless the system crashes. Before approaching to formal deﬁnition, let’s have an example ﬁrst. Figure 2.1 below is a graphically presented directed net N1 and a net system with N1 as its underlying structure. The transition set of N1 is T(N1), or simply T, T = {t1 , t2 , t3 , t4 , t5} The place set of N1 is S(N1), or simply S,
 
-Fig. 2.1 A system and its underlying directed net N1
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig2_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>System N1 (Fig. 2.1)</text></name>
-    <page id="page1">
-      <place id="s0"><name><text>s0</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="s1"><name><text>s1</text></name><initialMarking><text>2</text></initialMarking></place>
-      <place id="s2"><name><text>s2</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s3"><name><text>s3</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s4"><name><text>s4</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s5"><name><text>s5</text></name><initialMarking><text>0</text></initialMarking></place>
-      <transition id="t1"><name><text>t1</text></name></transition>
-      <transition id="t2"><name><text>t2</text></name></transition>
-      <transition id="t3"><name><text>t3</text></name></transition>
-      <transition id="t4"><name><text>t4</text></name></transition>
-      <transition id="t5"><name><text>t5</text></name></transition>
-      <!-- Arcs: (s0,t1),(s1,t1),(t1,s2),(s2,t2),(t2,s3),(t2,s5),(s5,t3),(t3,s0),
-           (s3,t4),(t4,s4),(t4,s4 w=2),(s4,t5),(t5,s1) -->
-      <arc id="a1" source="s0" target="t1"/>
-      <arc id="a2" source="s1" target="t1"/>
-      <arc id="a3" source="t1" target="s2"/>
-      <arc id="a4" source="s2" target="t2"/>
-      <arc id="a5" source="t2" target="s3"/>
-      <arc id="a6" source="t2" target="s5"/>
-      <arc id="a7" source="s5" target="t3"/>
-      <arc id="a8" source="t3" target="s0"/>
-      <arc id="a9" source="s3" target="t4">
-        <inscription><text>2</text></inscription>
-      </arc>
-      <arc id="a10" source="t4" target="s4">
-        <inscription><text>2</text></inscription>
-      </arc>
-      <arc id="a11" source="s4" target="t5"/>
-      <arc id="a12" source="t5" target="s1"/>
-    </page>
-  </net>
-</pnml>
-```
-
 (S, T; F) is called a directed net since tokens must ﬂow along arrows in F. An arrow is also called an arc. As indicated by the above example, directed net is a triple constructed from a place set and a transition set. The semicolon before F indicates that F is deﬁned from S and T. Every place si in S has a capacity to hold a certain number of tokens. The function to map a place to its capacity is called capacity function and denoted with K, K : S → I where I = {1, 2, . . .} is the set of non-zero positive integers. In case the capacity K(si) allows it to receive tokens freely, then the capacity of si is ω (inﬁnite), i.e., K(si) = ω. For directed net N1 in Fig. 2.1, capacities of all places are ω, and ω is the default value for capacity function. All arc weights (numbers of tokens to be consumed or produced by transition ﬁrings) are 1 by default, except w(s3, t4) = w(t4, s4) = 2. W : F → I is the weight function on F. The initial token distribution M0 on S is given by M0(s0) = 1, M0(s1) = 2, and M0(si) = 0 for all places si other than s0, s1. Note that a token distribution is called a marking on S. A marking is a global state, based on which transition rules (dynamics of a net system) will be deﬁned. What are the deﬁnitions based on global states? Does this contradict the claims given in Part 1 above? Readers may doubt it since it seems inconsistent with the local determination lemma. The extension of a transition is a part of a marking. Transition rules are just referring to the extension of a transition via marking. A transition may be enabled by an incomplete marking as long as the given part of this marking includes its extension.
 
 ###2.1.2 Formal Deﬁnitions and Basic Terms
@@ -99,67 +58,7 @@ Note F is constructed from S and T with dom(F) as its domain and cod(F) as its c
 
 In Fig. 2.2 below, (a) is an example of directed nets presented graphically with unnamed elements. Figure 2.2b presents a bicycle assembling transition in which elements are named as they are called in daily life. Figure 2.2b may also be explained as a chemical reaction. Two atoms of hydrogen and one atom of oxygen are combined to form a water molecule. As Fig. 2.2b suggests, a net may be understood differently in different areas.
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig2_2b" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Bicycle Assembly (Fig. 2.2b)</text></name>
-    <page id="page1">
-      <place id="wheel"><name><text>wheel</text></name><initialMarking><text>2</text></initialMarking></place>
-      <place id="frame"><name><text>frame</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="bicycle"><name><text>bicycle</text></name><initialMarking><text>0</text></initialMarking></place>
-      <transition id="assemble"><name><text>assemble</text></name></transition>
-      <arc id="a1" source="wheel" target="assemble">
-        <inscription><text>2</text></inscription>
-      </arc>
-      <arc id="a2" source="frame" target="assemble"/>
-      <arc id="a3" source="assemble" target="bicycle"/>
-    </page>
-  </net>
-</pnml>
-```
-
 Thus, as a common practice, net elements are named with meaningless identiﬁers. Net elements must be connected to physical objects only for real applications. It is in this sense that net is said to be an unexplained system model.
-
-Fig. 2.4 A line to transfer water buckets
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig2_4" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Line to Transfer Water Buckets (Fig. 2.4)</text></name>
-    <page id="page1">
-      <!-- s_i = full bucket at person i, s'_i = empty bucket at person i -->
-      <place id="s1"><name><text>s1</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s1p"><name><text>s'1</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="s2"><name><text>s2</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s2p"><name><text>s'2</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s3"><name><text>s3</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s3p"><name><text>s'3</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s4"><name><text>s4</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s4p"><name><text>s'4</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s5"><name><text>s5</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="s5p"><name><text>s'5</text></name><initialMarking><text>0</text></initialMarking></place>
-      <!-- transitions: x1 (pass from source to 1), y1..y4 (person-to-person), f5 (deliver) -->
-      <transition id="x1"><name><text>x1</text></name></transition>
-      <transition id="y1"><name><text>y1</text></name></transition>
-      <transition id="y2"><name><text>y2</text></name></transition>
-      <transition id="y3"><name><text>y3</text></name></transition>
-      <transition id="y4"><name><text>y4</text></name></transition>
-      <transition id="f5"><name><text>f5</text></name></transition>
-      <arc id="a1" source="s1p" target="x1"/><arc id="a2" source="x1" target="s1"/>
-      <arc id="a3" source="s1" target="y1"/><arc id="a4" source="s2p" target="y1"/>
-      <arc id="a5" source="y1" target="s2"/><arc id="a6" source="y1" target="s1p"/>
-      <arc id="a7" source="s2" target="y2"/><arc id="a8" source="s3p" target="y2"/>
-      <arc id="a9" source="y2" target="s3"/><arc id="a10" source="y2" target="s2p"/>
-      <arc id="a11" source="s3" target="y3"/><arc id="a12" source="s4p" target="y3"/>
-      <arc id="a13" source="y3" target="s4"/><arc id="a14" source="y3" target="s3p"/>
-      <arc id="a15" source="s4" target="y4"/><arc id="a16" source="s5p" target="y4"/>
-      <arc id="a17" source="y4" target="s5"/><arc id="a18" source="y4" target="s4p"/>
-      <arc id="a19" source="s5" target="f5"/><arc id="a20" source="f5" target="s5p"/>
-    </page>
-  </net>
-</pnml>
-```
 
 System design is a purposeful task. A net with freely named elements may gain generality, i.e., to be applied in different areas. Deﬁnition 2.1 contains only necessary requirements for a triple to be a directed net. As a tradition, fundamental concepts are always deﬁned as simple as possible to leave room for later enrichment. For example, a net is not necessary to be connected as shown in Fig. 2.3 below, in which (a), (b) and N = (a) + (b) are all directed nets by deﬁnition. Elements of N are named with meaningless symbols, since N is not connected with reality. People may line up to transfer water buckets to ﬁght a ﬁre. In the course of doing so, some weak or aged persons may become too tired to continue. A net modelling such a scene has a variable size since people may quit or join. The net in Fig. 2.4 below describes such a line consisting of 5 persons. Place si and si′ are states of the ith person to hold a full bucket or an empty bucket, depending on where the token is.
 
@@ -257,76 +156,8 @@ An EN-system describes how individual resources are consumed and produced. The E
 
 ###4.1 Completeness
 A man-designed system is complete if it contains all elements necessary for the intended purpose. As part of nature, an EN-system is complete if and only if every element of it has its individuality to distinguish itself from others. Figure 4.1 below explains this. The alternating of seasons has been mentioned above. As per our understanding of daily life, Fig. 4.1a seems correct. But it is just a rough model in people’s mind.
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig4_1a" type="http://www.pnml.org/version-2009/grammar/en-net">
-    <name><text>Four Seasons — Simple (Fig. 4.1a)</text></name>
-    <page id="page1">
-      <place id="spring"><name><text>spring</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="summer"><name><text>summer</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="autumn"><name><text>autumn</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="winter"><name><text>winter</text></name><initialMarking><text>0</text></initialMarking></place>
-      <transition id="t1"><name><text>t1</text></name></transition>
-      <transition id="t2"><name><text>t2</text></name></transition>
-      <transition id="t3"><name><text>t3</text></name></transition>
-      <transition id="t4"><name><text>t4</text></name></transition>
-      <arc id="a1" source="spring" target="t1"/><arc id="a2" source="t1" target="summer"/>
-      <arc id="a3" source="summer" target="t2"/><arc id="a4" source="t2" target="autumn"/>
-      <arc id="a5" source="autumn" target="t3"/><arc id="a6" source="t3" target="winter"/>
-      <arc id="a7" source="winter" target="t4"/><arc id="a8" source="t4" target="spring"/>
-    </page>
-  </net>
-</pnml>
-```
 
 The reality is, there exist hot days in Spring and nice days in Summer. People have tolerated such inaccuracy since it well serves the daily needs including farming. This model is not qualiﬁed as a theoretical one. A critical question on Fig. 4.1a is: does the event of a season change take time? If it does, which season that time belongs to? If not, at which moment such a change takes place? There is no answer to these questions based on Fig. 4.1a. Figure 4.1b answers above question well. Instead of a single condition for one season in (Fig. 4.1a), there are three conditions in (Fig. 4.1b), among them, an accompanying condition di for every event ti is observed.
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig4_1b" type="http://www.pnml.org/version-2009/grammar/en-net">
-    <name><text>Four Seasons EN-system — Complete (Fig. 4.1b)</text></name>
-    <page id="page1">
-      <!-- Season conditions -->
-      <place id="spring"><name><text>spring</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="summer"><name><text>summer</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="autumn"><name><text>autumn</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="winter"><name><text>winter</text></name><initialMarking><text>0</text></initialMarking></place>
-      <!-- Accompanying conditions (in-progress indicators) -->
-      <place id="d1"><name><text>d1</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="d2"><name><text>d2</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="d3"><name><text>d3</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="d4"><name><text>d4</text></name><initialMarking><text>1</text></initialMarking></place>
-      <!-- Season-change events -->
-      <transition id="t1"><name><text>t1 (spring→summer)</text></name></transition>
-      <transition id="t2"><name><text>t2 (summer→autumn)</text></name></transition>
-      <transition id="t3"><name><text>t3 (autumn→winter)</text></name></transition>
-      <transition id="t4"><name><text>t4 (winter→spring)</text></name></transition>
-      <!-- t1: spring + d4(end of winter) → d1(spring in progress) -->
-      <arc id="a1" source="spring" target="t1"/>
-      <arc id="a2" source="d4" target="t1"/>
-      <arc id="a3" source="t1" target="d1"/>
-      <arc id="a4" source="t1" target="summer"/>
-      <!-- t2: summer + d1 → d2 -->
-      <arc id="a5" source="summer" target="t2"/>
-      <arc id="a6" source="d1" target="t2"/>
-      <arc id="a7" source="t2" target="d2"/>
-      <arc id="a8" source="t2" target="autumn"/>
-      <!-- t3: autumn + d2 → d3 -->
-      <arc id="a9" source="autumn" target="t3"/>
-      <arc id="a10" source="d2" target="t3"/>
-      <arc id="a11" source="t3" target="d3"/>
-      <arc id="a12" source="t3" target="winter"/>
-      <!-- t4: winter + d3 → d4 -->
-      <arc id="a13" source="winter" target="t4"/>
-      <arc id="a14" source="d3" target="t4"/>
-      <arc id="a15" source="t4" target="d4"/>
-      <arc id="a16" source="t4" target="spring"/>
-    </page>
-  </net>
-</pnml>
-```
 
 The time taken by event ti may be long or short, its accompanying condition di tells that it is in progress. The other two conditions di - 1 and di + 1 (as subscript, 4 + 1 = 1 and 1 - 1 = 4)indicate the remaining part of the previous season and the beginning of the next season. The three tokens in Fig. 4.1b tell the fact that the three accompanied events are all in progress. There is no clear-cut line between adjacent seasons. This is the way Nets deals with time: things are going on in harmony with no need of a timer. A calendar may tell you an accurate time (month, day, hour, and minute) for the next season to come, but it seems no one cares about it. Such a calculated prediction is based on the belief that time is linear like the axis of a real number. Note that the tokens in Fig. 4.1a, b specify a current state instead of an initial one. No one knows how the alternating of seasons was started. The difference between Fig. 4.1a, b is reﬂected by their respective occurrence nets shown in Fig. 4.2a, b. Figure 4.2b has a rope structure, and each of its elements, say x, has a set c(x) and a set r(x) deﬁned as below:
 c(x) = {y|(x, y)=∉F+ ∪ (F-)+
@@ -360,49 +191,6 @@ M [t1 || t2 > ≡ M [t1 > ^ M [t2 >
 ^∀p ∈ t1˙∩ t2: M(p) + w(t1,p) + w(t,p) ≤ K (p)
 Note that M[t1||t2 > = M[t2 || t1> by deﬁnition, i.e., k is commutative. Besides, a place is different from a variable, no read/write conﬂict for places. Deﬁnition 5.2 Sequence Transitions t1 and t2 are sequentially related at M, if M
 [t1 → t2 > ≡ M[t1 > M′ ^ M′[t2 > ^ ¬M[t2 > .
-
-Fig. 5.1 Concurrency
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig5_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Concurrency M0[t1‖t2> and Sequence M2[t3→t4> (Fig. 5.1)</text></name>
-    <page id="page1">
-      <!-- M0 = (1,2,0,1,0,0,0) for p1..p7 -->
-      <place id="p1"><name><text>p1</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="p2"><name><text>p2</text></name><initialMarking><text>2</text></initialMarking></place>
-      <place id="p3"><name><text>p3</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="p4"><name><text>p4</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="p5"><name><text>p5</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="p6"><name><text>p6</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="p7"><name><text>p7</text></name><initialMarking><text>0</text></initialMarking></place>
-      <transition id="t1"><name><text>t1</text></name></transition>
-      <transition id="t2"><name><text>t2</text></name></transition>
-      <transition id="t3"><name><text>t3</text></name></transition>
-      <transition id="t4"><name><text>t4</text></name></transition>
-      <!-- t1 consumes p1(1), p2(2) → produces p3(2) -->
-      <arc id="a1" source="p1" target="t1"/>
-      <arc id="a2" source="p2" target="t1">
-        <inscription><text>2</text></inscription>
-      </arc>
-      <arc id="a3" source="t1" target="p3">
-        <inscription><text>2</text></inscription>
-      </arc>
-      <!-- t2 consumes p4(1) → produces p4(1) (self-loop via p4) and contributes to t3 -->
-      <arc id="a4" source="p2" target="t2"/>
-      <arc id="a5" source="p4" target="t2"/>
-      <arc id="a6" source="t2" target="p4"/>
-      <!-- t3 consumes p3 → produces p5 -->
-      <arc id="a7" source="p3" target="t3"/>
-      <arc id="a8" source="t3" target="p5"/>
-      <arc id="a9" source="t3" target="p6"/>
-      <!-- t4 consumes p5 → produces p7 -->
-      <arc id="a10" source="p5" target="t4"/>
-      <arc id="a11" source="t4" target="p7"/>
-    </page>
-  </net>
-</pnml>
-```
 
 That is, if the ﬁring of t1 enables t2, the ﬁring of t2 must follow the ﬁring of t1. The markings for the net in Fig. 5.1 are M0 = (1, 2, 0, 1, 0, 0, 0), M1 = (0, 1, 2, 1, 0, 0, 0), M2 = (0, 1, 2, 0, 0, 0, 1). Note that M0[t1 → t2> and M0[t1 → t4> are not true, though t2 and t4 must fire after t1. So, “→” implies “immediately follow.” Deﬁnition 5.3 Conﬂict Transitions t1 and t2 are in conﬂict at marking M, if M [t1 j t2>,
 M [t1 |t2 > ≡ M [t1 > ^ M[t2 > ^ ¬M [t1 || t 2 > There are two cases that cause a conﬂict, either t1 and t2 are “ﬁghting” for a shared token, or “ﬁghting” for shared space. Figure 5.2 exhibits conﬂicts: ﬁghting for token (a) and ﬁghting for space (b). Deﬁnition 5.4 Contact Transition t is in contact with place s at marking M, if M [t ~ s>,≡ ∀p ∈ ˙ t : M(p) ≥ w(p,t)
@@ -669,47 +457,6 @@ It is important that a process logic contains no loop. It is more important to d
 ####11.1.1 Conventional BPM and New Trend
 (a) WF-net
 Figure 11.1 below is an early model for insurance claim. It consists of 5 tasks: ac (accept), cc (check claim), cp (check policy), pay (claim is agreed), and dn (claim is denied). Figure 11.1a contains 4 basic node structures to be used in Fig. 11.1b. The meaning of triangles inside boxes is as given in Fig. 11.1a.
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fig11_1" type="http://www.pnml.org/version-2009/grammar/ptnet">
-    <name><text>Insurance Claim WF-net (Fig. 11.1)</text></name>
-    <page id="page1">
-      <!-- Places -->
-      <place id="start"><name><text>start</text></name><initialMarking><text>1</text></initialMarking></place>
-      <place id="c1"><name><text>c1</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="c2"><name><text>c2</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="c3"><name><text>c3</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="c4"><name><text>c4</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="c5"><name><text>c5</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="c6"><name><text>c6</text></name><initialMarking><text>0</text></initialMarking></place>
-      <place id="end"><name><text>end</text></name><initialMarking><text>0</text></initialMarking></place>
-      <!-- Transitions -->
-      <transition id="cc"><name><text>cc (check claim)</text></name></transition>
-      <transition id="cp"><name><text>cp (check payment)</text></name></transition>
-      <transition id="ac"><name><text>ac (accept claim)</text></name></transition>
-      <transition id="pay"><name><text>pay</text></name></transition>
-      <transition id="dn"><name><text>dn (deny)</text></name></transition>
-      <!-- Arcs -->
-      <arc id="a1" source="start" target="cc"/>
-      <arc id="a2" source="cc" target="c1"/>
-      <arc id="a3" source="cc" target="c2"/>
-      <arc id="a4" source="c1" target="cp"/>
-      <arc id="a5" source="c2" target="ac"/>
-      <arc id="a6" source="cp" target="c3"/>
-      <arc id="a7" source="ac" target="c4"/>
-      <arc id="a8" source="c3" target="pay"/>
-      <arc id="a9" source="c4" target="pay"/>
-      <arc id="a10" source="pay" target="c5"/>
-      <arc id="a11" source="cc" target="c6"/>
-      <arc id="a12" source="c6" target="dn"/>
-      <arc id="a13" source="c5" target="end"/>
-      <arc id="a14" source="dn" target="end"/>
-    </page>
-  </net>
-</pnml>
-```
 
 Apparently, this is not a true Petri net. Triangles do not belong to Nets. But it is called WF-net in the literature and is assumed to be an EN-system consisting of conditions and events. Correctness is not deﬁned for WF-net (maybe the inventors have no idea about it at all). Instead, soundness is the key property of WF-net. The proposed analysis method requires an extra event to be added to (b). This extra event is not included in (b) since it is not part of the process. A WF-net is sound if the token in the initial place start would, via the extra event, ﬂow back to start and leave no token behind. Besides, every event should have a chance to occur in dealing with this or that case. For a cooperative action with another company, a shadow of a man is attached to the event box (not shown in (b)). In case an envelope is attached to action box (not shown in (b)), that means extra data from outside is required. No wonder that such a model for business processes has not been used in reality, though many followers of workﬂow pioneers have written hundreds of papers about it. The reason for not being used in reality, the author guesses, is not only because of the complexity (special factors for individual cases and factors for all cases squished together), but also because it failed to be complete; the concept of correctness is missing. Correctness requires a different model for BPM.
 

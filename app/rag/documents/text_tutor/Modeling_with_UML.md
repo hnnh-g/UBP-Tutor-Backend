@@ -88,40 +88,10 @@ Due to the two-dimensional form of model representations, metamodeling has preva
 ### 2.2 Classes and Inheritance
 When introducing classes, attributes, methods, and inheritance, an implementation view—as already discussed—is taken as a basis in this section. Class A class consists of a collection of attributes and methods that determine the state and the behavior of its instances (objects). Classes are connected to each other by associations and inheritance relations. The class name identifies the class. Attribute State components of a class are called attributes. An attribute is described by its name and type. Method. The functionality of a class is stored in methods. A method consists of a signature and a body describing the implementation. In case of an abstract method, the body is missing. For the determination of visibility, instantiatability, and changeability of the modified elements, the modifiers public, protected, private, readonly, abstract, static, and final can be applied to classes, methods, roles, and attributes. UML/P offers the following iconic variants for the first four modifiers of these: “+”, “#”, “-”and “?”. Constants are defined as special attributes with the modifiers static and final. If two classes are in an inheritance relation to each other, the subclass inherits its attributes and methods from the superclass. The subclass can add further attributes and methods and redefine methods—as far as the modifiers allow. The subclass forms a subtype of the superclass that, according to the substitution principle, allows use of instances of the subclass where instances of the superclass are required. An interface describes the signatures of a collection of methods. In contrast to a class, no attributes (only constants) and no method bodies are specified. Interfaces are related to abstract classes and can also be in an inheritance relation to each other. Type is a basis data type such as int, a class or an interface. Interface implementation is a relation between an interface and a class, similar to inheritance. A class can implement any number of interfaces. Association is a binary relation between classes that is used for the realization of structural information. An association is described by an association name, a role name for each end, a cardinality, and information about the directions of navigation. The cardinality (also called multiplicity) is given for each end of the association. It has the form “0..1”, “1” or “*” and describes whether an association in this direction is optional or mandatory, or allows for multiple bindings.
 
-**Figure 2.3.** Class Auction in the class diagram
-```plantuml
-@startuml
-class Auction {
-  +long auctionIdent
-  #String title
-  -Money bestBid
-  ?int numberOfBids
-  +int getNumberOfBids()
-  #void incNumberOfBids()
-  +boolean bid(Person, Time, Money)
-  +getAuctionStatus()
-  -setAuctionIdent(long)
-}
-note right of Auction : "checks correctness\nand increases the number of bids"
-@enduml
-```
-
 #### 2.2.1 Attributes
 The middle compartment of a class definition describes the list of attributes that are defined in this class. The information on attributes can be incomplete in many respects. First, an attribute can be indicated with or without its type. As we use Java as target language, the default notation for the UML “attribute: Type” has been replaced by the Java-compliant version “Type attribute”. A number of modifiers are available for attributes, defining the attribute’s properties more precisely. As compact forms, UML provides “+” for public, “#” for protected, and “-” for private in order to describe the visibility of the attribute to foreign classes. “+” allows for general access, “#” for subclasses, and “-” allows access only within the defining class. The UML standard does not contain a fourth visibility declaration “?”, which is only offered by UML/P to mark an attribute as readonly. An attribute marked in this way is generally readable but can only be modified in subclasses and the class itself. This visibility thus has the same effect as public while reading and protected while modifying. It proves helpful in modeling in order to define access rights even more precisely. Further modifiers offered by the programming language Java such as static and final for the description of static and nonmodifiable attributes can also be used in the class diagram. In combination, these modifiers serve for defining constants. However, constants are often omitted in class diagrams. An attribute marked static is also called a class attribute and can be marked alternatively by an underscore.
 
 UML provides derived attributes that are marked with “/” (see Fig. 2.5). Incase of a derived attribute, its value can be calculated (“derived”) from other attributes of the same or other objects and associations. Usually, the calculation formula is defined in the form of a constraint attr==... .
-
-**Figure 2.5.** Derived attributes
-```plantuml
-@startuml
-class Auction {
-  +long auctionIdent
-  #String title
-  /Money bestBid
-  +/int numberOfBids
-}
-@enduml
-```
 
 #### 2.2.2 Methods
 In the third compartment of a class representation, methods are shown with names, signatures, and if any, modifiers for methods. Here, also the notation in line with Java Type method (Parameter) is used instead of the official UML notation method (Parameter): Type. While attributes store the state of an object, methods serve for the execution of tasks and data calculation. For this purpose, they use data stored in attributes and call other methods of the same or other objects. Like Java, UML/P also provides methods with variable arity that, e.g., are given in the form Type method(Type variable ...). The access rights for methods can be defined analogously to the visibilities for attributes with “+”, “#”, and “-”.
@@ -135,77 +105,15 @@ Just like class attributes, UML prefers to outline static methods alternatively 
 #### 2.2.3 Inheritance
 In order to structure classes into hierarchies, the inheritance relation can be used. If multiple classes with partly corresponding attributes or methods exist, these can be factorized in a common superclass. Figure 2.6 demonstrates this by means of similarities of several messages occurring in the auction system. If two classes are in an inheritance relation, the subclass inherits its attributes and methods from the superclass. The subclass can extend the list of attributes and methods as well as redefine methods—as far as the modifiers of the superclass permit. At the same time, the subclass forms a subtype of the superclass that, according to the substitution principle, allows for the use of instances of the subclass where instances of the superclass are required.
 
-**Figure 2.6.** Inheritance and interface implementation
-```plantuml
-@startuml
-interface Serializable { +void serialize(Buffer) }
-abstract class Message {
-  #Time time
-  +Time getMessageTime()
-  +deliverMessage(Auction)
-}
-Serializable <|.. Message
-class BidMessage {
-  #Person bidder
-  #Auction auction
-  #Money bidValue
-  #int graphSymbol
-  #Time biddingTime
-}
-class ExtensionMessage {
-  #Auction auction
-  #Time newClosing
-  #String reason
-}
-class StatusMessage {
-  #Auction auction
-  #int newStatus
-}
-Message <|-- BidMessage
-Message <|-- ExtensionMessage
-Message <|-- StatusMessage
-@enduml
-```
-
 In Java, each class (except Object) inherits from exactly one superclass. However, a superclass can have many subclasses that in turn can have further subclasses. By using inheritance as a means of structuring, we define an inheritance hierarchy. A superclass can be regarded as a generalization of its subclasses, as its attributes and method signatures determine the similarities of all subclasses. If in an inheritance hierarchy the code inheritance is less important than structuring, we speak of a generalization hierarchy. Especially for requirements elicitation and the architectural design, generalization plays a vital role to structure the system. In object-oriented modeling, inheritance is an essential structuring mechanism, but deep inheritance hierarchies should be avoided as inheritance couples the classes and, thus, the code contained. To fully comprehend a subclass, its direct as well as all other superclasses have to be understood.
 
 #### 2.2.4 Interfaces
 Java offers a special form of class, the interface. An interface consists of a collection of method signatures and constants and is applied especially for defining the usable interface between parts of the system, respectively its components. In Fig. 2.6, the interface Serializable is used in order to enforce a certain functionality from all classes that implement this interface. An interface, like a class, is depicted by a rectangle but marked with the stereotype ≪interface≫. Objects can be instantiated neither directly from an interface nor from an abstract class. Instead, the given method signatures have to be realized in classes which implement the interface. Furthermore, interfaces can only contain constants but no attributes. While in Java a class is only allowed to inherit from one superclass, it can implement any number of interfaces. An interface can extend other interfaces and, hence, have a subtype relation to these interfaces. In this case, the subinterface includes the method signatures defined by the superinterface in its own definition and extends these by additional methods. Figure 2.7 shows this by means of an extract of the Java class library.
 
-**Figure 2.7.** Interface implementation and extension
-```plantuml
-@startuml
-interface Serializable
-interface BeanContextChild
-interface Collection
-interface BeanContext
-BeanContextChild <|-- BeanContext
-Collection <|-- BeanContext
-class BeanContextSupport
-BeanContextChild <|.. BeanContextSupport
-BeanContext <|.. BeanContextSupport
-@enduml
-```
-
 Technically, interfaces and classes as well as inheritance and interface implementation are similar concepts. That is why hereinafter, for the sake of simplification, the term class is often used as a generic term for classes and interfaces as well as inheritance for the inheritance between classes, the implementation relation between interfaces and classes, and for the subtype relation between interfaces. This simplification is reasonable especially with regard to analysis and early design if the decision of whether a class can be instantiated, is abstract, or becomes an interface as not yet been made.
 
 ### 2.3 Associations
 An association has the purpose of relating objects of two classes. Using associations, complex data structures can be formed and methods of neighboring objects can be called. Figure 2.8 describes a part of the auction system with three classes, two interfaces, and five associations in different forms.
-
-**Figure 2.8.** Class diagram with associations
-```plantuml
-@startuml
-class Auction
-class Person
-class Message
-interface BiddingPolicy
-interface TimingPolicy
-Auction "1" *--> "1" BiddingPolicy : bidPol
-Auction "1" *--> "1" TimingPolicy : timePol
-Auction "*" -- "*" Person : auctions / bidder
-Auction "1" --> "*" Message : messages {ordered,addOnly}
-@enduml
-```
 
 Usually, an association has an association name and an association role foreach of the two ends as well as information about the cardinality and a description of possible navigation directions. Details can also be omitted from the model if they are not important for the representation of the desired facts and if no ambiguity occurs. Association names, e.g., often serve only to distinguish associations, especially between the same classes. In case of a lack of the association or role name, there are standard rules for obtaining a surrogate name. Just like a class, an association is a modeling concept in the class diagram. During the system’s runtime, an association manifests through links between the connected objects. The number of links is limited by the association’s cardinality. If an association is navigable in one direction, the implementation provides mechanisms to efficiently realize this navigability.
 
@@ -225,38 +133,8 @@ Composition is a special form of association. It is indicated by a filled diamon
 #### 2.3.5 Derived Associations
 Besides derived attributes, there are also derived associations in UML/P. They are also marked by a “/” in front of the association’s name. An association is considered derived if the set of its links can be calculated (“derived”) from other state elements. Other attributes and associations can be used for the calculation. Two associations are given, describing which persons are allowed to place bids in an auction and which persons can observe the behavior of a bidding colleague (“fellow”). The derived association /observers is calculated from these two associations. For this purpose, e.g., the OCL characterization can be used.
 
-**Figure 2.10.** Derived association
-
-```plantuml
-@startuml
-class Auction
-class Person
-Auction "*" -- "*" Person : auctions / bidder
-Auction "*" -- "*" Person : observedAuctions / observers
-Person "0..1" -- "*" Person : fellowOf / fellows
-note bottom
-  context Person p inv:
-    p.observedAuctions ==
-      p.fellowOf.auctions.union(p.auctions)
-end note
-@enduml
-```
-
 #### 2.3.6 Tags for Associations
 The UML standard offers a variety of additional tags for associations that concretize the properties of associations more precisely. Figure 2.11 contains three tags that are interesting in this context. {ordered} indicates that an association with cardinality “*” allows ordered access. In the case shown, the order of the messages of an auction is relevant. {frozen} indicates that the two associations to the policy objects can no longer be changed after the initialization of an Auction object is completed. In this way, the same policies are available throughout the whole lifetime of an Auction object. {addOnly} models that objects can only be added to the association and that removing them is prohibited. Thus, the model in Fig. 2.11 expresses that messages that have been sent in an auction cannot be withdrawn.
-
-**Figure 2.11.** Tags for associations
-```plantuml
-@startuml
-class Auction
-interface BiddingPolicy
-interface TimingPolicy
-class Message
-Auction "1" *--> "1" BiddingPolicy : {frozen}
-Auction "1" *--> "1" TimingPolicy : {frozen}
-Auction --> "*" Message : {ordered} {addOnly}
-@enduml
-```
 
 An association that is tagged with {ordered} on one end certainly has to provide a mechanism that allows access according to this order. Associations with the tag {ordered} present a special case of qualified associations.
 
@@ -267,30 +145,6 @@ While in explicitly qualified associations the type of qualifier can be freely c
 
 ### 2.4 View and Representation
 A class diagram is mainly used to describe the structure and the relations necessary for a certain task. A complete list of all methods and attributes is often obstructive in this case. Instead, only those methods and attributes that are helpful for presenting a “story” should be illustrated. “Story” is a 3. As common in Java, indexing starts with 0. A metaphor that is deliberately used to indicate that a diagram has a focus highlighting significant and omitting unimportant information. Diagrams can, e.g., model different parts of the system or particular system functions. Hence, a class diagram often represents an incomplete view of the whole system. Some classes or associations can be missing. Within classes, attributes and methods can be omitted or presented incompletely. For example, the argument list and the return type of a method can be omitted. Unfortunately, in general it is not evident from a UML diagram whether c ” has the information contained therein is complete or not. Therefore, “! been taken over from [FPR01] for the display of complete information. It supplements the representation indicator “. . .”already offered by UML to mark incomplete information.
-
-**Figure 2.13.** Complete class representation
-```plantuml
-@startuml
-class "Auction ©" as A1 {
-  +long auctionIdent
-  #String title
-  -Money bestBid
-  ?int numberOfBids
-  +int getNumberOfBids() ©
-  #void incNumberOfBids()
-  +boolean bid(Person, Time, Money)
-  +getAuctionStatus()
-  -setAuctionIdent(long)
-}
-class "Auction ..." as A2 {
-  +long auctionIdent
-  #String title
-  +int getNumberOfBids() ©
-  +boolean bid(Person, Time, Money)
-}
-class "Auction ..." as A3
-@enduml
-```
 
 The indicators “! c ” in the class name shows their representation within the class diagram. A “! that the attribute as well as the method list is complete. In contrast, the incompleteness indicator “. . .” means that the presentation can be incomplete. Due to the dualism between associations and attributes later discussed, it is implied that all associations that can be navigated from this class are also modeled when the attribute list is marked as incomplete. Both indicators can also be applied to the list of attributes and methods individually. The incompleteness indicator “. . .” acts as default when no indicators are given. This corresponds to the usual assumption that a diagram presents an abstraction of the system. To explain the use of these indicators precisely, the three model levels illustrated in Fig. 2.14 are to be distinguished: the system itself, the complete UML model of the system, and a graphic, incomplete representation of the model, e.g., on screen. In most cases, the representation is also called a view c ” and “. . .” describe a relation bebut is itself a model. Both indicators “! tween the view and the incomplete UML model on which the view is based. There are a number of different views for the same class. The two marks are thus called representation indicators. If a software system reaches a certain size, a complete class diagram can seem quite overloaded. Due to the many details, the story is concealed rather than presented. Because of this, in software development it is reasonable to work with multiple smaller class diagrams. Necessarily, class diagrams that each show an extract of the system have overlaps. Through these overlaps, the correlation between the individual models is established. Figure 2.15 shows two extracts of the auction system in which the class Auction is represented in different forms. Here, the indicator “. . .” allows one to explicitly describe that only the information necessary for the respective story is illustrated. Through fusion, a complete class diagram can be obtained from a collection of single class diagrams. As discussed in Sect. 1.4.4, some tools always use a complete class diagram internally as their model and the user gets extracts in the form of views. A fusion of class diagrams is basically a unification of all the class, association, and inheritance relations, whereas in the case of a repeatedly occurring class, attribute and method lists are also consolidated. There are of course a number of consistency conditions to be followed. These include conforming types for attributes and methods, compatible navigation roles and multiplicity specifications for associations, as well as prevention of cyclical inheritance relations.
 
@@ -316,25 +170,6 @@ While the stereotype ≪interface≫ is provided by default by UML, the two ster
 
 Of course, there are a number of overlaps between the mentioned and further application options for stereotypes. To allow the developer to specify properties in a more detailed form, a stereotype can be equipped with a variety of tags. Then, the application of a stereotype in a model element implies that its assigned tags are also defined on the model element.
 
-
-#### 2.5.2 Tags
-Information on the indicated test and its execution is stored in the form of tags.
-
-**Figure 2.18.** Tags applied on a test class
-```plantuml
-@startuml
-class "«Testclass»
-AuctionTest ..." as AT {
-  {field} {CreatedOn = 13.12.2000}
-  {field} {CreatedBy = B. Rumpe}
-  {field} {LastChange = 23.04.2001}
-  {field} {NoTestruns = 146}
-  {field} {LastExecutionResult = Pass}
-  {field} {LastExecution = 04.05.2001 14:07:48}
-}
-@enduml
-```
-
 Tags can be attached to basically each model element. In addition, tags, can be bound to a stereotype and thus applied together with the stereotype to model elements. In the example, the existence of the last three tags is demanded by the use of the stereotype ≪Testclass≫, as in the auction project these three tags are assigned to the stereotype. A tag is usually denoted in the form {name = value}. Principally, strings and numbers are accepted as values. An explicit typing of the tag values would be desirable, but up to now it is supported by neither the UML language standard nor the tools. If the value is not relevant or it is the Boolean value true, it can also be omitted; For example, {are Tests OK = true} and {are Tests OK} are alternative representations. The UML standard by default offers tags for associations such as {ordered} but also allows one to define new, situation-specific tags. Even if a tag is added to a class, it considerably differs from an attribute. A tag assigns a property to the model element, while an attribute has an independent value in each instance of the class. Attributes appear at the runtime of a system while tags do not exist there. Tags, however, can have effects on the system if they influence the properties of the model element with regard to its implementation. Among others, tags qualify for the presentation of the following properties:
 
 - The initial value of an attribute can be specified.
@@ -347,7 +182,6 @@ The variety of application options for stereotypes and tags makes it nearly impo
 The stereotype can often be applied to a superior model element or a whole diagram in order to be applied element-wise on all subelements.
 The definition of a stereotype follows the general form of design patterns, recipes, and process patterns [Amb98] by discussing motivation, requirements, application form, and effects on an informal basis. However, the template should not be regarded as rigid but, as needed, should be extended as appropriate or shortened by removing unnecessary sections. In principle, the same template can be used for tags. Tags, however, are basically more easily structured and easier to understand, so that such a detailed template often seems unnecessary. UML offers a third form of adaptations for model elements. Constraints are an instrument for the detailed specification of properties. As constraint languages, OCL or informal text is suggested. A constraint is generally given in the form {constraint}. The UML standard by default provides some constraints. These include the already known constraint {ordered} for associations that, however, can also be defined as a tag with Boolean type. This example illustrates in particular that the differences between constraints, tags, and stereotypes cannot always be clarified precisely. It also makes little sense to introduce a stereotype consisting of exactly one tag, as this tag could also be attached directly to a model element. When introducing new stereotypes, tags or constraints, certain creative freedom is given that can be used by the modeler in order to design a suitable model.
 
-
 # Chapter 3: Object Constraint Language
 Graphic notations are especially suited for giving the reader a quick overview of the modeled system. However, in order to achieve lucidity, it is necessary to abstract from details. That is why, e.g., class diagrams are not able to depict many structural and behavioral constraints. In general, due to their two-dimensional nature, graphic notations are only partly suited for the representation of any kind of constraints for a system. Pure visual programming languages such as VISTA attempt this, thus revealing an interesting approach but are not widespread. Hence, it can be expected that programming languages in the near future will continue to be text-based or contain tight interlocking of graphic and textual elements. A textual notation that conceptually leans on known mathematics is reasonable, particularly for constraints. Graphic abbreviations can, of course, be defined for certain kinds of properties that occur frequently. For example, UML provides cardinalities for associations as shortcuts for constraints. Also the type system of a language such as Java can be understood as a restriction regarding a system’s properties. Textual modeling of constraints allows one to model system properties that cannot be described with a graphic notation or often clumsily only. The compactness of a textual notation in contrast to a graphic description technique has the effect that the former is generally regarded as less comprehensible. Therefore, good modeling consists of comprehensible as well as compact and, thus, concisely formulated constraints. Furthermore, it is important to use the formulated constraints constructively in the software engineering process. Therefore, tools such as a parser or a checker for type correctness are helpful. In addition, the executability and, hence, the automated verifiability of a constraint is an essential prerequisite for the use of a constraint language for test definition. The Object Constraint Language (OCL) is defined by the UML standard and provides a textual notation that can be used for the definition of constraints in the form of invariants as well as for pre- and postconditions of methods. The history of the definition of programming and specification languages shows that it is very difficult to design a generally satisfying and sufficiently well-defined language on the first attempt. OCL offered in the UML standard is not derived from a widespread programming language. For this very reason, it has a rather unusual syntactic appearance that exacerbates the difficult access to OCL for many developers. Hence, a syntactic form of OCL that is derived from Java. 
 
@@ -356,28 +190,6 @@ A constraint is a Boolean statement about a system. It describes a property that
 
 #### 3.1.1 The Context of a Constraint
 One of the prominent properties of OCL constraints is their embedding in a context consisting of UML models. Usually, this context is given by a class diagram. The class diagram in Fig. 3.2 provides such a context in the form of two classes and a number of attributes partly dependent on each other, modeling a part of the auction system. These attribute dependencies can be defined by means of OCL/P constraints.
-
-**Figure 3.2.** Part of the auction system
-```plantuml
-@startuml
-class Auction {
-  +long auctionIdent
-  +Time startTime
-  +Time closingTime
-  -/Money bestBid
-  ?int numberOfBids
-  +int getNumberOfBids()
-  +boolean bid(Person, Time, Money)
-}
-class Person {
-  +String personIdent
-  +String login
-  +boolean isActive
-  +int activeParticipants
-}
-Auction "*" -- "*" Person : auctions / bidder
-@enduml
-```
 
 A simple constraint, for example, is the following: an auction always starts before it is completed. This constraint is described by explicitly including an Auction object in the context. The explicitly stated context of an OCL constraint consists of one or more objects whose name is declared by referencing them in the context of the constraint. The constraint uses a method of the Java class Time for comparison: context Auction a inv: a.startTime.lessThan(a.closingTime)
 This constraint requires that the signature of class Auction is provided in the context. The variable name a is locally introduced by the context statement and acts like a variable definition. An alternative is to explicitly import variables, for example, if they have already been defined in another constraint or diagram. Using this importing form of the context, OCL constraints are combined and connected to object diagrams. By doing so, the objects named in the object diagrams can be used explicitly in the OCL constraints. Thus, the contexts defined by import are discussed in more detail in Chap. 4. The following context, for instance, characterizes a property of the Auction object a that might come from an object diagram:
@@ -406,7 +218,6 @@ inv:
 forall a in Auction:
 a.startTime.greaterThan(Time.now()) implies
 a.numberOfBids == 0
-
 
 #### 3.1.2 The let Construct
 Intermediate results can be assigned to an auxiliary variable using the let construct in order to reuse them in the body of the construct, possibly several times. The subsequent constraint demands that the initial and final time of each auction obey the right relation. Here, the if-then-else known from Java is used in the compact form .?.:. as shown here:
@@ -855,66 +666,8 @@ Object diagrams are wellsuited for modeling the structure of a software system a
 ### 4.1 Introduction to Object Diagrams
 Object diagrams have to conform to the structure predefined by class diagrams. As most of the object diagrams in this chapter are taken from the auction system, the properties of the auction system that are essential for the object diagrams in this chapter are summarized in the class diagram shown in Fig. 4.3.
 
-**Figure 4.3.** Excerpt of the auction system
-```plantuml
-@startuml
-class AllData
-class Auction {
-  +long auctionIdent
-  #String title
-  -/Money bestBid
-  ?int numberOfBids
-}
-class Person {
-  +String personIdent
-  #String name; #String login; -boolean isActive
-}
-class Message { #Time time }
-class BidMessage {
-  #Person bidder; #Auction auction
-  #Money bidValue; #int graphSymbol; #Time biddingTime
-}
-class StatusMessage { #Auction auction; #int newStatus }
-AllData "[auctionIdent]" --> "*" Auction : auctions
-AllData "[login]"        --> "1" Person
-Auction "*"  -- "*" Person  : auctions / bidder
-Auction "*"  -- "*" Person  : observedAuctions / observers
-Auction "*"  -- "*" Person  : participants {ordered}
-Person       --    Person   : fellowOf / fellows
-Auction "1" *--> "1" BiddingPolicy  : {frozen}
-Auction "1" *--> "1" TimingPolicy   : {frozen}
-Auction      --> "*" Message : {ordered,addOnly}
-Message <|-- BidMessage
-Message <|-- StatusMessage
-@enduml
-```
-
-
 #### 4.1.1 Objects
 Objects are the core elements of an object diagram. The object shows crucial elements for depicting such an object. The graphic representation of an object is very similar to that of a class. The first field includes the object name together with the type of the object. The object name is a freely chosen identifier for this object that is unambiguous within the diagram. It plays a role similar to that of the actual object identifier of objects in the real system, but these two must not be confused. The real object identifier is an anonymous entity that occurs explicitly neither in the model nor in the program code. The top right marker OD for object diagrams serves for the precise distinction of class and object diagrams. Furthermore, object names are underlined in the form name:Type. The name begins with a lower-case letter. If the name of the object is of no further significance, it may be omitted. The colon, however, before the type declaration is preserved (see Fig. 4.4(b)). If, vice versa, the object type is already known from the context or if it can be deduced from the attribute list, we can omit the type instead (see Fig. 4.4(c)).1
-
-**Figure 4.4.** Forms of representation of the Auction object
-```plantuml
-@startuml
-' (a) name:Type
-object "power:Auction ..." as a {
-  +long auctionIdent = 783
-  String title = "Power, 7GW"
-  -/Money bestBid
-  ?int numberOfBids = 112
-}
-' (b) anonymous :Type
-object ":Auction ..." as b {
-  long auctionIdent = 783
-  String title = "Power, 7GW"
-}
-' (c) name only
-object "power ..." as c {
-  auctionIdent = 783
-  title = "Power, 7GW"
-}
-@enduml
-```
 
 This figure also shows that attributes obey the same rules for the usage of visibility modifiers and other tags as in class diagrams. The attribute list need not be complete. Accordingly, the two representation indicators “. . . ” c ” introduced in Fig. 2.4 are used. and “! Even if a type declaration exists, it does not necessarily describe the object’s class. Instead, the object can also be an instance of a subclass. Hence, it is a real type declaration. Therefore, abstract classes and interfaces are also allowed as types for the objects of the object diagram.
 
@@ -924,50 +677,10 @@ The second field in an object representation consists of a list of attributes. T
 #### 4.1.3 Links
 A link brings two objects into relation. An object is an instance of a class, so a link is an instance of an association. This is why there may be multiple objects of the same type and multiple links of the same association in an object diagram. One of them is permitted only as an observer. Usually, links are marked with the association name and, optionally, with further tags of the association. Especially role names and the navigation direction are expedient when it comes to links and can be taken over from the association. Like associations, links can be bidirectional, unidirectional or depicted without explicitly defined direction. If the association name is not given explicitly, role names can be used, as in the case of an association. If the association can be identified from the connected ends, the link does not need a name. In this case, however, the types of both objects participating in a link must be given. Links of derived associations are depicted like those of ordinary ones. However, the invariant that characterizes a derived association must be taken into account in order to obtain a valid object diagram. The association tag {frozen} that, for instance, was used for associations to message lists can, in object diagrams, be applied to links as well. It shows that the link is already created and that it must not be changed during the lifetime of the two objects. Two prototypical objects depicted in a diagram represent two different objects in the system. This also applies when both objects have the same type and cannot be distinguished by their names or their attribute values. Figure 4.6 shows an object diagram with seven different anonymous Person objects, all participating in the auction copper913. This rule for distinction also applies for links.
 
-**Figure 4.6.** Several anonymous objects
-```plantuml
-@startuml
-object "copper913:Auction ..." as a {
-  long auctionIdent = 913
-  String title = "380t Copper"
-  int numberOfBids = 0
-}
-object ":Person ..." as p1 { personIdent=1783; name="Theobald Schmidt"; isActive=false }
-object ":Person ..." as p2 { personIdent=20544; name="Ottokar Huber"; isActive=true }
-object ":Person ..." as p3 { personIdent=45362; name="Elisabeth Müller"; isActive=true }
-object ":Person ..." as p4
-object ":Person ..." as p5
-object ":Person ..." as p6
-object ":Person ..." as p7
-a --> p1 : participants
-a --> p2 : participants
-a --> p3 : participants
-a --> p4 : participants
-a --> p5 : participants
-a --> p6 : participants
-a --> p7 : participants
-note bottom : Seven different anonymous Person objects
-@enduml
-```
-
 The level of detail for presenting an object is left to the modeler. The example in Fig. 4.6 shows that even objects of the same type can be presented in distinctly detailed forms. In analogy to the class diagram, it is, of course, possible to depict objects and links with some helpful icons. In object diagrams, the legibility can be increased through appropriate application of icons as well.
 
 #### 4.1.4 Qualified Links
 An association can have a qualifier at one end that is used to select a unique target object from a number of objects. In an object diagram, the concrete qualifier value can be added to each link of such an association. Figure 4.7 contains an object diagram with multiple auctions that can be reached using a qualifier starting from the singleton of the class AllData.
-
-**Figure 4.7.** Qualified links
-```plantuml
-@startuml
-object ":AllData" as ad
-object ":Auction ..." as a1 { long auctionIdent=1213; String title="fast drills"; int numberOfBids=0 }
-object ":Auction ..." as a2 { long auctionIdent=1214; String title="thread rods"; int numberOfBids=0 }
-object ":Person ..." as p  { personIdent=1783; login="schmidt"; name="Theobald Schmidt"; isActive=false }
-ad --> a1 : [1213]
-ad --> a2 : [1214]
-ad --> p  : ["schmidt"]
-note right : qualifier value used at a link
-@enduml
-```
 
 The qualifiers in this example are always identical to the attribute of the target object distinctly defining the target. If this attribute is defined in the object, the qualifier value is redundant information. In these cases, the qualifier can also be omitted, or the link can name the qualifying attribute instead of indicating a concrete qualifier value. An association is regarded as qualified if it has the tag {ordered}. In this case, integers can be used as qualifier values. Figure 4.9 shows a collection of message objects that are assigned to an auction. The highest given qualifier is 14 so that, due to the completeness of the interval available as qualifier scope, at least 15 messages with the indexes 0 to 14 must be available. Here, the 12 bids are not shown.
 
@@ -1097,41 +810,11 @@ Basically, the Statecharts used in UML are a form of finite automata extended by
 #### 5.2.1 Recognizing and Mealy Automata
 A transition always connects a source state with a target state and carries either an input symbol or the symbol ε. The latter transitions are called spontaneous, as they do not depend on an input symbol while firing. The semantics of a recognizing automaton consists of the set of all words of the alphabet E for which there is a path through the automaton starting from an initial state to a final state. Moreover, final states can also be passed through repeatedly. The semantics of a recognizing automaton is given by the set of words that are accepted on a path from an initial state to a final state.
 
-**Figure 5.3.** Examples for recognizing automata
-
-```plantuml
-@startuml
-' (a) recognises binary strings ending with 0
-[*] --> P
-P --> P : 1
-P --> Q : 0
-Q --> P : 1
-Q --> Q : 0
-Q --> [*]
-@enduml
-```
-
 If an automaton is used for modeling object-oriented behavior, the recognition of input sequences plays a minor role. Instead, the output as a reaction to an input element and the destination state reached are considered relevant. The automaton states can, e.g., correspond to the states of the graphical user interface and thus be directly visible to the user of the modeled system. Therefore, the nondeterminism in the automaton discussed in more detail below has a totally different purpose than it does in the recognition of word sets. Alternatively, it would also have been possible to extend the recognizing automaton by an output at each state to a Moore automaton. It is known from finite automaton theory that these two extensions do not principally differ in their expressiveness but are convertible into each other. An alphabetic (nondeterministic and incomplete) Mealy automaton is a sextuplet (S, I, O, t, S0 , F ) that contains a recognizing automaton (S, I, t, S0 , F ) and in addition has:
 - An output alphabet O
 - A transition relation t ⊆ S × I ε × Oε × S extended by an output
 
 The semantics of the Mealy automaton consists of the relation describing which input words lead to which output words. If in addition the state space is of interest, as it is in object-oriented modeling, the semantics of an automaton can be extended to the set of possible paths through the automaton. Figure 5.5 contains a Mealy automaton that replaces consecutive sequences of the digit 0 in the input by a single X or several Y. The nondeterminism in the automaton has an effect on the state transitions as well as the produced output. For Mealy automata, final states often do not play a vital role and are, thus, frequently not specified.
-
-**Figure 5.5.** Example of Mealy automaton
-```plantuml
-@startuml
-' Mealy automaton: replaces consecutive 0s with X or Y
-[*] --> P
-P --> P : 1/1
-P --> Q : 0/X
-Q --> Q : 0/
-Q --> P : 1/1
-Q --> R : 0/Y
-R --> R : 0/Y
-R --> P : 1/1
-R --> Q : ε
-@enduml
-```
 
 #### 5.2.2 Interpretation
 A formalism, such as the theory of finite automata, concentrates on the representation of structures that are important for the respective analysis. Therefore, it is suited for studying capabilities and restrictions of automaton representations, simplification rules, as well as sequential or alternative compositions. Such a formalism is a closed mathematical structure that abstracts from the real world and can, thus, be applied to many real-world phenomena. In modeling, however, this relation to the real world is of great importance. In order to establish this relation, each concept of a finite automaton has to be interpreted by real-world elements, i.e., within object-oriented systems. A possible interpretation is the following:
@@ -1179,44 +862,12 @@ In automaton theory, possibilities for transformation, refinement, and compositi
 ### 5.3 States
 Statechart notation is used to describe the behavior of an object on the basis of its state spaces. Hence, states, transitions, and assigned actions are essential elements of a Statechart.  According to the UML standard, a state is a situation for an object in which the object meets a certain condition and, thereby, awaits an event or executes an internal activity. Typically, an object remains in such State. A state (synonym: diagram state) represents a subset of possible object states. A diagram state is modeled by a state name and an optional state invariant, entryaction, exit-action, and do-activity. Initial state. Objects begin their lifecycle in an initial state. Multiple initial states allow the representation of multiple forms of object creation. In a method Statechart, the initial state marks the beginning of the method. The semantics of the Statechart as part of another state is described in Sect. 5.4.2. Final state. A final state describes that the object has fulfilled its duty in this state and is not necessary anymore. However, final states can be left again, if transitions emerge. In a method Statechart, the final state marks the end of the method processing. States can be nested hierarchically. A containing state contains several substates. State invariant is an OCL constraint that characterizes for a diagram state which object states are assigned to it. State invariants of different states may generally overlap. Stimulus is caused by other objects or the runtime environment and leads to the execution of a transition. A stimulus can, e.g., be a method call, a remote procedure call, the receipt of an asynchronously sent message, or a timeout. A transition leads from a source state to a target state and contains a description of the stimulus as well as the reaction in the form of an action. Additional OCL constraints allow one to constrain the enabledness and the reaction of a transition in great detail. A transition is enabled exactly if the object is in the source state of a transition, the stimulus is correct, and the precondition of the transition is true. If multiple transitions are enabled in the same situation, the Statechart is nondeterministic, and it is not defined which transition is chosen. Precondition of the Transition. In addition to the source state and the stimulus, it is possible to restrict a transition’s enabledness via an OCL constraint using the attribute and the stimulus values. Postcondition of the Transition (also: action constraint). In addition to the operational description of the reaction to a stimulus, a property-oriented restriction of the potential reaction can be given by an OCL constraint. Action. An action is a change of an object’s state and its environment described through operational code (for example, Java) or an OCL constraint. A transition typically contains an action. Entry Action. A state can contain an entry-action that is executed if the object enters the state. If actions are described operationally, the entry-action is executed after the transition action. If a property-oriented description is used, the conjunction of both descriptions holds. Exit-action. Analogous to the entry-action, a state can contain an exit-action. If operational, the exit-action is executed before the transition action; if described as properties, the conjunction holds. Do-activity A permanently running activity contained in a state is called a doactivity. By different mechanisms such as local threads for timers, its implementation can be executed and simulate parallelism. Nondeterminism. If there are several alternative transition in one situations that are enabled, this is called nondeterminism of the Statechart. Then, the object’s behavior is underspecified. There are several methodically reasonable possibilities to use and refine underspecification in the software design process.
 
-**Figure 5.11.** A state of the class Auction with invariant and actions
-```plantuml
-@startuml
-state "AuctionOpen" as open {
-  open : [timePol.status == TimingPolicy.RUNNING]
-  open : entry / protocol("Auction "+auctionIdent+": started.")
-  open : exit  / protocol("Auction "+auctionIdent+" finished.")
-  open : do    / protocol("Auction running "+Time.now())
-}
-note right of open : Statechart Auction (incomplete)
-@enduml
-```
-
 #### 5.3.1 State Invariants
 As a diagram state corresponds to a set of object states, it is often necessary to describe this set more precisely. For this, the state invariant can be used, denoted in the form of an OCL condition. The OCL constraint is formulated in the context of the described object. In Fig. 5.11 that is an object of the class Auction. It is possible to access attributes of the own object but also of dependent objects (i.e., of the object environment). The state invariant, thus, could also have been used in a regular OCL constraint. It is recommendable to restrict the state invariant by using local attributes and, if needed, attributes of dependent objects, as otherwise a diagram state could change without an explicit stimulus of the modeled object being processed. Usually, such Statecharts only have descriptive character and are suited for modeling tests but not for code generation. A state invariant can fulfill various tasks:
 1. Similar to a contract [Mey97], a transition starting from the state can rely on the fact that the object state fulfills the given condition.
 2. Vice versa, this means for a transition ending in this state that it is obliged to establish the state invariant.
 3. If, furthermore, a nonvisible, external activity that affects the object can happen on the object environment, while the object is in the state, this activity also has to ensure that the state invariant is not infringed. Such a guarantee is, e.g., necessary if the object has public attributes or if the state invariant accesses the object state of foreign objects.
 If, in case of a Statechart, there is the risk of overloading the diagram with information, outsourcing of state elements into a table is recommended as an alternative. Table 5.13 illustrates this for state invariants. Various forms of tabular representation can also be implemented also for transitions and actions where reasonable. To understand the state concept in object-oriented modeling, it is helpful to consider its components. The data state of an object is determined by its own attributes and possibly attributes of dependent objects. This also includes links to other objects. A second component of the object state is, however, the control state, which manifests in the running system through the program counter and the call stack. A state invariant can only specify the data state while the control state remains hidden. Figure 5.12, for example, shows four data states of the class Auction that each have disjoint state invariants.
-
-**Figure 5.12.** Four data states of the class Auction
-```plantuml
-@startuml
-state "AuctionReady" as r1 {
-  r1 : [timePol.status == TimingPolicy.READY_TO_GO]
-}
-state "AuctionRegularOpen" as r2 {
-  r2 : [timePol.status==TimingPolicy.RUNNING && !timePol.isInExtension]
-}
-state "AuctionFinished" as r3 {
-  r3 : [timePol.status == TimingPolicy.FINISHED]
-}
-state "AuctionExtended" as r4 {
-  r4 : [timePol.status==TimingPolicy.RUNNING && timePol.isInExtension]
-}
-note top : Statechart Auction (incomplete)
-@enduml
-```
 
 The control state cannot be modeled in full detail with a Statechart. However, states in a Statechart that describe the process of a single method represent an abstraction of the control state space. State invariants of data states need not necessarily be disjoint either; For example, the usage of state invariants can be completely neglected if they do not contribute to the representation of the desired information. To distinguish control states from data states, the usage of stereotypes is suitable. For this purpose, Table 5.14 introduces the stereotypes ≪datastate≫ and 
 An object state consists of data and control states. This is to be modeled in the Statechart. A state tagged with ≪datastate≫ is called a data state. ≪controlstate≫ tags a control state. Usually, a Statechart consists of only one sort, either data or control states. Attributes and links alone can determine whether an object are located in a state tagged with ≪datastate≫. For control states, also the program counter and the stack are relevant. Control states are used in the modeling of internal states of complex methods. The state invariant in ≪datastate≫ states does not necessarily suffice for identification of the current state. In particular, state invariants can be incomplete or missing and, thus, overlap the invariants of data states in the diagram. ≪statedefining≫ to keep the defining character of the state invariant. A whole Statechart if it applies to each single state. This is usually the case. Furthermore, for Statecharts that are assigned to classes, ≪datastate≫ is assumed as default. A state invariant typically characterizes a property of the state respectively the object in this state. An object, however, can also fulfill the state invariant if it is currently located in another state. A rating that, among other aspects, includes correct behavior in previous auctions is used to distinguish three groups of persons. The stereotype ≪statedefining≫ in the state BadPerson leads to the fact that each person with a rating smaller than zero is definitely located in this state. Therefore, this condition is defining for the state BadPerson. The condition, in contrast, only has characterizing character in the state VIP-Person. Hence, according to the Statechart in Fig. 5.15, there can be persons in the state NormalPerson that also reach a rating higher than 4500. The background of this modeling is the fact that a person only becomes a VIP if this is explicitly decided by, e.g., the auctioneer, while, in the case of a negative rating, the state BadPerson is taken automatically.
@@ -1227,57 +878,13 @@ Depending on whether the states modeled in the Statechart are controlor data sta
 Hierarchy can be used to prevent a state explosion by structuring complex state spaces with it. Additionally, hierarchy is of methodical interest, as it allows one to first define states of the higher level and than refine them later into substates. The use of hierarchies thus allows defining an abstract view of the state space. A hierarchically divided state has, like any other state, a name and can contain a state invariant as well as an entry-action, exit-action, and do-activity. In addition, it contains one or more substates. Figure 5.17 shows an alternative representation of the Statechart, where two states
 have been hierarchically aggregated.
 
-**Figure 5.17.** Hierarchical decomposition of the state space
-```plantuml
-@startuml
-state "AuctionOpen ©" as open {
-  open : [timePol.status == TimingPolicy.RUNNING]
-  state "AuctionRegularOpen" as ro { ro : [!timePol.isInExtension] }
-  state "AuctionExtended"    as ex { ex : [timePol.isInExtension]  }
-}
-note right of open : Statechart Auction (incomplete)
-@enduml
-```
-
 The state AuctionOpen is structured by two substates AuctionRegularOpen and AuctionExtended. These substates are denoted separately from the other components of the superstate in their own compartment. c determines that the state AuctionOpen is parThe completeness mark ! titioned by the two substates. This means that, if the object is located in the state AuctionOpen, it is in exactly one of the two substates, and vice versa. If the completeness mark had been omitted or incompleteness mark “. . .” given, it would be possible that objects of the modeled class take the superstate AuctionOpen without being in one of the two substates. This is, e.g., possible if another substate exists but is not explicitly given in the diagram. One of the advantages of hierarchical decomposition of states is the possibility to note common parts of state invariants in the superstates. This leads to a more compact version of the state invariant for both substates. The actual state invariant of a substate is, hence, the conjunction of all state invariants of its superstates. The concept of the equivalence of two Statecharts is subsequently used to, e.g., introduce a new element of the Statechart notation by relating it to the already known elements. In this sense, some of the equivalences can be regarded as defining. But
 generally, these equivalences are used in a rather illustrative way and serve for better understandability. Most representations, thus, illustrate only a special case. It is possible that a state invariant is not satisfiable. This means that there is no object state where the state invariant evaluates to true. In hierarchically structured states, the state invariant must not be considered separately but the conjunction of all state invariants of the substate and its superstates. A side-effect of the possibility to explicitly take over state invariants from the superstate to the substate and the later discussed options of leading transitions from or to the superstate directly into substates allow for introduction or removal of a hierarchy in the state space where necessary. Due to this equivalence, hierarchy is mainly a convenience to prevent the explosion of states and transitions.
-
-**Figure 5.19.** Introduction and expansion of hierarchy
-```plantuml
-@startuml
-state "superstate ©" as ss {
-  ss : [condition1]
-  state substateA { substateA : [conditionA] }
-  state substateB { substateB : [conditionB] }
-  [*] --> substateA
-  [*] --> substateB
-}
-note right
-  Flat equivalent:
-  substateA [conditionA && condition1]
-  substateB [conditionB && condition1]
-end note
-@enduml
-```
 
 Compared with the original Statecharts [Har87] and the UML standard, only the so-called or-decomposition of states is used, just like in ROOM. This form of decomposition allows the hierarchical decomposition of the state space but is not suitable to describe parallelism or concurrency within an object. As today parallelism is immanent in many systems at larger granularity, but sequential processing is the dominant concept within an object, the and-decomposition of states for modeling concurrent behavior components is not necessary in UML.
 
 #### 5.3.3 Initial and Final States
 As Statecharts mostly model the lifecycle of an object or the process of a method, they require a description to identify diagram states as initial or final states. Figure 5.20 shows how initial and final states are marked.
-
-**Figure 5.20.** Initial and final states
-```plantuml
-@startuml
-[*] --> AuctionCreated
-[*] --> AuctionReady
-state AuctionCreated { AuctionCreated : [timePol.status==TimingPolicy.WAIT_FOR_RELEASE] }
-state AuctionReady   { AuctionReady   : [timePol.status==TimingPolicy.READY_TO_GO] }
-state AuctionFinished{ AuctionFinished: [timePol.status==TimingPolicy.FINISHED] }
-AuctionCreated --> [*]
-AuctionFinished --> [*]
-note right : Statechart Auction (incomplete)
-@enduml
-```
 
 A Statechart may have several initial and final states. States can even be initial and final state at the same time. Figure 5.20 shows that there are two ways to initiate an auction. Normal customers can set up an auction, but it additionally needs to be released. Only an authorized group of good customers are allowed to set up auctions in a directly released state. If an auction is, for example, not released because of a lack of solvency of the person setting up the auction or if the auction is terminated, the lifecycle of the auction object is also terminated. Thus, the black circles and the arrows from or to them do not represent states or transitions themselves, although their representation might create this impression. The developer can either restrict this freedom of choice in the further process of the project or leave all possibilities to the system when implemented with different constructors. This view is consistent with the target language Java, which also prevents parallelism within objects by providing the keyword synchronized. Initial and final states can also be labeled within a hierarchically decomposed state.
 
@@ -1290,21 +897,6 @@ The transition labeled with finish() leading to the closure of an auction has th
 
 #### 5.4.2 Initial and Final States in the State Hierarchy
 The transition start() described in the Statechart has the substate AuctionRegularOpen as target state. Alternatively, it is possible that this transition only targets the superstate AuctionOpen. However, it is then not described in which of the two substates the auction really is after the execution of this transition. This is indicated by using an initial state mark within a hierarchically partitioned state. The equivalence suggested by Figures 5.21 and 5.24 can generally be expressed as shown in Fig. 5.25. This rule can even be used repeatedly if the initial substate in turn is again refined by substates.
-
-**Figure 5.25.** Initial state marks in hierarchical states
-```plantuml
-@startuml
-state "superstate ©" as ss {
-  state substate1 as s1
-  state substate2 as s2
-  state substate3 as s3
-  [*] --> s1
-  [*] --> s2
-}
-note right : Initial marks in substates determine
-targets of incoming transitions
-@enduml
-```
 
 In a similar manner, it is also possible to use final state marks within hierarchical states. They describe when transitions originating from the superstate may be triggered. However, as the clarity of the Statecharts quickly suffers, it is recommended to use marks for initial and final states not too often. For the same reason, hierarchies should be used carefully in automata. If a superstate does not contain initial states, it is equivalent to the fact that all substates also are initial states. The same holds for missing final states.
 
@@ -1346,24 +938,6 @@ In the previous section, situations with multiple, simultaneously enabled transi
 
 In the first two interpretations, the lifecycle is regarded as the maximal possible one, while in the last interpretation it is understood as the minimally ensured one. This becomes a crucial difference, especially for the transformations. The first two interpretations of incompleteness are useful if the Statechart serves as an implementation. In fact, ignoring nonprocessible stimuli is only a special case of explicit error handling. If there is consistent error handling, it can be modeled as an entry-action in a dedicated state tagged with the stereotype ≪error≫. The stereotype ≪error≫ is used if explicit transitions for handling errors are not wanted, for example, for the sake of clarity. Figure 5.32 illustrates a possible application.
 
-**Figure 5.32.** Stereotype ≪error≫ for error handling
-```plantuml
-@startuml
-state AuctionReady
-state AuctionRegularOpen
-state AuctionExtended
-state AuctionFinished
-state "«error»«exception»" as err { err : entry / protocol(...) }
-AuctionReady        --> AuctionRegularOpen : start()
-AuctionRegularOpen  --> AuctionExtended   : startExtension()
-AuctionRegularOpen  --> AuctionFinished   : finish()
-AuctionExtended     --> AuctionFinished   : finish()
-AuctionFinished     --> err               : ε
-note right of err : «error»: stimuli in wrong state
-«exception»: abnormal exceptions
-@enduml
-```
-
 However, using an explicit error state as in Fig. 5.32 has the drawback that only one universal and uniform error handling is possible. Hence, a return to the state that caused the error cannot be modeled. Alternative error handling can use stereotypes, such as ≪completion:ignore≫, either for the whole Statechart or for single states. For pragmatic reasons, we also distinguish normal error situations, in which the enabledness for a stimulus is missing, from the receipt of an exception. Thus, the stereotype ≪exception≫ is available for dealing with exception stimuli. It is the only stereotype for handling occurrences of explicit exceptions. Statecharts defined and refined during the development process can temporarily be incomplete without the intention of specifying error handling through their incompleteness. Furthermore, Statecharts can intentionally be incomplete, e.g., if they are used for the definition of tests. The semantics of Statecharts intended for tests says that, if a Statechart describes a behavior, it has to be fulfilled by the object. Otherwise, if the Statechart does not make a statement, the object is completely free in its action. Thus, the third of the aforementioned possibilities of interpreting incompleteness is the best one for the usage of Statecharts in tests. This behaviorial freedom for implementations can be specified for a whole Statechart with the stereotype ≪completion:chaos≫. If a Statechart is incomplete, a uniform error handling can be conducted by introducing an error state. A state tagged with ≪error≫ is called error state. In a Statechart, only one state may be marked with ≪error≫. This cannot be a substate, but it can have explicit incoming transitions and substates. If there is no transition that can process a stimulus, a transition to the triggered error state processes the stimulus. Exception stimuli are not handled by this stereotype. ≪exception≫, ≪completion:chaos≫, and ≪completion:ignore≫.
 The stereotpye ≪error≫ handles stimuli in situations without enabledness, but it does not handle exceptions. This can be achieved with the stereotype ≪exception≫ A state tagged with ≪exception≫ is called an exception error state. In a Statechart, only one state may be tagged with ≪exception≫. This cannot be a substate, but it can have explicit incoming transitions and substates. The stereotype ≪exception≫ is used independently from the stereotype ≪error≫ and ≪completion:. . . ≫. If no other transition can process an exception stimulus, a transition into the exception error state is conducted to process the exception. ≪error≫, ≪completion:chaos≫ , and ≪completion:ignore≫ . There are various possible interpretations for an incomplete Statechart. By using one of these stereotypes, the developer can explicitly choose the desired interpretation. Both stereotypes exclude each other as well as the simultaneous use of an error state (≪error≫). Statecharts tagged with ≪completion:ignore≫ ignore stimuli they cannot process. This is suitable for a robust implementation. Statecharts tagged with ≪completion:chaos≫ allow arbitrary freedom in processing of otherwise unhandled stimuli. This is suited for specification and tests. Exceptions are not handled with these stereotypes. Both variants are used to clarify the interpretation of incompleteness. For practical issues other than prototyping, robust treatment of unspecified situations is particularly reasonable, say in an error state. ≪error≫ and ≪exception≫ The interpretations dealing with incomplete Statecharts suggested in this section can also be modeled by an explicit completion of the transitions, as known from automaton theory, for example in a Statechart tagged with ≪completion:ignore≫, all incomplete states need to be supplemented with loops. These loops start and end in the same state, process all stimuli that are not processed by other transitions, but do not change the state or produce an output. When using an error state, these transitions must instead end in the marked error state. In a chaos completion with the stereotype ≪completion:chaos≫, a lot more transitions could have to be introduced, as they can lead from each incomplete state to all states of the Statechart. The actions of these transitions have arbitrary freedom. They can freely change the state of the modeled objects, restricted only by the target state and their environment, set up new objects, etc. Nonterminating actions are also not excluded in a chaos completion. While the first two forms of completion are indeed reasonable for the implementation, due to the explosion of transitions, it is obvious that a chaos completion is only a conceptual mechanism for clarifying the meaning of a Statechart but should not be considered for an implementation.
 
@@ -1377,21 +951,6 @@ Figure 5.36 contains an extract a Statechart for the class Auction which
 shows a transition with a procedural action description and a postcondition.
 If the class TimingPolicy is implemented correctly, the postcondition already results from the action instructions. Thus, the postcondition here has
 illustrative character and can be used particularly for tests.
-
-**Figure 5.36.** Transition with procedural and descriptive action
-
-```plantuml
-@startuml
-state AuctionReady
-state AuctionRegularOpen
-AuctionReady --> AuctionRegularOpen : [Time.now()>=timePol.start] start() /
-  sendMessageToAllParticipants(new WelcomeMessage(this));
-  timePol.start();
-  protocol("Auction "+auctionIdent+": started at "+Time.now())
-  [timePol.status==TimingPolicy.RUNNING && !timePol.isInExtension]
-@enduml
-```
-
 
 Postconditions can not only be formulated as a redundant addendum to
 action instructions but also supplement them. In this way, one part of the
@@ -1488,28 +1047,6 @@ A collection of transformation rules for Statecharts shows on the one hand the s
 A sequence diagram represents an exemplary snippet of a software system’s process. It models the occurring interactions and activities and can be extended by OCL expressions. This chapter introduces a simplified version of sequence diagrams which are suitable especially for the modeling of tests.
 Sequence diagrams are used for modeling interactions between objects. A sequence diagram describes in which order method calls are executed and when they terminate. Thus, similar to Statecharts, sequence diagrams model behavioral aspects. A sequence diagram focuses on the interaction between objects, but the inner state of an object is not represented. Basically, a sequence diagram is exemplary. Just like in the object diagram, the represented information can, thus, occur arbitrarily often, multiple times in parallel, or even not at all in the process of a system. Due to their exemplary character, sequence diagrams are not suitable for the complete modeling of behavior. They are mainly used for requirements definition and, as shown in this work, test case modeling. Hence, sequence diagrams are methodically used especially for requirements analysis as well as for test definition for or after implementation. If sequence diagrams are used for modeling a system, they always illustrate specific, desired or undesired situations or erroneous behavior and are therefore suitable as a starting point for test cases. When used in requirements engineering, developers need to derive a complete implementation from a necessarily finite set of sequence diagrams. A number of proposals extend sequence diagrams in order to systematize this derivation. Control structures are often added that allow alternatives, parallelism, iterations, and recursive calls of sequence diagrams. These proposals are discussed, e.g., in and used in different forms in the two essential standards for sequence diagrams. Besides the UML standard, dialects of sequence diagrams are used particularly in the telecommunication, industry in the form of Message Sequence Charts (MSCs). The automaton-based extensionin High-Level MSCs also allows the representation of MSC combinations. Another variant of sequence diagrams is Object-MSCs in which activity bars have been introduced. Also the Live Sequence Charts’(LSCs) approach deserves special attention. It gives sequence diagrams considerably more expressiveness and therefore becomes accessible for complete specifications, simulation of different processes, constructive code generation, or verification techniques. In comparison with the mentioned variants, the form of sequence diagrams introduced in this chapter is kept simple. The reason is, among others, that, in this work, the methodical use of sequence diagrams is rather restricted to modeling of test cases and test drivers. Statecharts can already be used for complete process descriptions. Thereby, a redundant description is avoided. This is based on the experience that it is much more elaborate to create complete descriptions instead of exemplary ones and that, for reasons of developer efficiency, redundancy needs to be avoided. Thus, sequence diagrams are adequate to exemplarily describe system runs.
 
-### 6.1 Concepts of Sequence Diagrams
-**Figure 6.1.** Sequence diagram for accepting a bid
-```plantuml
-@startuml
-participant ":AuctionTest"     as at
-participant "copper912:Auction" as a
-participant "bidPol:BiddingPolicy" as bp
-participant "timePol:TimingPolicy" as tp
-at -> a  : «trigger» handleBid(bid)
-activate a
-  a -> bp : validateBid(bid)
-  activate bp
-    bp --> a : return BiddingPolicy.OK
-  deactivate bp
-  a --> at : return
-deactivate a
-note over a
-  t.timeSec == bid.time.timeSec + extensionTime
-end note
-@enduml
-```
-
 In a sequence diagram, objects are represented next to one another in a row and furnished with a timeline pointing downward. Optionally, objects have a name and a type.
 
 **Object** 
@@ -1523,63 +1060,13 @@ An interaction between two objects can be one of several kinds of stimuli. This 
 
 Due to the assumptions described above, this also holds especially for asynchronous messages, which are not differentiated syntactically from normal method calls. In some dialects, a specific arrow is used for asynchronously sent messages. At the arrows, method calls, returns, or exceptions are added. These can optionally have arguments. An argument is denoted as a Java expression. If it is a single variable that has not occurred so far, it is defined with its first occurrence. Return information can be omitted completely, as the dashed arrow is already unambiguous. Due to its nature, a return can only occur in the diagram after the corresponding method call. To avoid information overload, the incompleteness indicator “. . .” can be used instead of the arguments of the interaction. This has the same effect as if the parameters were omitted completely.
 
-**Figure 6.3.** Types of interactions in sequence diagrams
-```plantuml
-@startuml
-participant A
-participant B
-A ->  B : methodName(arguments)
-A ->  B : methodName
-A ->  B : methodName(...)
-B --> A : return result
-B --> A : return
-B --> A : ExceptionType(arguments)
-B --> A : ExceptionType(...)
-@enduml
-```
-
 **Static Method**
 If a method is static, it is underlined like in the class diagram. In this case, the arrow ends at a class that is used analogously to an object.
-
-**Figure 6.4.** Static method in a sequence diagram
-
-```plantuml
-@startuml
-participant "copper912:
-Auction" as a
-participant "Protocol"           as p
-a -> p : writeToProtocol("Auction 912 started.")
-activate p
-p --> a : return
-deactivate p
-note right of p : static method – arrow ends at class
-@enduml
-```
 
 While objects are underlined as instances, attributes and methods are underlined if they are not assigned to an instance. This is not consistent but corresponds to the rule that elements that are used more often can be described more easily.
 
 **Object Creation**
 If an object is newly created during some interaction, this can be represented by the object’s timeline starting at a later point in time. Figure 6.5 shows two typical forms of object creation. Both representations are even equivalent if they are used for certain forms of object creation. Form (b) is then only a more detailed and more implementation-related representation. A representation for destroying an object is not offered in UML/P, as this is also not possible in the target language Java.
-
-**Figure 6.5.** Creation of a new object
-
-```plantuml
-@startuml
-participant "copper912:
-Auction" as a
-participant "f:Factory"          as f
-' (a) constructor
-a -> "bm:
-BidMessage" ** : new BidMessage(...)
-' (b) factory
-a -> f : getNewBidMessage(...)
-activate f
-  f -> "bm:
-BidMessage" ** : new BidMessage(...)
-  f --> a : return bm
-deactivate f
-@enduml
-```
 
 **Stereotypes and Tags**
 Stereotypes and tags can be used in sequence diagrams as well. The stereotype ≪match≫ is introduced in Sect. 6.4 to give the developer the possibility of choosing between different semantics for sequence diagrams. The stereotype ≪trigger≫, for example, can be used to indicate that a method call is the cause for all other interactions of the sequence diagram. Therefore, such a stereotype is especially suited for test drivers, and it can be used only for method calls of objects of the test environment into the tested object structure. Hence, mostly only the first method call is tagged with ≪trigger≫. Interactions tagged with ≪trigger≫ necessarily lead to the other described interactions. The called objects are not allowed to behave differently. This is a considerably stronger restriction than sequence diagrams without this stereotype would denote.
@@ -1589,21 +1076,6 @@ An OCL constraint can describe occurring objects and parameters as well as a mes
 This condition, among other things, requires thatbmis an object of the type Bid Message and then partly checks its content. The specification of the context shows that access to attributes is possible by qualification with the object. However, if an OCL constraint is exclusively assigned to one timeline, the attributes of this object can directly be accessed, but for better readability, it is reasonable to still use a qualification.
 The validity of an OCL constraint refers to the point in time directly after the last occurred interaction or the last occurred activity bar. This means that the OCL constraint must only be satisfied directly after this interaction but not during the overall “period” in which the OCL constraint is embedded. This is illustrated by means of two sequence diagrams in Fig. 6.7.
 
-**Figure 6.7.** Validity of OCL constraints in sequence diagrams
-```plantuml
-@startuml
-participant "copper912:
-Auction" as a
-participant "theo:
-Person"       as t
-note over a : OCL constraint valid here
-a -> t : handleBid(bid, t)
-activate a
-note over a : OCL constraint valid directly after interaction
-deactivate a
-@enduml
-```
-
 As a sequence diagram models temporal system runs, other than in the OCL method specification, a@preoperator is not available. If a previous attribute value must be accessed, this value needs to be stored explicitly in an auxiliary variable. For this purpose, a let construct is used that is similar to the OCL construct and that introduces new variables that are accessible only within the sequence diagram. These auxiliary variables are not part of the implementation but exclusively serve for the specification of effects during the process of interactions. Figure 6.8 shows a use of these variables.
 
 ### 6.3 Semantics of a Sequence Diagram
@@ -1611,21 +1083,6 @@ The exemplary character of a sequence diagram has already been referred to. Howe
 
 **Exemplaricity and Incompleteness**
 Similar to the object diagram, the exemplaricity of a sequence diagram is based on the description of a set of objects that, in this form, can occur in a system arbitrarily often or even not at all. Furthermore, the run itself is exemplary. It can occur arbitrarily often, be concurrent and nested, or not occur at all. In addition to these forms of exemplaricity, a sequence diagram represents an abstraction of a process, as it can contain neither all objects of the system nor all occurring interactions. In a sequence diagram, interactions can also be missing. Figure 6.9 can, therefore, represent the same process as Fig. 6.8 on a different abstraction level because different objects are shown.
-
-**Figure 6.9.** Representation with different abstraction level
-```plantuml
-@startuml
-participant "copper912:
-Auction ©" as a
-participant "theo:
-Person ..."     as t
-a -> t : handleBid(bid)
-activate a
-  a --> t : return
-deactivate a
-note right : Different abstraction level from Fig. 6.8
-@enduml
-```
 
 Formally, the semantics of a sequence diagram can be explained by mapping the diagram’s elements to a system run. 
 The prototypic objects in the sequence diagram are mapped to real objects, and the shown interactions are mapped to real interactions of the system; the chronological order must be consistent. This form of matching corresponds to the already discussed form of an observer selectively observing objects and protocolling some interactions.
@@ -1691,55 +1148,11 @@ Ainitial,k={ak,ak+1,...,an|obj(al)∩Oinitial+=∅fork≤l≤n}. (3)
 
 (1) and (2) describe interactions that must be stated in the sequence diagram and are therefore prohibited in between. (3) identifies interactions that are later stated in the sequence diagram and, thus, would contradict the initial matching. It holds thatXk=Act\Acomplete\Avisible\Ainitial,k. The arguments of interactionsActcan be taken into consideration by introducing type information. The dynamic assignment of prototypic objects to real objects that is analogous to the object diagram can also be taken into consideration.
 
-**Figure 6.15.** Noncausal sequence diagram
-```plantuml
-@startuml
-participant ":A" as a
-participant ":B" as b
-participant ":C" as c
-a -> b : method1()
-activate b
-b --> a : return
-deactivate b
-c -> b : method2()
-activate b
-b --> c : return
-deactivate b
-note bottom : Noncausal: two disjoint parts,
-no causal connection between them
-@enduml
-```
-
 6.4 Special Cases and Extensions for Sequence Diagrams 205
 Non causal sequence diagrams can be prohibited by using suitable≪match:*≫stereotypes.
 
 **Recursion and Ambiguity**
 The object recursion already discussed in Sect. 5.2.7 causes complications not only in Statecharts but also in sequence diagrams. We talk of object recursion if, within the execution of a method, another method of the same object is called directly or indirectly. Figure 6.17 shows both forms of calls.
-
-**Figure 6.17.** Sequence diagrams with object recursion
-```plantuml
-@startuml
-participant ":A" as a
-participant ":B" as b
-' direct recursion
-a -> a : method1()
-activate a
-  a -> b : method2()
-  activate b
-  b --> a
-  deactivate b
-deactivate a
-' indirect recursion
-a -> b : method3()
-activate b
-  b -> a : method4()
-  activate a
-  a --> b
-  deactivate a
-b --> a
-deactivate b
-@enduml
-```
 
 Normally, activity bars serve to illustrate behavior pattern and can be omitted. In recursive cases however, they allow to resolve ambiguities. The elimination of ambiguity can, as shown, happen by using activity bars or, in a similar manner, by adding returns. The source of these ambiguities is the object recursion shown in Fig. 6.17. As such an ambiguity can easily be resolved by using activity bars, we decide that a sequence diagram with such an ambiguity is not well-formed and is rejected by a code generator.
 
@@ -1762,22 +1175,6 @@ A similar procedure is:anLSC(LiveSequenceChart is implicitly created by protocol
 
 **Sequence Diagrams and UML Communication Diagrams**
 Besides sequence diagrams, the UML standard provides an additional notation which is closely related to the notation of sequence diagrams.Communication diagramsrepresent a subset of a sequence diagram’s information but are less focused on the chronological order and more on the cooperation between objects. Figure 6.19 contains the representation of thes equence diagrams as a communication diagram. However, OCL constraints and returns are not represented in the communication diagram.
-
-**Figure 6.19.** Communication diagram
-```plantuml
-@startuml
-participant ":AuctionTest"         as at
-participant "copper912:
-Auction"  as a
-participant "bidPol:
-BiddingPolicy" as bp
-at -> a  : 1: handleBid(bid)
-a  -> bp : 1.1: validateBid(bid)
-bp --> a : 1.1.r: BiddingPolicy.OK
-a  --> at: 1.r:
-note bottom : Communication diagram – numbering replaces timeline
-@enduml
-```
 
 The two-dimensional distribution allows one to accommodate more objects in communication diagrams. The interaction order is not determined by timelines but by numeration. For this, nested calls are marked with ascending lists of numbers. Return values are added to the call. There is no concept analogous to activity bars in communication diagrams. Although the information represented in both diagrams is essentially the same, the form of representation and, thus, the way diagrams are dealt with varies considerably. Adding an interaction, for example, is easier in a sequence diagram, because in a communication diagram interactions must be renumbered. Besides, OCL constraints cannot be stated in the simple form for certain points in time, as it is the case for sequence diagrams.
 

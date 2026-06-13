@@ -133,32 +133,6 @@ Tabelle Person: PkPersId, Vorname, Nachname
 Tabelle Projekt: PkProjektId, Name
 Tabelle Projektmitarbeiter (Zwischentabelle): FkPersId, FkProjektId
 
-## Implementierungsalternativen: XML
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<Lieferanten>
-  <Lieferant>
-    <LNr>1234</LNr>
-    <LName>Müller KG</LName>
-    <Standort>Magdeburg</Standort>
-    <Servicegrad>90%</Servicegrad>
-  </Lieferant>
-  <Lieferant>
-    <LNr>5678</LNr>
-    <LName>SASD GmbH</LName>
-    <Standort>Berlin</Standort>
-    <Servicegrad>80%</Servicegrad>
-  </Lieferant>
-  <Lieferant>
-    <LNr>1212</LNr>
-    <LName>Tele 50000 AG</LName>
-    <Standort>Stendal</Standort>
-    <Servicegrad>34%</Servicegrad>
-  </Lieferant>
-</Lieferanten>
-```
-
 ## Vom ER-Diagramm zum Datenbankmodell
 
 - Aus dem Fachkonzept wird das DV-Konzept abgeleitet:
@@ -216,53 +190,6 @@ XML-Syntaxregeln:
 - Groß-/Kleinschreibung wird unterschieden
 
 Entspricht ein XML-Dokument den Regeln, wird es als wohlgeformt bezeichnet.
-
-```xml
-<?xml version="1.0"?>
-<Produkt>
-  <Name>Kaltgetränkeautomat</Name>
-  <Preis Waehrung="EUR">698,00</Preis>
-  <Preis Waehrung="DM">1366,00</Preis>
-</Produkt>
-```
-
-## XML – Beispieldokument
-
-```xml
-<?xml version="1.0"?>
-<Kunde>
-  <Kund-Nr>3416484</Kund-Nr>
-  <Name>Bayer</Name>
-  <Adresse>
-    <Str>Waldweg</Str>
-    <Nr>12</Nr>
-    <PLZ>39106</PLZ>
-    <Ort>Magdeburg</Ort>
-  </Adresse>
-  <Status>3</Status>
-</Kunde>
-```
-
-## XML – Hierarchischer Aufbau
-
-```xml
-<?xml version="1.0"?>
-<Rechnung>
-  <Auftraggeber>
-    <KundenNr>25562-556E</KundenNr>
-    <Name>Universität Augsburg</Name>
-    <Adresse>Universitätsstrasse 16, 86135 Augsburg</Adresse>
-    <Datum>01.01.2002</Datum>
-  </Auftraggeber>
-  <Rechnungspositionen>
-    <Rechnungsposition>
-      <Artikel>Heissgetränkeautomat G45</Artikel>
-      <Anzahl>10</Anzahl>
-      <Preis Waehrung="EUR">1000</Preis>
-    </Rechnungsposition>
-  </Rechnungspositionen>
-</Rechnung>
-```
 
 Hierarchischer Aufbau als Baum: Rechnung → Auftraggeber (KundenNr, Name, Adresse, Datum), Rechnungspositionen → Rechnungsposition (Artikel, Anzahl, Preis)
 
@@ -335,26 +262,6 @@ Syntax des Inhaltsmodells:
 <!ATTLIST Gesamtpreis Waehrung CDATA>
 ```
 
-```xml
-<?xml version="1.0"?>
-<Rechnung>
-  <Auftraggeber>
-    <KundenNr>25562-556E</KundenNr>
-    <Name>Universität Augsburg</Name>
-    <Adresse>Universitätsstrasse 16, 86135 Augsburg</Adresse>
-    <Datum>01.01.2002</Datum>
-  </Auftraggeber>
-  <Rechnungspositionen>
-    <Position>
-      <Artikel>Heissgetränkeautomat G45</Artikel>
-      <Anzahl>10</Anzahl>
-      <Preis Waehrung="EUR">1000</Preis>
-    </Position>
-    <Gesamtpreis Waehrung="EUR">10000</Gesamtpreis>
-  </Rechnungspositionen>
-</Rechnung>
-```
-
 ## XML – Schema Description Language (XSD)
 
 Struktur:
@@ -425,62 +332,6 @@ XSL verwendet XPath (XML Path Language):
 Prozess:
 1. Darstellung des XML-Dokuments als hierarchischer Baum und Auswahl der gewünschten Elemente mittels XPath (z.B. /Position/Anzahl)
 2. Transformation in HTML gemäß XSLT-Formatvorlage
-
-## XSL – Transformation (XSLT)
-
-XML-Datei:
-```xml
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<?xml-stylesheet type="text/xsl" href="Rechnungen.xsl"?>
-<Rechnung>
-  <Rechnungskopf>
-    <Name>Maier</Name>
-    <Vorname>Wilhelm</Vorname>
-  </Rechnungskopf>
-  <Rechnungspositionen>
-    <Position id="1">
-      <Artikel>Gummibären</Artikel>
-      <Anzahl>200</Anzahl>
-      <Preis>1,50</Preis>
-      <Zeilensumme>300,00</Zeilensumme>
-    </Position>
-    <Position id="2">
-      <Artikel>Kaugummi</Artikel>
-      <Anzahl>15</Anzahl>
-      <Preis>0,90</Preis>
-      <Zeilensumme>13,50</Zeilensumme>
-    </Position>
-    <Gesamtsumme>313,50</Gesamtsumme>
-  </Rechnungspositionen>
-</Rechnung>
-```
-
-XSL-Datei:
-```xml
-<?xml version="1.0"?>
-<xsl:transform version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:template match="/">
-    <html>
-      <body>
-        <h2>Lieferschein</h2>
-        <table border="1">
-          <tr bgcolor="#9acd32">
-            <th align="left">Anzahl</th>
-            <th align="left">Artikel</th>
-          </tr>
-          <xsl:for-each select="/Rechnung/Rechnungspositionen/Position">
-            <tr>
-              <td><xsl:value-of select="Anzahl"/></td>
-              <td><xsl:value-of select="Artikel"/></td>
-            </tr>
-          </xsl:for-each>
-        </table>
-      </body>
-    </html>
-  </xsl:template>
-</xsl:transform>
-```
 
 ## XPath – Syntax
 
