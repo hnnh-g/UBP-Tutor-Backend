@@ -107,12 +107,15 @@ class ModelGenerationAgent:
             parts=[types.Part(text=prompt)]
         )
 
-        async for _ in self.runner.run_async(
-            user_id=user_id,
-            session_id=session_id,
-            new_message=adk_message
-        ):
-            pass
+        try:
+            async for _ in self.runner.run_async(
+                user_id=user_id,
+                session_id=session_id,
+                new_message=adk_message
+            ):
+                pass
+        except ValueError as e:
+            logger.warning("Runner raised ValueError: %s", e)
 
         session = await self.session_service.get_session(
             app_name=self.app_name,

@@ -11,6 +11,7 @@ class TextTutoringWorkflow:
     
     async def stream(self, request):
         rag_context = await self.retriever.retrieve(request.message)
+        rag_used = bool(rag_context.strip())
         async for token in self.agent.stream_response(
             message=request.message,
             user_context=request.user_context,
@@ -21,13 +22,13 @@ class TextTutoringWorkflow:
                 "event": "token",
                 "data": token,
                 "activated_agent": "TextTutoringAgent",
-                "rag_used": True,
+                "rag_used": rag_used,
             }
 
 class ModelGenerationWorkflow:
     def __init__(self):
         self.agent = ModelGenerationAgent()
-        self.retriever = Retriever("model_generation")
+        self.retriever = Retriever("model_generation_tutor")
 
     async def run(self, request):
         rag_context = await self.retriever.retrieve(request.message)
@@ -39,17 +40,18 @@ class ModelGenerationWorkflow:
             content=content,
             activated_agent="ModelGenerationAgent",
             status="success",
-            rag_used=True,
+            rag_used=bool(rag_context.strip()),
         )
 
 
 class ModelEvaluationWorkflow:
     def __init__(self):
         self.agent = ModelEvaluationAgent()
-        self.retriever = Retriever("model_evaluation")
+        self.retriever = Retriever("model_evaluation_tutor")
 
     async def stream(self, request):
         rag_context = await self.retriever.retrieve(request.message)
+        rag_used = bool(rag_context.strip())
         async for token in self.agent.stream_response(message=request.message,
             user_context=request.user_context,
             metadata=request.metadata,rag_context=rag_context):
@@ -57,5 +59,5 @@ class ModelEvaluationWorkflow:
                 "event": "token",
                 "data": token,
                 "activated_agent": "ModelEvaluationAgent",
-                "rag_used": True,
+                "rag_used": rag_used,
             }

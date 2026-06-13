@@ -1,3 +1,4 @@
+import logging
 from google.adk.agents import LlmAgent, SequentialAgent
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.models.lite_llm import LiteLlm
@@ -8,6 +9,8 @@ from app.prompts.model_evaluation_prompt import MODEL_EVALUATION_SYSTEM_PROMPT
 from app.syntax_checker.syntax_tool import validate_model_syntax
 from app.syntax_checker.extractors.bpmn_extractor import strip_bpmndi
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 class ModelEvaluationAgent:
     def __init__(self):
@@ -47,6 +50,7 @@ class ModelEvaluationAgent:
         )
 
     def build_prompt(self, message: str, rag_context: str | None = None) -> str:
+        logger.info("Running syntax check on student model (%d chars)", len(message))
         syntax_result = validate_model_syntax(message)
         model_for_llm = strip_bpmndi(message)
         return f"""
@@ -74,6 +78,7 @@ class ModelEvaluationAgent:
             if metadata and metadata.get("session_id")
             else "default"
         )
+        logger.info("Starting evaluation — user=%s session=%s", user_id, session_id)
 
         await self.ensure_session(user_id, session_id)
         prompt = self.build_prompt(message, rag_context)

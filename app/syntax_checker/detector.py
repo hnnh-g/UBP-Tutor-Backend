@@ -1,12 +1,12 @@
 def detect_notation(model_text: str) -> str:
     text = model_text.strip()
 
-    if text.startswith("@startuml") or "@enduml" in text:
+    if "@startuml" in text and "@enduml" in text:
         return "uml"
     if "<bpmn:definitions" in text or "<definitions" in text and "bpmn" in text:
         return "bpmn"
 
-    if text.startswith("<pnml") or "<pnml" in text:
+    if text.startswith("<pnml") or "pnml" in text:
         return "pnml"
 
     return "unknown"

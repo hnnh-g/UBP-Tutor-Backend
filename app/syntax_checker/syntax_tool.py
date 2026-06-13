@@ -70,3 +70,17 @@ def validate_model_syntax(model_text: str):
             }
 
         return validate_pnml(diagram)
+
+    else:
+        return {
+            "valid": False,
+            "notation": "unknown",
+            "issues": [
+                {
+                    "severity": "error",
+                    "code": "UNKNOWN_NOTATION",
+                    "message": "Could not detect diagram notation (not UML, BPMN, or PNML).",
+                    "suggestion": "Ensure the diagram starts with @startuml, <bpmn:definitions>, or <pnml>.",
+                }
+            ],
+        }

@@ -3,10 +3,9 @@ import numpy as np
 
 class SemanticChunker:
 
-    def __init__(self, similarity_threshold: float = 0.75, max_sentences_per_chunk: int = 10):
+    def __init__(self, similarity_threshold: float = 0.75, max_sentences_per_chunk: int = 5):
         self.similarity_threshold = similarity_threshold
         self.max_sentences_per_chunk = max_sentences_per_chunk
-        nltk.download("punkt_tab", quiet=True)
 
     def _cosine_similarity(self, a: list[float], b: list[float]) -> float:
         a, b = np.array(a), np.array(b)

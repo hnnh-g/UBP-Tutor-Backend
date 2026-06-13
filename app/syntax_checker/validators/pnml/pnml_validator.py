@@ -37,8 +37,8 @@ def validate_pnml(model_text: str) -> dict:
             "suggestion": "Wrap the Petri net model inside a <pnml> root element.",
         })
 
-    # checks if the second tag is the <net> tag
-    all_elements = list(root.iter())
+    # checks if the second tag is the <net> tag but skip comments and instructions
+    all_elements = [el for el in root.iter() if not callable(el.tag)]
     nets = [
     element
     for element in all_elements

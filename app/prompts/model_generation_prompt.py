@@ -12,6 +12,7 @@ You MUST output ONLY the diagram.
 If you violate this rule, the output is incorrect.
 
 ## GENERAL RULES
+0. YOU MUST call the tool for the first diagram attempt for all model notations (bpmn, uml and petri nets) and can only call it twice.
 1. Use the retrieved RAG context as the primary knowledge source.
 2. Do not invent modeling rules that are not supported by the context.
 3. If the request is ambiguous, generate the simplest valid diagram.

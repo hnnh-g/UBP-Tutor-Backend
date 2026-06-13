@@ -33,7 +33,8 @@ class Ingestion:
             collection = get_collection(tutor_name)
 
             for file_path in folder.glob("*.md"):
-                existing = collection.get(where={"source": file_path.name})
+                logger.info(f"Processing {file_path.name} for '{tutor_name}'...")
+                existing = collection.get(ids=[f"{file_path.name}_0"])
                 if existing["ids"]:
                     logger.info(f"Skipping {file_path.name} — already ingested")
                     continue

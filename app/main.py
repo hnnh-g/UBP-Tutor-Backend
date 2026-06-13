@@ -8,11 +8,15 @@ from app.routers import status
 from app.routers import admin
 import logging
 
+logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 @asynccontextmanager
 async def lifespan(app):
-    await Ingestion().ingest_all_documents()
+    try:
+        await Ingestion().ingest_all_documents()
+    except Exception as e:
+        logger.warning(f"Startup ingestion failed: {e}. Run manually or restart.")
     yield
 
 app = FastAPI(title="UBP Tutor Backend", lifespan=lifespan)

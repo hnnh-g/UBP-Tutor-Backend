@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     vllm_model_generation_url: str = "http://localhost:8201/v1"
     vllm_model_evaluation_url: str = "http://localhost:8202/v1"
     vllm_embedding_url: str = "http://localhost:8203/v1"
+    vllm_reranker_url: str = "http://localhost:8204/v1"
 
     model_config = {"env_file": ".env", "extra": "ignore"}
     active_model: str = "not configured"

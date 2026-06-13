@@ -1,6 +1,6 @@
 class ParagraphChunker: 
 
-    def __init__(self, paragraphs_per_chunk: int = 2,  separator: str = "\n\n"):
+    def __init__(self, paragraphs_per_chunk: int = 1,  separator: str = "\n\n"):
         self.paragraphs_per_chunk = paragraphs_per_chunk
         self.separator = separator
 
