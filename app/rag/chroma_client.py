@@ -7,5 +7,8 @@ client = chromadb.HttpClient(
 )
 
 def get_collection(tutor_name: str):
-    return client.get_or_create_collection(name=tutor_name)
+    return client.get_or_create_collection(
+        name=tutor_name,
+        configuration={"hnsw": {"space": "cosine"}},
+    )
 

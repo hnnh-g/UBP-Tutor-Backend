@@ -10,13 +10,21 @@ class Reranker:
         self.model = "vllm-reranker-model"
         self.top_n = top_n
 
-    _MAX_CHARS_PER_DOC = 1000
+    _MODEL_MAX_TOKENS = 8192
+    _OVERHEAD_TOKENS = 400  # prompt template overhead
+    _CHARS_PER_TOKEN = 3    # conservative estimate for German text
+
+    def _max_chars_per_doc(self, query: str, n_docs: int) -> int:
+        query_tokens = len(query) // self._CHARS_PER_TOKEN + 1
+        available = self._MODEL_MAX_TOKENS - self._OVERHEAD_TOKENS - query_tokens
+        return max(100, (available // n_docs) * self._CHARS_PER_TOKEN)
 
     async def rerank(self, query: str, documents: list[str]) -> list[str]:
         if not documents:
             return []
-        
-        truncated = [doc[: self._MAX_CHARS_PER_DOC] for doc in documents]
+
+        max_chars = self._max_chars_per_doc(query, len(documents))
+        truncated = [doc[:max_chars] for doc in documents]
 
 
         try:

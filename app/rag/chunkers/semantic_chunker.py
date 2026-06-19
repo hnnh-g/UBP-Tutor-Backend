@@ -3,7 +3,7 @@ import numpy as np
 
 class SemanticChunker:
 
-    def __init__(self, similarity_threshold: float = 0.75, max_sentences_per_chunk: int = 5):
+    def __init__(self, similarity_threshold: float = 0.85, max_sentences_per_chunk: int = 5):
         self.similarity_threshold = similarity_threshold
         self.max_sentences_per_chunk = max_sentences_per_chunk
 
