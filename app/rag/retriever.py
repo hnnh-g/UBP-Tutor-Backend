@@ -36,3 +36,11 @@ class Retriever:
         for i, chunk in enumerate(results):
             logger.info(f"  Final chunk {i+1}: {chunk[:150]}...")
         return "\n\n".join(results)
+    
+    async def retrieve_as_list(self, query: str) -> list[str]:
+        query_embedding = await self.embedder.embed_query(query)
+        collection = get_collection(self.tutor_name)
+        results = collection.query(query_embeddings=[query_embedding], n_results=self.n_documents, include=["documents"])
+        candidates = results["documents"][0]
+        return await self.reranker.rerank(query, candidates)  # already returns a list
+

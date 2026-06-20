@@ -14,3 +14,4 @@ nltk
 numpy
 chromadb
 httpx
+ragas
