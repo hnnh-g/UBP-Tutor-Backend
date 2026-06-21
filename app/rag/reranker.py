@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Reranker:
-    def __init__(self, top_n: int = 2):
+    def __init__(self, top_n: int = 4):
         self.url = f"{settings.vllm_reranker_url}/rerank"
         self.model = "vllm-reranker-model"
         self.top_n = top_n

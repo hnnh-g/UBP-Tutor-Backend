@@ -11,9 +11,9 @@ DOCUMENTS_DIR = Path(__file__).parent / "documents"
 
 # mapping each tutor to its chunking strategy
 TUTOR_CONFIG = {
-    "text_tutor":             {"chunking": "semantic",  "separator": "\n\n"},
-    "model_evaluation_tutor": {"chunking": "paragraph", "separator": "---"},
-    "model_generation_tutor": {"chunking": "paragraph", "separator": "---"},
+    "text_tutor":             {"chunking": "semantic",  "separator": "\n\n", "paragraphs_per_chunk": 1},
+    "model_evaluation_tutor": {"chunking": "paragraph", "separator": "---",  "paragraphs_per_chunk": 1},
+    "model_generation_tutor": {"chunking": "paragraph", "separator": "---",  "paragraphs_per_chunk": 3},
 }
 
 
@@ -46,15 +46,16 @@ class Ingestion:
                     source=file_path.name,
                     chunking=config["chunking"],
                     separator=config["separator"],
+                    paragraphs_per_chunk=config.get("paragraphs_per_chunk", 1),
                 )
                 logger.info(f"Ingested {file_path.name} → {count} chunks into '{tutor_name}'")
 
 
-    async def ingest(self, text: str, tutor_name: str, source: str, chunking: str = "paragraph", separator: str = "\n\n") -> int:
+    async def ingest(self, text: str, tutor_name: str, source: str, chunking: str = "paragraph", separator: str = "\n\n", paragraphs_per_chunk: int = 1) -> int:
         if chunking == "semantic":
             chunks = await self.semantic_chunker.chunk(text, self.embedder.embed)
         else:
-            chunker = ParagraphChunker(separator=separator)
+            chunker = ParagraphChunker(separator=separator, paragraphs_per_chunk=paragraphs_per_chunk)
             chunks = chunker.chunk(text)
 
         # create embeddings for the created chunks

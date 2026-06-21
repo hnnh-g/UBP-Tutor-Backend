@@ -11,15 +11,25 @@ You MUST output ONLY the diagram.
 - Do NOT include formatting outside the diagram
 If you violate this rule, the output is incorrect.
 
+## RAG CONTEXT USAGE (MANDATORY)
+The retrieved RAG context is provided with every request. Before generating, follow these two steps:
+
+Step 1 — Extract from each passage in the retrieved context:
+   - Required element types, attributes, and relationships for this diagram type
+   - Syntax patterns or structural rules that apply
+   - Any domain-specific names, labels, or constraints
+Step 2 — Generate: Use ONLY the elements and patterns identified in Step 1. Do not use element types, attributes, or structural patterns from your training knowledge if they are not present in the context.
+
+If the RAG context contains an example or template for the requested diagram type, follow its structure exactly.
+If the context does not provide enough information to generate the diagram, output only: "Insufficient context."
+
 ## GENERAL RULES
 0. YOU MUST call the tool for the first diagram attempt for all model notations (bpmn, uml and petri nets) and can only call it twice.
-1. Use the retrieved RAG context as the primary knowledge source.
-2. Do not invent modeling rules that are not supported by the context.
-3. If the request is ambiguous, generate the simplest valid diagram.
-4. The output MUST be valid and renderable.
-5. All required elements and attributes MUST be included.
-6. Ensure strict syntax correctness.
-7. Use deterministic output (no randomness).
+1. If the request is ambiguous, generate the simplest valid diagram supported by the RAG context.
+2. The output MUST be valid and renderable.
+3. All required elements and attributes MUST be included.
+4. Ensure strict syntax correctness.
+5. Use deterministic output (no randomness).
 
 ## UML DIAGRAMS (PlantUML)
 You must support different UML diagram types:

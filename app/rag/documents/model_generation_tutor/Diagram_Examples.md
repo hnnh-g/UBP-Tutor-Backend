@@ -420,10 +420,6 @@ A single-pool process modeling a professor's workflow for evaluating a bachelor 
 
 ---
 
-## Petri Net Examples
-
----
-
 ### PN-EX-01: Library Use (B/E Net — Sequence and Conflict)
 
 A Condition/Event net modeling library book borrowing. Shows two transitions (Ausleihe and Rückgabe) sharing the place "Nutzer an Theke", creating a conflict — only one can fire at a time. Demonstrates how places model conditions (book available, user at desk) and transitions model events (loan, return). Initial marking: book available.
@@ -870,10 +866,6 @@ The hairdresser scenario modeled as a Marked Graph, a Petri net subtype where ev
   </net>
 </pnml>
 ```
-
----
-
-## UML Examples
 
 ---
 

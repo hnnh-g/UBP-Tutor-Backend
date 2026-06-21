@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 class Retriever:
 
-    def __init__(self, tutor_name: str, n_documents: int = 10, n_results: int = 2):
+    def __init__(self, tutor_name: str, n_documents: int = 10, n_results: int = 4):
         self.tutor_name = tutor_name
         self.n_documents = n_documents
         self.n_results = n_results
