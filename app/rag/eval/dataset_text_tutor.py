@@ -1,43 +1,43 @@
 dataset = [
     # --- BPMN: Modell-Evaluierung ---
     {
-        "question": "Bewerte die folgende Antwort: „Artefakte wie Gruppen und Text-Annotationen sind in BPMN essenziell, da sie den Kontrollfluss eines Prozesses verändern und steuern."",
+        "question": "Bewerte die folgende Antwort: „Artefakte wie Gruppen und Text-Annotationen sind in BPMN essenziell, da sie den Kontrollfluss eines Prozesses verändern und steuern",
         "ground_truth": "Die Antwort ist falsch. Artefakte beeinflussen den Kontrollfluss eines Prozesses nicht. Sie dienen vielmehr der reinen Dokumentation des Modells und stellen dem Leser zusätzliche Informationen bereit.",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Der Sequenzfluss wird in BPMN genutzt, um den Austausch von E-Mails und Nachrichten zwischen zwei völlig unabhängigen Unternehmen darzustellen."",
+        "question": "Bewerte die folgende Antwort: „Der Sequenzfluss wird in BPMN genutzt, um den Austausch von E-Mails und Nachrichten zwischen zwei völlig unabhängigen Unternehmen darzustellen.",
         "ground_truth": "Die Antwort ist falsch. Für den Austausch von Nachrichten zwischen verschiedenen Entitäten oder Teilnehmern wird der Nachrichtenfluss verwendet. Der Sequenzfluss definiert hingegen die zeitliche und logische Reihenfolge von Aktivitäten innerhalb eines Prozesses.",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Ein Ereignis (Event) in BPMN wird als Kreis dargestellt und kann entweder ein Startereignis, ein Zwischenereignis oder ein Endereignis sein."",
+        "question": "Bewerte die folgende Antwort: „Ein Ereignis (Event) in BPMN wird als Kreis dargestellt und kann entweder ein Startereignis, ein Zwischenereignis oder ein Endereignis sein.",
         "ground_truth": "Die Antwort ist richtig. Ein Event repräsentiert ein Ereignis innerhalb eines Geschäftsprozesses, wird als Kreis modelliert und es wird genau in diese drei Arten (Start, Zwischen, Ende) unterschieden, wobei Start- und Zwischenereignisse zusätzlich unterbrechend oder nicht-unterbrechend sein können.",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Der Nachrichtenfluss (Message Flow) wird in BPMN verwendet, um die strikte zeitliche Reihenfolge von Aktivitäten innerhalb eines einzelnen Pools zu definieren."",
+        "question": "Bewerte die folgende Antwort: „Der Nachrichtenfluss (Message Flow) wird in BPMN verwendet, um die strikte zeitliche Reihenfolge von Aktivitäten innerhalb eines einzelnen Pools zu definieren.",
         "ground_truth": "Die Antwort ist falsch. Der beschriebene Zweck trifft auf den Sequenzfluss zu. Der Nachrichtenfluss repräsentiert stattdessen den Austausch von Nachrichten zwischen verschiedenen Entitäten oder Teilnehmern (also über Pool-Grenzen hinweg).",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Ein Manueller Task (Manual Task) zeichnet sich dadurch aus, dass er von einem Benutzer zwingend mit IT-Unterstützung durchgeführt wird."",
+        "question": "Bewerte die folgende Antwort: „Ein Manueller Task (Manual Task) zeichnet sich dadurch aus, dass er von einem Benutzer zwingend mit IT-Unterstützung durchgeführt wird.",
         "ground_truth": "Die Antwort ist falsch. Ein Manueller Task wird per Definition ohne IT-Unterstützung durchgeführt. Ein Task, der von einem Benutzer mit IT-Unterstützung ausgeführt wird, ist stattdessen ein Benutzer-Task (User Task).",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Eine Text-Annotation ist ein steuerndes Element (Flow Object), das den Kontrollfluss eines Geschäftsprozesses direkt verändert und verzweigt."",
+        "question": "Bewerte die folgende Antwort: „Eine Text-Annotation ist ein steuerndes Element (Flow Object), das den Kontrollfluss eines Geschäftsprozesses direkt verändert und verzweigt.",
         "ground_truth": "Die Antwort ist falsch. Eine Text-Annotation gehört zu den Artefakten (Artifacts) und beeinflusst den Kontrollfluss nicht. Sie dient lediglich der Dokumentation und stellt dem Leser zusätzliche Informationen zum Modell bereit.",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Ja, ein Timer (Zeit-Ereignis) in BPMN kann verwendet werden, um auf periodische zeitliche Ereignisse, spezifische Zeitpunkte oder Zeitspannen zu reagieren."",
+        "question": "Bewerte die folgende Antwort: „Ja, ein Timer (Zeit-Ereignis) in BPMN kann verwendet werden, um auf periodische zeitliche Ereignisse, spezifische Zeitpunkte oder Zeitspannen zu reagieren.",
         "ground_truth": "Die Antwort ist richtig. Ein Timer in BPMN gehört zu den Ereignissen (Events) und wird exakt für die Abbildung von periodischen Ereignissen, bestimmten Zeitpunkten oder abgelaufenen Zeitspannen eingesetzt.",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Ja, ein Datenspeicher (Data Store) wird in BPMN verwendet, um Daten darzustellen, auf die ausschließlich innerhalb eines einzelnen Teilprozesses zugegriffen werden kann."",
+        "question": "Bewerte die folgende Antwort: „Ja, ein Datenspeicher (Data Store) wird in BPMN verwendet, um Daten darzustellen, auf die ausschließlich innerhalb eines einzelnen Teilprozesses zugegriffen werden kann.",
         "ground_truth": "Die Antwort ist falsch. Ein Datenspeicher repräsentiert einen Speicher, auf den explizit prozessübergreifend sowohl lesend als auch schreibend zugegriffen werden kann.",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Prozessfragmentierung in arbeitsteiligen Organisationen ist ein großer Vorteil, weil dadurch jeder Mitarbeiter die volle Verantwortung für den Gesamtprozess übernimmt und Warteschlangen bei der Übergabe vermieden werden."",
+        "question": "Bewerte die folgende Antwort: „Prozessfragmentierung in arbeitsteiligen Organisationen ist ein großer Vorteil, weil dadurch jeder Mitarbeiter die volle Verantwortung für den Gesamtprozess übernimmt und Warteschlangen bei der Übergabe vermieden werden.",
         "ground_truth": "Die Antwort ist falsch. Prozessfragmentierung führt in der Praxis oft genau zum Gegenteil: Es gibt häufig keine klar definierte Verantwortung für den Gesamtprozess, die Fehleranfälligkeit steigt durch die vielen Beteiligten, und die zahlreichen Übergaben zwischen den Stationen führen zu Warteschlangen und Verzögerungen.",
     },
     {
-        "question": "Bewerte die folgende Antwort: „Eine Aufruf-Aktivität (Call Activity) wird in BPMN verwendet, um einen lokalen Teilprozess darzustellen, der ausschließlich für dieses eine Diagramm gültig ist und nicht wiederverwendet werden kann."",
+        "question": "Bewerte die folgende Antwort: „Eine Aufruf-Aktivität (Call Activity) wird in BPMN verwendet, um einen lokalen Teilprozess darzustellen, der ausschließlich für dieses eine Diagramm gültig ist und nicht wiederverwendet werden kann.",
         "ground_truth": "Die Antwort ist falsch. Eine Aufruf-Aktivität repräsentiert einen Teilprozess oder eine Aufgabe, welche global definiert sind und eben genau deshalb im aktuellen Prozess wiederverwendet werden können. Ein normaler Teilprozess ist hingegen fest in den umgebenden Prozess eingebettet.",
     },
     # --- Petri-Netze ---
@@ -84,7 +84,7 @@ dataset = [
     # --- UML ---
     {
         "question": "Was ist der Unterschied zwischen einer Assoziation und einer Aggregation in UML-Klassendiagrammen?",
-        "ground_truth": "Eine Assoziation beschreibt eine allgemeine Beziehung zwischen Klassen ohne Besitzverhältnis. Eine Aggregation ist eine spezielle Form der Assoziation, die eine „Ganzes-Teil"-Beziehung darstellt, wobei die Teile unabhängig vom Ganzen existieren können.",
+        "ground_truth": "Eine Assoziation beschreibt eine allgemeine Beziehung zwischen Klassen ohne Besitzverhältnis. Eine Aggregation ist eine spezielle Form der Assoziation, die eine „Ganzes-Teil”-Beziehung darstellt, wobei die Teile unabhängig vom Ganzen existieren können.",
     },
     {
         "question": "Was ist Vererbung (Generalization) in UML?",
