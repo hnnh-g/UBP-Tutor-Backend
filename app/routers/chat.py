@@ -38,7 +38,10 @@ async def chat(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-    except Exception:
+    except Exception as e:
+        import traceback
+        print("CHAT ENDPOINT ERROR:")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail="Internal server error")
     
     finally: 

@@ -60,7 +60,7 @@ def validate_pnml(model_text: str) -> dict:
 ]
     if not pages:
         issues.append({
-            "severity": "error",
+            "severity": "warning",
             "code": "MISSING_PAGE",
             "message": "No <page> element was found.",
             "suggestion": "Add a <page> element inside <net>.",
@@ -161,73 +161,70 @@ def validate_pnml(model_text: str) -> dict:
                 "suggestion": "Petri-net arcs must connect place → transition or transition → place.",
             })
 
-        # check for duplicate IDs
-        all_ids_list = []
-        
-        for element in places + transitions + arcs:
-            element_id = element.get("id")
-            if element_id:
-                all_ids_list.append(element_id)
-
-        seen_ids = set()
-        duplicate_ids = set()
-
-        for element_id in all_ids_list:
-            if element_id in seen_ids:
-                duplicate_ids.add(element_id)
-            else:
-                seen_ids.add(element_id)
-
-        for duplicate_id in duplicate_ids:
-            issues.append({
-                "severity": "error",
-                "code": "DUPLICATE_ID",
-                "message": f"The id '{duplicate_id}' is used more than once.",
-                "suggestion": "Use unique ids for all places, transitions, and arcs.",
-            })
-
         # check missing arc IDs
-        arc_id = arc.get("id")
-
-        if not arc_id:
+        if not arc.get("id"):
             issues.append({
-                "severity": "error",
+                "severity": "warning",
                 "code": "ARC_MISSING_ID",
                 "message": "An arc is missing an id attribute.",
                 "suggestion": "Add a unique id to every <arc>, for example id='A1'.",
             })
-            arc_id = "unknown"
 
-        # check isolated nodes (places or transitions) and produce a warning message
-        connected_node_ids = set()
+    # check for duplicate IDs - once for the whole model, not once per arc
+    all_ids_list = []
 
-        for arc in arcs:
-            source = arc.get("source")
-            target = arc.get("target")
+    for element in places + transitions + arcs:
+        element_id = element.get("id")
+        if element_id:
+            all_ids_list.append(element_id)
 
-            if source:
-                connected_node_ids.add(source)
+    seen_ids = set()
+    duplicate_ids = set()
 
-            if target:
-                connected_node_ids.add(target)
+    for element_id in all_ids_list:
+        if element_id in seen_ids:
+            duplicate_ids.add(element_id)
+        else:
+            seen_ids.add(element_id)
 
-        for place_id in place_ids:
-            if place_id not in connected_node_ids:
-                issues.append({
-                    "severity": "warning",
-                    "code": "ISOLATED_PLACE",
-                    "message": f"Place '{place_id}' is not connected to any arc.",
-                    "suggestion": "Connect the place to a transition if it belongs to the Petri net behavior.",
-                })
+    for duplicate_id in duplicate_ids:
+        issues.append({
+            "severity": "error",
+            "code": "DUPLICATE_ID",
+            "message": f"The id '{duplicate_id}' is used more than once.",
+            "suggestion": "Use unique ids for all places, transitions, and arcs.",
+        })
 
-        for transition_id in transition_ids:
-            if transition_id not in connected_node_ids:
-                issues.append({
-                    "severity": "warning",
-                    "code": "ISOLATED_TRANSITION",
-                    "message": f"Transition '{transition_id}' is not connected to any arc.",
-                    "suggestion": "Connect the transition to at least one place.",
-                }) 
+    # check isolated nodes (places or transitions) and produce a warning message
+    connected_node_ids = set()
+
+    for arc in arcs:
+        source = arc.get("source")
+        target = arc.get("target")
+
+        if source:
+            connected_node_ids.add(source)
+
+        if target:
+            connected_node_ids.add(target)
+
+    for place_id in place_ids:
+        if place_id not in connected_node_ids:
+            issues.append({
+                "severity": "error",
+                "code": "ISOLATED_PLACE",
+                "message": f"Place '{place_id}' is not connected to any arc.",
+                "suggestion": "Connect the place to a transition if it belongs to the Petri net behavior.",
+            })
+
+    for transition_id in transition_ids:
+        if transition_id not in connected_node_ids:
+            issues.append({
+                "severity": "error",
+                "code": "ISOLATED_TRANSITION",
+                "message": f"Transition '{transition_id}' is not connected to any arc.",
+                "suggestion": "Connect the transition to at least one place.",
+            })
 
     return {
         "valid": not any(issue["severity"] == "error" for issue in issues),

@@ -15,23 +15,7 @@ logger = logging.getLogger(__name__)
 
 MAX_VALIDATION_ATTEMPTS = 2
 
-def validate_and_exit_if_valid(model_text: str, tool_context):
-    attempt = tool_context.state.get("validation_attempts", 0) + 1
-    tool_context.state["validation_attempts"] = attempt
-    logger.info("Validation attempt %d/%d (model length: %d chars)", attempt, MAX_VALIDATION_ATTEMPTS, len(model_text))
-
-    result = validate_model_syntax(strip_bpmndi(model_text))
-
-    if result["valid"]:
-        logger.info("Model is valid — saving to session state and escalating")
-        tool_context.state["generated_model"] = model_text
-        tool_context.actions.escalate = True
-    elif attempt >= MAX_VALIDATION_ATTEMPTS:
-        logger.warning("Max validation attempts reached — escalating without valid model")
-        tool_context.actions.escalate = True
-    else:
-        logger.info("Model is invalid — LLM will retry")
-    return result
+# NOTE: the syntax check is deliberately NOT exposed as an LLM tool.
 
 class ModelGenerationAgent:
     def __init__(self):
@@ -44,12 +28,12 @@ class ModelGenerationAgent:
                 model="openai/model-generation",
                 api_base=settings.vllm_model_generation_url,
                 api_key="EMPTY",
+                extra_body={"stop": ["</s>"]},
             ),
             instruction=MODEL_GENERATION_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
                 temperature=0.1
-            ),
-            tools=[validate_and_exit_if_valid]
+            )
         )
 
         # 2 define Loop Agent 
@@ -77,11 +61,16 @@ class ModelGenerationAgent:
             session_service=self.session_service,
         )
 
-    def build_prompt(self, message: str, rag_context: str | None = None) -> str:
-        return f"""
-        Retrieved RAG context: {rag_context or "No retrieved context provided."}
-        Student question: {message}
-        """
+    def build_prompt(self, message: str, rag_context: str | None = None, correction: str | None = None) -> str:
+        # Mirrors the fine-tuning format:
+        BPMN_DIRECTIVE = "Create a BPMN process diagram."
+        directive = BPMN_DIRECTIVE if "bpmn" in message.lower() else message.strip()
+        parts = [directive, "", "### Input:", message.strip()]
+        if rag_context:
+            parts += ["", f"Retrieved RAG context (follow its syntax patterns and reuse its domain names where they apply): {rag_context}"]
+        if correction:
+            parts += ["", correction]
+        return "\n".join(parts)
     
     # create conversation session for tutor and student
     async def ensure_session(self, user_id: str, session_id: str) -> None:
@@ -95,36 +84,61 @@ class ModelGenerationAgent:
             # TODO: handle session that already exists
             pass
 
-    async def generate_response(self, message: str, user_context, metadata: dict | None = None, rag_context: str | None = None) -> str:
+    async def generate_response(self, message: str, user_context, session_id: str, metadata: dict | None = None, rag_context: str | None = None) -> str:
         user_id = getattr(user_context, "sub", "anonym")
-        session_id = str(uuid.uuid4())
-
         await self.ensure_session(user_id, session_id)
 
-        prompt = self.build_prompt(message, rag_context)
-        adk_message = types.Content(
-            role="user",
-            parts=[types.Part(text=prompt)]
-        )
+        base_prompt = self.build_prompt(message, rag_context)
+        prompt = base_prompt
+        last_text = ""
 
-        try:
-            async for _ in self.runner.run_async(
-                user_id=user_id,
-                session_id=session_id,
-                new_message=adk_message
-            ):
-                pass
-        except ValueError as e:
-            logger.warning("Runner raised ValueError: %s", e)
+        for attempt in range(1, MAX_VALIDATION_ATTEMPTS + 1):
+            # a fresh session per attempt keeps each retry independent
+            session_id = str(uuid.uuid4())
+            await self.ensure_session(user_id, session_id)
 
-        session = await self.session_service.get_session(
-            app_name=self.app_name,
-            user_id=user_id,
-            session_id=session_id
+            adk_message = types.Content(
+                role="user",
+                parts=[types.Part(text=prompt)]
+            )
+
+            # collect the model's text output - this is the diagram itself
+            text = ""
+            try:
+                async for event in self.runner.run_async(
+                    user_id=user_id,
+                    session_id=session_id,
+                    new_message=adk_message
+                ):
+                    if event.content and event.content.parts:
+                        for part in event.content.parts:
+                            if part.text:
+                                text += part.text
+            except ValueError as e:
+                logger.warning("Runner raised ValueError: %s", e)
+
+            last_text = text.strip()
+            result = validate_model_syntax(strip_bpmndi(last_text))
+            logger.info(
+                "Validation attempt %d/%d: valid=%s (model length: %d chars)",
+                attempt, MAX_VALIDATION_ATTEMPTS, result.get("valid"), len(last_text)
+            )
+
+            if result.get("valid"):
+                logger.info("Model generation succeeded (%d chars)", len(last_text))
+                return last_text
+
+            # feed the syntax errors back so the next attempt can correct itself
+            correction = "\n".join([
+                "The previous attempt was invalid.",
+                f"syntax error: {result.get('issues')}",
+                f"previous attempt: {last_text}",
+                "Please correct the diagram.",
+            ])
+            prompt = self.build_prompt(message, rag_context, correction=correction)
+
+        logger.warning(
+            "Model generation produced no valid model after %d attempt(s)",
+            MAX_VALIDATION_ATTEMPTS
         )
-        result = session.state.get("generated_model", "")
-        if result:
-            logger.info("Model generation succeeded (%d chars)", len(result))
-        else:
-            logger.warning("Model generation produced no valid model after %d attempt(s)", session.state.get("validation_attempts", 0))
-        return result
+        return last_text

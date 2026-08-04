@@ -1,3 +1,5 @@
+import uuid
+
 from app.orchestration.models import OrchestrationResponse
 from app.agents.text_tutoring_agent import TextTutoringAgent
 from app.agents.model_generation_agent import ModelGenerationAgent
@@ -15,6 +17,7 @@ class TextTutoringWorkflow:
         async for token in self.agent.stream_response(
             message=request.message,
             user_context=request.user_context,
+            session_id=request.session_id or str(uuid.uuid4()),
             metadata=request.metadata,
             rag_context=rag_context
         ):
@@ -34,6 +37,7 @@ class ModelGenerationWorkflow:
         rag_context = await self.retriever.retrieve(request.message)
         content = await self.agent.generate_response(message=request.message,
             user_context=request.user_context,
+            session_id=request.session_id,
             metadata=request.metadata, rag_context=rag_context)
 
         return OrchestrationResponse(
@@ -53,7 +57,7 @@ class ModelEvaluationWorkflow:
         rag_context = await self.retriever.retrieve(request.message)
         rag_used = bool(rag_context.strip())
         async for token in self.agent.stream_response(message=request.message,
-            user_context=request.user_context,
+            user_context=request.user_context, session_id=request.session_id or str(uuid.uuid4()),
             metadata=request.metadata,rag_context=rag_context):
             yield {
                 "event": "token",
