@@ -23,7 +23,7 @@ class ModelEvaluationAgent:
                 model="openai/model-evaluation",
                 api_base=settings.vllm_model_evaluation_url,
                 api_key="EMPTY",
-                extra_body={"repetition_penalty": 1.1},
+                extra_body={"repetition_penalty": 1.1, "stop": ["</s>"]},
             ),
             instruction=MODEL_EVALUATION_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
@@ -50,14 +50,29 @@ class ModelEvaluationAgent:
         )
 
     def build_prompt(self, message: str, rag_context: str | None = None) -> str:
+        # The prompt mirrors the fine-tuning format:
         logger.info("Running syntax check on student model (%d chars)", len(message))
         syntax_result = validate_model_syntax(message)
-        model_for_llm = strip_bpmndi(message)
-        return f"""
-        Retrieved RAG context: {rag_context or "No retrieved context provided."}
-        Syntax validation result: {syntax_result}
-        Student's model: {model_for_llm}
-        """
+        model_for_llm = strip_bpmndi(message).strip()
+
+        # every training example had a fenced code block as input
+        if not model_for_llm.startswith("```"):
+            model_for_llm = f"```\n{model_for_llm}\n```"
+
+        rag_line = (
+            f"Retrieved RAG context: {rag_context}\n"
+            if rag_context and rag_context.strip() else ""
+        )
+
+        return (
+            "Evaluate the following diagram. Identify modeling errors and give suggestions in how to improve the diagram.\n"
+            "\n"
+            f"Syntax check (additional Information): {syntax_result}\n"
+            f"{rag_line}"
+            "\n"
+            "### Input:\n"
+            f"{model_for_llm}"
+        )
     
     # create conversation session for tutor and student
     async def ensure_session(self, user_id: str, session_id: str) -> None:
@@ -71,15 +86,9 @@ class ModelEvaluationAgent:
             # TODO: handle session that already exists
             pass
 
-    async def stream_response(self, message: str, user_context, metadata: dict | None = None, rag_context: str | None = None):
+    async def stream_response(self, message: str, user_context,session_id: str, metadata: dict | None = None, rag_context: str | None = None):
         user_id = getattr(user_context, "sub", "anonym")
-        session_id = (
-            metadata.get("session:id")
-            if metadata and metadata.get("session_id")
-            else "default"
-        )
-        logger.info("Starting evaluation — user=%s session=%s", user_id, session_id)
-
+        user_id = getattr(user_context, "sub", "anonym")
         await self.ensure_session(user_id, session_id)
         prompt = self.build_prompt(message, rag_context)
 

@@ -18,7 +18,7 @@ class TextTutoringAgent:
                 model="openai/text-tutor",
                 api_base=settings.vllm_text_tutor_url,
                 api_key="EMPTY",
-                extra_body={"repetition_penalty": 1.1},
+                extra_body={"repetition_penalty": 1.1, "stop": ["</s>"]},
             ),
             instruction=TEXT_TUTORING_SYSTEM_PROMPT,
             generate_content_config=types.GenerateContentConfig(
@@ -45,10 +45,13 @@ class TextTutoringAgent:
         )
 
     def build_prompt(self, message: str, rag_context: str | None = None) -> str:
-        return f"""
-        Retrieved RAG context: {rag_context or "No retrieved context provided."}
-        Student question: {message}
-        """
+        if not rag_context or not rag_context.strip():
+            return message.strip()
+        return "\n".join([
+            message.strip(),
+            "",
+            f"Retrieved RAG context: {rag_context.strip()}",
+        ])
     
     # create conversation session for tutor and student
     async def ensure_session(self, user_id: str, session_id: str) -> None:
@@ -62,14 +65,8 @@ class TextTutoringAgent:
             # TODO: handle session that already exists
             pass
 
-    async def stream_response(self, message: str, user_context, metadata: dict | None = None, rag_context: str | None = None):
+    async def stream_response(self, message: str, user_context, session_id: str, metadata: dict | None = None, rag_context: str | None = None):
         user_id = getattr(user_context, "sub", "anonym")
-        session_id = (
-            metadata.get("session:id")
-            if metadata and metadata.get("session_id")
-            else "default"
-        )
-
         await self.ensure_session(user_id, session_id)
         prompt = self.build_prompt(message, rag_context)
 
