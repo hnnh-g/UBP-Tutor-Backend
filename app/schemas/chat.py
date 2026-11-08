@@ -8,7 +8,7 @@ class TaskType(str, Enum):
     MODEL_EVALUATION = "model_evaluation"
     SUMMARY = "summary"
     QUESTION_GENERATION = "question_generation"
-    ANWER_EVALUATION = "answer_evaluation"
+    ANSWER_EVALUATION = "answer_evaluation"
 
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1)
