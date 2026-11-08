@@ -12,7 +12,8 @@ class TaskRouter:
             TaskType.SUMMARY: TextTutoringWorkflow(),
             TaskType.QUESTION_GENERATION: TextTutoringWorkflow(),
             TaskType.MODEL_EVALUATION: ModelEvaluationWorkflow(),
-            TaskType.MODEL_GENERATION: ModelGenerationWorkflow()
+            TaskType.MODEL_GENERATION: ModelGenerationWorkflow(),
+            TaskType.ANSWER_EVALUATION: TextTutoringWorkflow(),
             
         }
 

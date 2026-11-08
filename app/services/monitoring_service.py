@@ -46,7 +46,7 @@ class MonitorService:
         active_model = settings.active_model
 
         available_agents = [
-            AgentInfo(name="TextTutoringAgent", task_types=["question", "summary", "question_generation"]),
+            AgentInfo(name="TextTutoringAgent", task_types=["question", "summary", "question_generation", "answer_evaluation"]),
             AgentInfo(name="ModelGenerationAgent", task_types=["model_generation"]),
             AgentInfo(name="ModelEvaluationAgent", task_types=["model_evaluation"])
         ]
