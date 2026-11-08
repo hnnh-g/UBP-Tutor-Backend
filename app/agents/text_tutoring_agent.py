@@ -44,13 +44,10 @@ class TextTutoringAgent:
             session_service=self.session_service,
         )
 
-    def build_prompt(self, message: str, rag_context: str | None = None) -> str:
-        if not rag_context or not rag_context.strip():
-            return message.strip()
+    def build_prompt(self, message: str) -> str:
         return "\n".join([
             message.strip(),
             "",
-            f"Retrieved RAG context: {rag_context.strip()}",
         ])
     
     # create conversation session for tutor and student
@@ -65,10 +62,10 @@ class TextTutoringAgent:
             # TODO: handle session that already exists
             pass
 
-    async def stream_response(self, message: str, user_context, session_id: str, metadata: dict | None = None, rag_context: str | None = None):
+    async def stream_response(self, message: str, user_context, session_id: str, metadata: dict | None = None):
         user_id = getattr(user_context, "sub", "anonym")
         await self.ensure_session(user_id, session_id)
-        prompt = self.build_prompt(message, rag_context)
+        prompt = self.build_prompt(message)
 
         # create structured message object
         adk_message = types.Content(

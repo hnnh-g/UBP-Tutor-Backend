@@ -12,14 +12,12 @@ class TextTutoringWorkflow:
         self.retriever = Retriever("text_tutor")
     
     async def stream(self, request):
-        rag_context = await self.retriever.retrieve(request.message)
-        rag_used = bool(rag_context.strip())
+        rag_used = bool('false')
         async for token in self.agent.stream_response(
             message=request.message,
             user_context=request.user_context,
             session_id=request.session_id or str(uuid.uuid4()),
-            metadata=request.metadata,
-            rag_context=rag_context
+            metadata=request.metadata
         ):
             yield {
                 "event": "token",
